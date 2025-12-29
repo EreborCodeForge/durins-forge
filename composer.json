@@ -1,0 +1,61 @@
+{
+  "name": "ereborcodeforge/durins-forge",
+  "description": "Durin’s Forge is the official framework and project forger built atop MithrilPHP — crafting applications using Clean Architecture",
+  "type": "project",
+  "license": "MIT",
+  "keywords": [
+    "php",
+    "framework",
+    "installer",
+    "scaffolding",
+    "clean-architecture",
+    "api",
+    "mithrilphp",
+    "erebor",
+    "durin"
+  ],
+  "homepage": "https://github.com/EreborCodeForge/durins-forge",
+  "support": {
+    "source": "https://github.com/EreborCodeForge/durins-forge",
+    "issues": "https://github.com/EreborCodeForge/durins-forge/issues"
+  },
+  "authors": [
+    {
+      "name": "Thales Ruppenthal",
+      "email": "thales.rup@gmail.com"
+    }
+  ],
+
+  "require": {
+    "php": "^8.3",
+    "ereborcodeforge/mithrilphp": "^1.0"
+  },
+
+  "autoload": {
+    "psr-4": {
+      "App\\": "src/"
+    }
+  },
+
+  "autoload-dev": {
+    "psr-4": {
+      "App\\Tests\\": "tests/"
+    }
+  },
+
+  "bin": [
+    "bin/durins-forge"
+  ],
+
+  "scripts": {
+    "test": "phpunit"
+  },
+
+  "minimum-stability": "stable",
+  "prefer-stable": true,
+
+  "config": {
+    "sort-packages": true,
+    "optimize-autoloader": true
+  }
+}
