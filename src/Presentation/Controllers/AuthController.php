@@ -9,18 +9,21 @@ use App\Application\DTOs\Auth\RegisterDTO;
 use App\Application\UseCases\Auth\LoginUseCaseInterface;
 use App\Application\UseCases\Auth\RegisterUseCaseInterface;
 use App\Application\Validation\Validator;
-use App\Core\Http\Request;
-use App\Core\Http\Response;
+use App\Infrastructure\Session\SessionManager;
+use Erebor\Mithril\Http\HttpContext;
+use Erebor\Mithril\Http\Response;
 
 class AuthController
 {
     public function __construct(
         private LoginUseCaseInterface $loginUseCase,
-        private RegisterUseCaseInterface $registerUseCase
+        private RegisterUseCaseInterface $registerUseCase,
+        private SessionManager $sessionManager
     ) {}
 
-    public function login(Request $request): Response
+    public function login(HttpContext $context): Response
     {
+        $request = $context->request;
         $data = $request->body;
         (new Validator())->validate($data, [
             'email' => 'required|email',
@@ -34,11 +37,22 @@ class AuthController
         
         $result = $this->loginUseCase->execute($dto);
 
+        // Store token in session
+        if (isset($result['token'])) {
+            $this->sessionManager->regenerate();
+            $this->sessionManager->put('auth_token', $result['token']);
+            
+            if (isset($result['user'])) {
+                $this->sessionManager->put('user', $result['user']);
+            }
+        }
+
         return (new Response())->json($result);
     }
 
-    public function register(Request $request): Response
+    public function register(HttpContext $httpContext): Response
     {
+        $request = $httpContext->request;
         $data = $request->body;
         (new Validator())->validate($data, [
             'name' => 'required|min:3',

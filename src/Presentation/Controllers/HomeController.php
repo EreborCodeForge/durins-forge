@@ -4,15 +4,20 @@ declare(strict_types=1);
 
 namespace App\Presentation\Controllers;
 
-use App\Core\Http\Request;
-use App\Core\Http\Response;
-use App\Infrastructure\View\VueEngine;
+use App\Infrastructure\Bridge\VueViewHandler;
+use Erebor\Mithril\Http\HttpContext;
+use Erebor\Mithril\Http\Response;
 
 class HomeController
 {
-    public function index(Request $request): Response
+    public function __construct(
+        private VueViewHandler $vue
+    ) {}
+
+    public function index(HttpContext $context): Response
     {
-        $html = (new VueEngine())->render('/views/layouts/vue/index.php');
-        return Response::html($html);
+        return $this->vue->render('Welcome', [
+            'message' => 'The Forge is Ready.'
+        ]);
     }
 }

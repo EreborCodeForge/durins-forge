@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Erebor\Mithril\Core\Environment;
+use Erebor\Mithril\Environment;
 
 return [
     /*

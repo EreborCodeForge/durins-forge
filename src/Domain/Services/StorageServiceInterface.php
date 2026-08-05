@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Services;
 
-use App\Core\Http\UploadedFile;
+use Erebor\Mithril\Http\UploadedFile;
 
 interface StorageServiceInterface
 {

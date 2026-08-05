@@ -1,0 +1,5 @@
+# Force LF for shell/CLI entrypoints (WSL/Git Bash shebang)
+bin/* text eol=lf
+scripts/*.php text eol=lf
+docker/*.sh text eol=lf
+*.sh text eol=lf

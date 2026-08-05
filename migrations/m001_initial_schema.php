@@ -2,17 +2,25 @@
 
 declare(strict_types=1);
 
-use Erebor\Mithril\Core\Migration;
+use App\Infrastructure\Database\Migrations\BaseMigration;
 
-return new class extends Migration
+return new class extends BaseMigration
 {
     public function up(): void
     {
-        $driver = $this->db->getAttribute(PDO::ATTR_DRIVER_NAME);
+        $driver = $this->db->getAttribute(\PDO::ATTR_DRIVER_NAME);
         
-        $autoIncrement = $driver === 'sqlite' ? 'INTEGER PRIMARY KEY AUTOINCREMENT' : 'INT AUTO_INCREMENT PRIMARY KEY';
-        $timestamp = $driver === 'sqlite' ? 'DATETIME DEFAULT CURRENT_TIMESTAMP' : 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP';
-        $updateTimestamp = $driver === 'sqlite' ? 'DATETIME DEFAULT CURRENT_TIMESTAMP' : 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP';
+        $autoIncrement = $driver === 'sqlite' 
+            ? 'INTEGER PRIMARY KEY AUTOINCREMENT' 
+            : 'INT AUTO_INCREMENT PRIMARY KEY';
+        
+        $timestamp = $driver === 'sqlite' 
+            ? 'DATETIME DEFAULT CURRENT_TIMESTAMP' 
+            : 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP';
+        
+        $updateTimestamp = $driver === 'sqlite' 
+            ? 'DATETIME DEFAULT CURRENT_TIMESTAMP' 
+            : 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP';
 
         $this->db->exec("CREATE TABLE IF NOT EXISTS users (
             id $autoIncrement,

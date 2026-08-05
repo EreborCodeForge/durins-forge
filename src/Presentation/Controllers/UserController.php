@@ -12,8 +12,8 @@ use App\Application\UseCases\User\GetUserUseCase;
 use App\Application\UseCases\User\ListUsersUseCase;
 use App\Application\UseCases\User\UpdateUserUseCase;
 use App\Application\Validation\Validator;
-use App\Core\Http\Request;
-use App\Core\Http\Response;
+use Erebor\Mithril\Http\HttpContext;
+use Erebor\Mithril\Http\Response;
 use App\Domain\Enums\UserRole;
 
 class UserController
@@ -26,21 +26,22 @@ class UserController
         private DeleteUserUseCase $deleteUserUseCase
     ) {}
 
-    public function index(Request $request): Response
+    public function index(HttpContext $context): Response
     {
         $users = $this->listUsersUseCase->execute();
         return (new Response())->json($users);
     }
 
-    public function show(Request $request, array $params): Response
+    public function show(HttpContext $context, array $params): Response
     {
         $id = (int)$params['id'];
         $user = $this->getUserUseCase->execute($id);
         return (new Response())->json($user);
     }
 
-    public function store(Request $request): Response
+    public function store(HttpContext $context): Response
     {
+        $request = $context->request;
         $data = $request->body;
 
         (new Validator())->validate($data, [
@@ -62,9 +63,10 @@ class UserController
         return (new Response())->json($user, 201);
     }
 
-    public function update(Request $request, array $params): Response
+    public function update(HttpContext $context, array $params): Response
     {
         $id = (int)$params['id'];
+        $request = $context->request;
         $data = $request->body;
 
         (new Validator())->validate($data, [
@@ -86,7 +88,7 @@ class UserController
         return (new Response())->json($user);
     }
 
-    public function delete(Request $request, array $params): Response
+    public function delete(HttpContext $context, array $params): Response
     {
         $id = (int)$params['id'];
         $this->deleteUserUseCase->execute($id);

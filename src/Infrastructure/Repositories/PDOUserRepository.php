@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Repositories;
 
-use App\Core\Database;
 use App\Domain\Entities\User;
 use App\Domain\Enums\UserRole;
 use App\Domain\Repositories\UserRepositoryInterface;
@@ -16,9 +15,9 @@ class PDOUserRepository implements UserRepositoryInterface
 {
     private PDO $db;
 
-    public function __construct()
+    public function __construct(PDO $db)
     {
-        $this->db = Database::getConnection();
+        $this->db = $db;
     }
 
     public function findByEmail(string $email): ?User
