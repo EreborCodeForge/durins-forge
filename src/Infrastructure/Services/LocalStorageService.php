@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Services;
 
-use App\Core\Http\UploadedFile;
 use App\Domain\Services\StorageServiceInterface;
 use App\Infrastructure\Exceptions\InfrastructureException;
+use Erebor\Mithril\Http\UploadedFile;
 
 class LocalStorageService implements StorageServiceInterface
 {

@@ -1,0 +1,21 @@
+# Eregion Application Server — aligned with Eregion v0.1.0 fileConfig
+# Omitted keys use binary defaults. Do not use a top-level `worker:` key.
+
+version: "1"
+
+server:
+  host: "0.0.0.0"
+  port: 8080
+
+php:
+  binary: "php"
+  worker_script: "public/index.php"
+  working_directory: "."
+
+workers:
+  count: 4
+  max_requests: 10000
+  memory_limit_mb: 256
+
+socket:
+  directory: "var/runtime"

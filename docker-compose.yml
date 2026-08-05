@@ -1,0 +1,62 @@
+services:
+  app-live:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: durins-live
+    environment:
+      CONTAINER_MODE: live
+      APP_ENV: production
+      APP_DEBUG: "false"
+      APP_URL: http://localhost:8082
+      DB_CONNECTION: sqlite
+      DB_FILE: database.sqlite
+      PORT: "8080"
+    ports:
+      - "8082:8080"
+    healthcheck:
+      test: ["CMD", "php", "-r", "exit(@file_get_contents('http://127.0.0.1:8080/api/health') && str_contains(@file_get_contents('http://127.0.0.1:8080/api/health'), 'ok') ? 0 : 1);"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+  app-compiled:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: durins-compiled
+    environment:
+      CONTAINER_MODE: compiled
+      APP_ENV: production
+      APP_DEBUG: "false"
+      APP_URL: http://localhost:8081
+      DB_CONNECTION: sqlite
+      DB_FILE: database.sqlite
+      PORT: "8080"
+    ports:
+      - "8081:8080"
+    healthcheck:
+      test: ["CMD", "php", "-r", "exit(@file_get_contents('http://127.0.0.1:8080/api/health') && str_contains(@file_get_contents('http://127.0.0.1:8080/api/health'), 'ok') ? 0 : 1);"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+  bench:
+    image: php:8.3-cli-bookworm
+    profiles: ["bench"]
+    working_dir: /bench
+    volumes:
+      - ./docker/bench.php:/bench/bench.php:ro
+    depends_on:
+      app-live:
+        condition: service_healthy
+      app-compiled:
+        condition: service_healthy
+    entrypoint: ["php", "/bench/bench.php"]
+    environment:
+      LIVE_URL: http://app-live:8080/api/health
+      COMPILED_URL: http://app-compiled:8080/api/health
+      BENCH_REQUESTS: "300"
+      BENCH_WARMUP: "30"

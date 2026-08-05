@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Presentation\Controllers;
 
-use App\Core\Http\Response;
+use Erebor\Mithril\Http\Response;
 
 class HealthCheckController
 {
@@ -13,7 +13,7 @@ class HealthCheckController
         return (new Response())->json([
             'status' => 'ok',
             'timestamp' => time(),
-            'service' => 'AppMarket API',
+            'service' => 'Durin\'s Forge API',
             'version' => '1.0.2'
         ]);
     }
