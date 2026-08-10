@@ -107,6 +107,19 @@ Ajuste carga: `make bench BENCH_REQUESTS=500 BENCH_WARMUP=50`.
 - **Database (PDO)** e **Cache** são registrados como singletons; a conexão/instância só é criada no primeiro uso. Rotas que não usam DB nem cache não pagam esse custo.
 - **VueViewHandler** e **Session** só são resolvidos quando uma rota web renderiza view; rotas de API não instanciam esses serviços.
 
+### 7. HTTP Response Cache (L1/L2)
+
+Middleware `ResponseCacheMiddleware` + attribute `#[CacheResponse]` cacheiam o **Response** (nunca o Request). Em rotas privadas:
+
+1. **`AuthMiddleware` primeiro** — valida e grava `auth.user_id` no `HttpContext`
+2. **`ResponseCacheMiddleware` depois** — chave com `vary: user` (sem identity → BYPASS, sem HIT compartilhado)
+
+Eficiência real: chave correta + L1 in-memory no worker warm (Eregion) + L2 (`CacheInterface`/FileCache) + TTL/tags. Header de diagnóstico: `X-Durin-Cache: HIT|MISS|BYPASS`.
+
+Config: `config/cache.php` → `http_response`. Demo: `GET /api/products` (público) e `GET /api/products/secure` (Auth + private).
+
+Após mudar bindings/rotas: `php bin/durin optimize`.
+
 ## Recomendações
 
 ### OPcache (PHP)
@@ -146,5 +159,6 @@ Para testar o fast path com muitas conexões, use um servidor com múltiplos wor
 | Fast path `/api/health`        | Máximo throughput e latência mínima                                   |
 | `config:cache` em produção     | Menos I/O e menos chamadas a `Environment`                            |
 | `container:compile` em produção | Uso de `Container::loadCompiled()` — sem providers em runtime        |
+| Response cache (Auth→Cache)    | Evita reexecução do controller; L1 worker + L2 file; vary por user   |
 | OPcache                       | Bytecode em memória, menos parsing                                      |
 | PHP-FPM / RoadRunner / Swoole | Concorrência real, mais req/s                                          |

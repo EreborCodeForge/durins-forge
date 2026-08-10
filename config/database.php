@@ -77,5 +77,25 @@ return [
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             ],
         ],
+
+        /*
+        | Real remote MySQL for I/O bench (GET /api/benchmark/data).
+        | Keep credentials in .env — never commit secrets.
+        */
+        'benchmark' => [
+            'driver' => 'mysql',
+            'host' => Environment::get('DB_BENCHMARK_HOST', '127.0.0.1'),
+            'port' => (int) Environment::get('DB_BENCHMARK_PORT', '3306'),
+            'dbname' => Environment::get('DB_BENCHMARK_DATABASE', 'benchmark'),
+            'user' => Environment::get('DB_BENCHMARK_USERNAME', ''),
+            'password' => Environment::get('DB_BENCHMARK_PASSWORD', ''),
+            'charset' => Environment::get('DB_BENCHMARK_CHARSET', 'utf8mb4'),
+            'options' => [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES => false,
+                PDO::ATTR_TIMEOUT => 5,
+            ],
+        ],
     ],
 ];

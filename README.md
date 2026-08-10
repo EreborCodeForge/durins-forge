@@ -29,7 +29,7 @@ php bin/durin migrate
 
 - `ereborcodeforge/mithrilphp:^2.1`
 - `extra.mithril.kernel = App\\Kernel`
-- `extra.mithril.eregion = v0.1.0`
+- `extra.mithril.eregion = v0.3.0`
 
 ---
 
