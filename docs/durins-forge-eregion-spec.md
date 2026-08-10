@@ -8,7 +8,7 @@
 | Camada | Pacote / binário | Papel |
 |--------|------------------|-------|
 | Engine | `ereborcodeforge/mithrilphp` ^2.1 | Worker, DI, HTTP, Forge CLI, bridge Eregion |
-| Server | Eregion Go `v0.1.0+` (protocol `eregion/1`) | HTTP público, pool, UDS, recycle |
+| Server | Eregion Go `v0.3.0+` (protocol `eregion/1`) | HTTP público, pool, UDS, recycle |
 | Framework | **Durin’s Forge** (este documento) | App skeleton, Kernel, rotas, compile, DX |
 
 Contratos irmãos:
@@ -122,7 +122,7 @@ Regras:
   "extra": {
     "mithril": {
       "kernel": "App\\Kernel",
-      "eregion": "v0.1.0"
+      "eregion": "v0.3.0"
     }
   }
 }
@@ -250,7 +250,7 @@ vendor/bin/forge serve:php --port=8000
   "extra": {
     "mithril": {
       "kernel": "App\\Kernel",
-      "eregion": "v0.1.0",
+      "eregion": "v0.3.0",
       "eregion_repo": "EreborCodeForge/eregion"
     }
   }
@@ -261,10 +261,10 @@ vendor/bin/forge serve:php --port=8000
 
 ```bash
 vendor/bin/forge server:install
-# overrides: EREGION_VERSION, EREGION_BINARY, --version=v0.1.0
+# overrides: EREGION_VERSION, EREGION_BINARY, --version=v0.3.0
 vendor/bin/forge server:version
 # esperado:
-#   eregion 0.1.0
+#   eregion 0.3.0
 #   protocol eregion/1
 ```
 
@@ -311,12 +311,14 @@ Volume **não** precisa expor `public/` para o Go se Eregion fala só com worker
 | Evento | Comportamento |
 |--------|----------------|
 | HTTP 500 da app | Worker **permanece** vivo |
-| `max_requests` / memory | `meta.recycle=true` + exit `10` → Eregion troca processo sem crash penalty |
+| `max_requests` (Go) | Eregion conta requests sozinho e recicla o processo |
+| memory / `meta.recycle` (PHP) | Continuar enviando `memory_usage` e `meta.recycle` quando fizer sentido; exit `10` no recycle planejado |
+| `requests_handled` (PHP) | Diagnóstico apenas — não é a autoridade do recycle |
 | Falha de protocolo / frame | exit `21` → crash/replace |
 | Falha `endScope` | exit `22` → não processa próximo request |
 | EOF / shutdown | encerramento limpo |
 
-Durin **não** chama `resetWorker()` no lugar de recycle de processo no v1.
+Durin **não** chama `resetWorker()` no lugar de recycle de processo no v1. Fila / capacity / logging / prefix são 100% Go + `eregion.yaml`.
 
 ---
 

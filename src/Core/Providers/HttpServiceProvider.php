@@ -12,16 +12,22 @@ use App\Core\ServiceProvider;
 use App\Infrastructure\Security\RateLimiter;
 use App\Infrastructure\Session\SessionManager;
 use App\Presentation\Controllers\AuthController;
+use App\Presentation\Controllers\BenchmarkController;
+use App\Presentation\Controllers\CheckoutController;
 use App\Presentation\Controllers\DashboardController;
 use App\Presentation\Controllers\ExampleController;
 use App\Presentation\Controllers\HealthCheckController;
 use App\Presentation\Controllers\HomeController;
+use App\Presentation\Controllers\JobController;
+use App\Presentation\Controllers\PaymentController;
 use App\Presentation\Controllers\ProductController;
+use App\Presentation\Controllers\ReportController;
 use App\Presentation\Controllers\UserController;
 use App\Presentation\Middleware\ApiRateLimitMiddleware;
 use App\Presentation\Middleware\AuthMiddleware;
 use App\Presentation\Middleware\CorsMiddleware;
 use App\Presentation\Middleware\CsrfMiddleware;
+use App\Presentation\Middleware\ResponseCacheMiddleware;
 use App\Presentation\Middleware\ThrottleRequests;
 use App\Application\UseCases\Auth\LoginUseCaseInterface;
 use App\Application\UseCases\Auth\RegisterUseCaseInterface;
@@ -31,6 +37,7 @@ use App\Application\UseCases\User\DeleteUserUseCase;
 use App\Application\UseCases\User\GetUserUseCase;
 use App\Application\UseCases\User\ListUsersUseCase;
 use App\Application\UseCases\User\UpdateUserUseCase;
+use App\Domain\Repositories\SimulationRepositoryInterface;
 use App\Infrastructure\Bridge\VueViewHandler;
 use Erebor\Mithril\Container;
 use Erebor\Mithril\Contracts\PipelineContract;
@@ -53,6 +60,7 @@ final class HttpServiceProvider implements ServiceProvider
             );
         });
         $container->singleton(HttpKernel::class, fn(Container $c) => new HttpKernel($c->get(HttpDispatcher::class)));
+        $container->singleton(ResponseCacheMiddleware::class, fn(Container $c) => ResponseCacheMiddleware::make($c));
     }
 
     public function describe(): array
@@ -89,6 +97,9 @@ final class HttpServiceProvider implements ServiceProvider
                     'new' => ApiRateLimitMiddleware::class,
                     'deps' => [RateLimiter::class],
                 ],
+                ResponseCacheMiddleware::class => [
+                    'builder' => ResponseCacheMiddleware::class . '::make',
+                ],
             ],
             'factories' => [],
             'bind' => [
@@ -122,6 +133,26 @@ final class HttpServiceProvider implements ServiceProvider
                 ProductController::class => [
                     'new' => ProductController::class,
                     'deps' => [ListProductsUseCase::class],
+                ],
+                PaymentController::class => [
+                    'new' => PaymentController::class,
+                    'deps' => [SimulationRepositoryInterface::class],
+                ],
+                CheckoutController::class => [
+                    'new' => CheckoutController::class,
+                    'deps' => [SimulationRepositoryInterface::class],
+                ],
+                ReportController::class => [
+                    'new' => ReportController::class,
+                    'deps' => [SimulationRepositoryInterface::class],
+                ],
+                JobController::class => [
+                    'new' => JobController::class,
+                    'deps' => [SimulationRepositoryInterface::class],
+                ],
+                BenchmarkController::class => [
+                    'new' => BenchmarkController::class,
+                    'deps' => [],
                 ],
             ],
             'preloaded' => [],

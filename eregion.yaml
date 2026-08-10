@@ -1,5 +1,6 @@
-# Eregion Application Server — aligned with Eregion v0.1.0 fileConfig
-# Omitted keys use binary defaults. Do not use a top-level `worker:` key.
+# Eregion Application Server — Durin's Forge
+# Schema completo (v0.2+). Chaves omitidas usam defaults do binário.
+# Protocolo: eregion/1 (inalterado). Não usar chave top-level `worker:` (inválida).
 
 version: "1"
 
@@ -7,15 +8,125 @@ server:
   host: "0.0.0.0"
   port: 8080
 
+  # Protege contra clientes que enviam headers muito lentamente.
+  read_header_timeout: 10s
+
+  # Tempo máximo para ler a requisição completa.
+  read_timeout: 30s
+
+  # Tempo máximo para escrever a resposta ao cliente.
+  write_timeout: 30s
+
+  # Tempo máximo de uma conexão HTTP keep-alive ociosa.
+  idle_timeout: 60s
+
+  # Tempo máximo para concluir requests em andamento durante o shutdown.
+  shutdown_timeout: 20s
+
+  # Limite total dos headers HTTP.
+  max_header_bytes: 1048576 # 1 MiB
+
+  # Limite do body HTTP recebido do cliente.
+  max_body_bytes: 10485760 # 10 MiB
+
 php:
   binary: "php"
+
+  # Durin: entry UDS com EregionBridge (não o worker genérico Mithril).
   worker_script: "public/index.php"
+
   working_directory: "."
 
+  # Repassado aos workers (ambiente do processo pai é preservado).
+  environment:
+    APP_ENV: "production"
+    APP_DEBUG: "false"
+
 workers:
-  count: 4
+  count: 32
+
+  # Quantidade mínima de workers saudáveis para readiness positiva.
+  min_ready: 1
+
+  # Recicla o processo PHP depois desta quantidade de requests (0 = off).
   max_requests: 10000
+
+  # Tempo máximo para o processo iniciar, criar o socket e ficar disponível.
+  startup_timeout: 10s
+
+  # Tempo máximo para concluir o handshake EREGION/1.
+  handshake_timeout: 5s
+
+  # Deadline de uma requisição já entregue ao worker.
+  request_timeout: 30s
+
+  # Tempo máximo aguardando um worker ficar livre (fila + acquire).
+  # Antes, com timeout curto/zero, -c100 virava 503 imediato.
+  acquire_timeout: 2s
+
+  # Tempo dado ao worker para encerrar antes de SIGKILL.
+  shutdown_timeout: 5s
+
+  # Reciclagem cooperativa (memória reportada pelo PHP). 0 = off.
   memory_limit_mb: 256
 
+  # Crash loop: máx. reinícios dentro de restart_window.
+  restart_limit: 5
+  restart_window: 30s
+
+  restart_backoff:
+    initial: 100ms
+    maximum: 5s
+    multiplier: 2.0
+    jitter: 0.2
+
 socket:
+  # Relativo ao projeto (Windows/WSL). Evitar /tmp fixo do template genérico.
   directory: "var/runtime"
+  directory_permissions: "0700"
+  socket_permissions: "0600"
+
+protocol:
+  version: 1
+  # UDS + MessagePack (fixos no Eregion v1).
+  # Deve ser > server.max_body_bytes (headers + metadados do frame).
+  max_frame_bytes: 16777216 # 16 MiB
+
+queue:
+  # Requests esperando worker (em execução não contam).
+  # Mitiga thundering herd: enfileira antes de 503.
+  capacity: 1000
+
+  # Header Retry-After quando a fila estiver cheia.
+  retry_after: 1s
+
+logging:
+  level: "info"
+  format: "json"
+
+  # Em bench agressivo, desligue (access_log: false) — reduz I/O.
+  access_log: false
+  include_request_headers: false
+  include_request_body: false
+  include_response_body: false
+
+operations:
+  # Paths relativos abaixo são unidos a este prefixo (Eregion 0.2+).
+  # Paths absolutos legados (/_eregion/health) ainda funcionam (compat).
+  prefix: "/_eregion"
+
+metrics:
+  enabled: true
+  path: "/metrics"
+
+health:
+  enabled: true
+  path: "/health"
+
+readiness:
+  enabled: true
+  path: "/ready"
+
+liveness:
+  enabled: true
+  path: "/live"

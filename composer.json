@@ -51,7 +51,7 @@
   "extra": {
     "mithril": {
       "kernel": "App\\Kernel",
-      "eregion": "v0.1.0",
+      "eregion": "v0.3.0",
       "eregion_repo": "EreborCodeForge/eregion"
     }
   },
