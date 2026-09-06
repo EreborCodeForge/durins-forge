@@ -22,7 +22,7 @@ final class SeedCommand extends BaseMigrateCommand
     public function execute(): int
     {
         try {
-            // Ensures SQLite file / MySQL DB exist and wires DB::connection()
+            // Ensures SQLite file / MySQL DB exist and wires Mazarbul via DB::database()
             $this->getRunner();
 
             $this->info('Seeding products…');

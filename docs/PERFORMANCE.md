@@ -104,7 +104,7 @@ Ajuste carga: `make bench BENCH_REQUESTS=500 BENCH_WARMUP=50`.
 
 ### 6. Providers e lazy resolution
 
-- **Database (PDO)** e **Cache** são registrados como singletons; a conexão/instância só é criada no primeiro uso. Rotas que não usam DB nem cache não pagam esse custo.
+- **Mazarbul (DB)** e **Cache** são registrados como singletons; a conexão física só abre no primeiro I/O (lazy). Use `db()` / `DB::database()` para CRUD; `stream()`/`pipeline()` para leituras grandes. Workers Eregion chamam `onRequestEnd` no fim do request. Rotas que não usam DB nem cache não pagam esse custo.
 - **VueViewHandler** e **Session** só são resolvidos quando uma rota web renderiza view; rotas de API não instanciam esses serviços.
 
 ### 7. HTTP Response Cache (L1/L2)

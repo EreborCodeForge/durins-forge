@@ -60,8 +60,12 @@ return function (Router $router): void {
     // Public on purpose — easy wrk contrast vs cached GET /products
     $router->get('/api/reports/slow', [ReportController::class, 'slow']);
 
-    // Real remote MySQL I/O (connection "benchmark", table data LIMIT 3) — no cache
+    // Mazarbul API pura / hot / diffs — no cache HTTP
     $router->get('/api/benchmark/data', [BenchmarkController::class, 'data']);
+    $router->get('/api/benchmark/data-hot', [BenchmarkController::class, 'hot']);
+    $router->get('/api/benchmark/data-baseline', [BenchmarkController::class, 'baseline']);
+    $router->get('/api/benchmark/diff', [BenchmarkController::class, 'diff']);
+    $router->get('/api/benchmark/diff-sql', [BenchmarkController::class, 'diffSql']);
 
     $router->post('/api/jobs/enqueue', [JobController::class, 'enqueue'], [
         AuthMiddleware::class,

@@ -4,8 +4,68 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "190b27186267a3235bfaaedae96038b5",
+    "content-hash": "5a01c51ec88bb69ddb1db04771114fa2",
     "packages": [
+        {
+            "name": "ereborcodeforge/mazarbul",
+            "version": "v1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/EreborCodeForge/mazarbul.git",
+                "reference": "655c98c4c4fc7ed1c41de4374a8fadd8dbb0a275"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/EreborCodeForge/mazarbul/zipball/655c98c4c4fc7ed1c41de4374a8fadd8dbb0a275",
+                "reference": "655c98c4c4fc7ed1c41de4374a8fadd8dbb0a275",
+                "shasum": ""
+            },
+            "require": {
+                "ext-pdo": "*",
+                "php": "^8.5"
+            },
+            "require-dev": {
+                "phpstan/phpstan": "^2.0",
+                "phpunit/phpunit": "^12.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-main": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "EreborCodeForge\\Mazarbul\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Erebor Code Forge",
+                    "homepage": "https://github.com/EreborCodeForge"
+                }
+            ],
+            "description": "Stream-oriented database access for PHP with lazy reusable connections, pipelines, chunk processing and bulk writes.",
+            "homepage": "https://github.com/EreborCodeForge/mazarbul",
+            "keywords": [
+                "bulk",
+                "database",
+                "mysql",
+                "pdo",
+                "pipeline",
+                "postgresql",
+                "streaming"
+            ],
+            "support": {
+                "issues": "https://github.com/EreborCodeForge/mazarbul/issues",
+                "source": "https://github.com/EreborCodeForge/mazarbul"
+            },
+            "time": "2026-08-10T14:38:15+00:00"
+        },
         {
             "name": "ereborcodeforge/mithrilphp",
             "version": "v2.1.0",
@@ -1759,14 +1819,15 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "php": "^8.3",
+        "php": "^8.5",
         "ext-msgpack": "*",
+        "ext-pdo": "*",
         "ext-sockets": "*"
     },
-    "platform-dev": [],
-    "plugin-api-version": "2.6.0"
+    "platform-dev": {},
+    "plugin-api-version": "2.9.0"
 }

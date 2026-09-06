@@ -6,36 +6,36 @@ namespace App\Infrastructure\Repositories;
 
 use App\Domain\Repositories\SimulationRepositoryInterface;
 use App\Infrastructure\Exceptions\InfrastructureException;
-use PDO;
-use PDOException;
+use EreborCodeForge\Mazarbul\Query\Database;
+use Throwable;
 
 final class PDOSimulationRepository implements SimulationRepositoryInterface
 {
-    public function __construct(private PDO $db) {}
+    public function __construct(private Database $db) {}
 
     public function createPaymentAttempt(array $data): array
     {
         try {
-            $stmt = $this->db->prepare(
+            $this->db->execute(
                 'INSERT INTO payment_attempts
                     (kind, user_id, amount, method, status, idempotency_key, delay_ms, meta)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                [
+                    $data['kind'],
+                    $data['user_id'] ?? null,
+                    $data['amount'],
+                    $data['method'],
+                    $data['status'],
+                    $data['idempotency_key'] ?? null,
+                    $data['delay_ms'],
+                    isset($data['meta']) ? json_encode($data['meta'], JSON_THROW_ON_ERROR) : null,
+                ]
             );
-            $stmt->execute([
-                $data['kind'],
-                $data['user_id'] ?? null,
-                $data['amount'],
-                $data['method'],
-                $data['status'],
-                $data['idempotency_key'] ?? null,
-                $data['delay_ms'],
-                isset($data['meta']) ? json_encode($data['meta'], JSON_THROW_ON_ERROR) : null,
-            ]);
 
             $id = (int) $this->db->lastInsertId();
 
             return $this->paymentById($id) ?? ['id' => $id] + $data;
-        } catch (PDOException $e) {
+        } catch (Throwable $e) {
             throw new InfrastructureException('Failed to create payment attempt', 0, $e);
         }
     }
@@ -43,14 +43,13 @@ final class PDOSimulationRepository implements SimulationRepositoryInterface
     public function findPaymentByIdempotencyKey(string $key): ?array
     {
         try {
-            $stmt = $this->db->prepare(
-                'SELECT * FROM payment_attempts WHERE idempotency_key = ? LIMIT 1'
+            $row = $this->db->fetchOne(
+                'SELECT * FROM payment_attempts WHERE idempotency_key = ? LIMIT 1',
+                [$key]
             );
-            $stmt->execute([$key]);
-            $row = $stmt->fetch();
 
-            return $row === false ? null : $this->mapPayment($row);
-        } catch (PDOException $e) {
+            return $row === null ? null : $this->mapPayment($row);
+        } catch (Throwable $e) {
             throw new InfrastructureException('Failed to find payment attempt', 0, $e);
         }
     }
@@ -58,17 +57,17 @@ final class PDOSimulationRepository implements SimulationRepositoryInterface
     public function createCheckoutOrder(array $data): array
     {
         try {
-            $stmt = $this->db->prepare(
+            $this->db->execute(
                 'INSERT INTO checkout_orders (user_id, amount, status, delay_ms, items_json)
-                 VALUES (?, ?, ?, ?, ?)'
+                 VALUES (?, ?, ?, ?, ?)',
+                [
+                    $data['user_id'] ?? null,
+                    $data['amount'],
+                    $data['status'],
+                    $data['delay_ms'],
+                    isset($data['items']) ? json_encode($data['items'], JSON_THROW_ON_ERROR) : null,
+                ]
             );
-            $stmt->execute([
-                $data['user_id'] ?? null,
-                $data['amount'],
-                $data['status'],
-                $data['delay_ms'],
-                isset($data['items']) ? json_encode($data['items'], JSON_THROW_ON_ERROR) : null,
-            ]);
             $id = (int) $this->db->lastInsertId();
 
             return [
@@ -79,7 +78,7 @@ final class PDOSimulationRepository implements SimulationRepositoryInterface
                 'delay_ms' => (int) $data['delay_ms'],
                 'items' => $data['items'] ?? [],
             ];
-        } catch (PDOException $e) {
+        } catch (Throwable $e) {
             throw new InfrastructureException('Failed to create checkout order', 0, $e);
         }
     }
@@ -87,21 +86,21 @@ final class PDOSimulationRepository implements SimulationRepositoryInterface
     public function createJob(array $data): array
     {
         try {
-            $stmt = $this->db->prepare(
+            $this->db->execute(
                 'INSERT INTO background_jobs (type, status, user_id, payload_json, delay_ms)
-                 VALUES (?, ?, ?, ?, ?)'
+                 VALUES (?, ?, ?, ?, ?)',
+                [
+                    $data['type'] ?? 'generic',
+                    'pending',
+                    $data['user_id'] ?? null,
+                    isset($data['payload']) ? json_encode($data['payload'], JSON_THROW_ON_ERROR) : null,
+                    $data['delay_ms'] ?? 100,
+                ]
             );
-            $stmt->execute([
-                $data['type'] ?? 'generic',
-                'pending',
-                $data['user_id'] ?? null,
-                isset($data['payload']) ? json_encode($data['payload'], JSON_THROW_ON_ERROR) : null,
-                $data['delay_ms'] ?? 100,
-            ]);
             $id = (int) $this->db->lastInsertId();
 
             return $this->findJob($id) ?? ['id' => $id, 'status' => 'pending'];
-        } catch (PDOException $e) {
+        } catch (Throwable $e) {
             throw new InfrastructureException('Failed to create job', 0, $e);
         }
     }
@@ -109,12 +108,10 @@ final class PDOSimulationRepository implements SimulationRepositoryInterface
     public function findJob(int $id): ?array
     {
         try {
-            $stmt = $this->db->prepare('SELECT * FROM background_jobs WHERE id = ? LIMIT 1');
-            $stmt->execute([$id]);
-            $row = $stmt->fetch();
+            $row = $this->db->fetchOne('SELECT * FROM background_jobs WHERE id = ? LIMIT 1', [$id]);
 
-            return $row === false ? null : $this->mapJob($row);
-        } catch (PDOException $e) {
+            return $row === null ? null : $this->mapJob($row);
+        } catch (Throwable $e) {
             throw new InfrastructureException('Failed to find job', 0, $e);
         }
     }
@@ -122,14 +119,14 @@ final class PDOSimulationRepository implements SimulationRepositoryInterface
     public function markJobRunning(int $id): bool
     {
         try {
-            $stmt = $this->db->prepare(
+            $affected = $this->db->execute(
                 "UPDATE background_jobs SET status = 'running', started_at = CURRENT_TIMESTAMP
-                 WHERE id = ? AND status = 'pending'"
+                 WHERE id = ? AND status = 'pending'",
+                [$id]
             );
-            $stmt->execute([$id]);
 
-            return $stmt->rowCount() > 0;
-        } catch (PDOException $e) {
+            return $affected > 0;
+        } catch (Throwable $e) {
             throw new InfrastructureException('Failed to mark job running', 0, $e);
         }
     }
@@ -137,32 +134,26 @@ final class PDOSimulationRepository implements SimulationRepositoryInterface
     public function claimNextPendingJob(): ?array
     {
         try {
-            $this->db->beginTransaction();
-            $stmt = $this->db->query(
-                "SELECT id FROM background_jobs WHERE status = 'pending' ORDER BY id ASC LIMIT 1"
-            );
-            $row = $stmt->fetch();
-            if ($row === false) {
-                $this->db->commit();
-                return null;
-            }
+            return $this->db->transaction(function (Database $db): ?array {
+                $row = $db->fetchOne(
+                    "SELECT id FROM background_jobs WHERE status = 'pending' ORDER BY id ASC LIMIT 1"
+                );
+                if ($row === null) {
+                    return null;
+                }
 
-            $id = (int) $row['id'];
-            $upd = $this->db->prepare(
-                "UPDATE background_jobs SET status = 'running', started_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'pending'"
-            );
-            $upd->execute([$id]);
-            if ($upd->rowCount() === 0) {
-                $this->db->commit();
-                return null;
-            }
-            $this->db->commit();
+                $id = (int) $row['id'];
+                $affected = $db->execute(
+                    "UPDATE background_jobs SET status = 'running', started_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'pending'",
+                    [$id]
+                );
+                if ($affected === 0) {
+                    return null;
+                }
 
-            return $this->findJob($id);
-        } catch (PDOException $e) {
-            if ($this->db->inTransaction()) {
-                $this->db->rollBack();
-            }
+                return $this->findJob($id);
+            });
+        } catch (Throwable $e) {
             throw new InfrastructureException('Failed to claim job', 0, $e);
         }
     }
@@ -170,13 +161,13 @@ final class PDOSimulationRepository implements SimulationRepositoryInterface
     public function completeJob(int $id, array $result): void
     {
         try {
-            $stmt = $this->db->prepare(
+            $this->db->execute(
                 "UPDATE background_jobs
                  SET status = 'completed', result_json = ?, finished_at = CURRENT_TIMESTAMP
-                 WHERE id = ?"
+                 WHERE id = ?",
+                [json_encode($result, JSON_THROW_ON_ERROR), $id]
             );
-            $stmt->execute([json_encode($result, JSON_THROW_ON_ERROR), $id]);
-        } catch (PDOException $e) {
+        } catch (Throwable $e) {
             throw new InfrastructureException('Failed to complete job', 0, $e);
         }
     }
@@ -184,15 +175,15 @@ final class PDOSimulationRepository implements SimulationRepositoryInterface
     public function createReportRun(array $data): array
     {
         try {
-            $stmt = $this->db->prepare(
-                'INSERT INTO report_runs (queries, rows_seen, delay_ms, duration_ms) VALUES (?, ?, ?, ?)'
+            $this->db->execute(
+                'INSERT INTO report_runs (queries, rows_seen, delay_ms, duration_ms) VALUES (?, ?, ?, ?)',
+                [
+                    $data['queries'],
+                    $data['rows_seen'],
+                    $data['delay_ms'],
+                    $data['duration_ms'],
+                ]
             );
-            $stmt->execute([
-                $data['queries'],
-                $data['rows_seen'],
-                $data['delay_ms'],
-                $data['duration_ms'],
-            ]);
 
             return [
                 'id' => (int) $this->db->lastInsertId(),
@@ -201,7 +192,7 @@ final class PDOSimulationRepository implements SimulationRepositoryInterface
                 'delay_ms' => (int) $data['delay_ms'],
                 'duration_ms' => (int) $data['duration_ms'],
             ];
-        } catch (PDOException $e) {
+        } catch (Throwable $e) {
             throw new InfrastructureException('Failed to create report run', 0, $e);
         }
     }
@@ -212,14 +203,12 @@ final class PDOSimulationRepository implements SimulationRepositoryInterface
         $rows = 0;
         try {
             for ($i = 0; $i < $times; $i++) {
-                $stmt = $this->db->query('SELECT id, name, price, sku FROM products ORDER BY id ASC');
-                while ($stmt->fetch()) {
-                    $rows++;
-                }
+                $batch = $this->db->fetchAll('SELECT id, name, price, sku FROM products ORDER BY id ASC');
+                $rows += count($batch);
             }
 
             return $rows;
-        } catch (PDOException $e) {
+        } catch (Throwable $e) {
             throw new InfrastructureException('Failed to scan products', 0, $e);
         }
     }
@@ -227,11 +216,9 @@ final class PDOSimulationRepository implements SimulationRepositoryInterface
     /** @return array<string, mixed>|null */
     private function paymentById(int $id): ?array
     {
-        $stmt = $this->db->prepare('SELECT * FROM payment_attempts WHERE id = ? LIMIT 1');
-        $stmt->execute([$id]);
-        $row = $stmt->fetch();
+        $row = $this->db->fetchOne('SELECT * FROM payment_attempts WHERE id = ? LIMIT 1', [$id]);
 
-        return $row === false ? null : $this->mapPayment($row);
+        return $row === null ? null : $this->mapPayment($row);
     }
 
     /** @param array<string, mixed> $row */

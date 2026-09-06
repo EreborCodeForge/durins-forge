@@ -26,9 +26,11 @@
     }
   ],
   "require": {
-    "php": "^8.3",
+    "php": "^8.5",
     "ext-msgpack": "*",
+    "ext-pdo": "*",
     "ext-sockets": "*",
+    "ereborcodeforge/mazarbul": "^1.0",
     "ereborcodeforge/mithrilphp": "^2.1"
   },
   "autoload": {
