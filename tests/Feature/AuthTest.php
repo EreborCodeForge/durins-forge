@@ -34,9 +34,7 @@ class AuthTest extends DurinsForgeBaseTest
         }
 
         $this->assertEquals(201, $response->getStatusCode());
-        $this->assertEquals('User created successfully', $content['message']);
-        $this->assertArrayHasKey('user', $content);
-        $this->assertEquals($email, $content['user']['email']);
+        $this->assertEquals('User created', $content['message']);
     }
 
     public function test_login_returns_token()

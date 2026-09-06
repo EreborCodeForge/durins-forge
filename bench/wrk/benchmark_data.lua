@@ -1,6 +1,7 @@
--- Real MySQL I/O: GET /api/benchmark/data (no auth)
+-- Mazarbul API (Database::fetchAll): GET /api/benchmark/data
+-- Hot stmt cache: GET /api/benchmark/data-hot
 -- wrk -t2 -c16 -d10s -s bench/wrk/benchmark_data.lua http://127.0.0.1:8080/api/benchmark/data
-
+-- Expect "driver":"mazarbul"
 local threads = {}
 
 function setup(thread)

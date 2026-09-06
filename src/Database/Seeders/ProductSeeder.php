@@ -15,10 +15,10 @@ final class ProductSeeder
 {
     public function run(): void
     {
-        $pdo = DB::connection();
-        $repo = new PDOProductRepository($pdo);
+        $db = DB::database();
+        $repo = new PDOProductRepository($db);
 
-        $count = (int) $pdo->query('SELECT COUNT(*) FROM products')->fetchColumn();
+        $count = (int) $db->scalar('SELECT COUNT(*) FROM products');
         if ($count > 0) {
             echo "products already seeded ({$count} rows) — skip\n";
             return;

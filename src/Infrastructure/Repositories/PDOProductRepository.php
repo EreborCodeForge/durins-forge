@@ -7,24 +7,24 @@ namespace App\Infrastructure\Repositories;
 use App\Domain\Entities\Product;
 use App\Domain\Repositories\ProductRepositoryInterface;
 use App\Infrastructure\Exceptions\InfrastructureException;
-use PDO;
-use PDOException;
+use EreborCodeForge\Mazarbul\Query\Database;
+use Throwable;
 
 final class PDOProductRepository implements ProductRepositoryInterface
 {
-    public function __construct(private PDO $db) {}
+    public function __construct(private Database $db) {}
 
     public function findAll(): array
     {
         try {
-            $stmt = $this->db->query('SELECT * FROM products ORDER BY id ASC');
+            $rows = $this->db->fetchAll('SELECT * FROM products ORDER BY id ASC');
             $products = [];
-            while ($row = $stmt->fetch()) {
+            foreach ($rows as $row) {
                 $products[] = $this->mapRow($row);
             }
 
             return $products;
-        } catch (PDOException $e) {
+        } catch (Throwable $e) {
             throw new InfrastructureException('Failed to fetch products', 0, $e);
         }
     }
@@ -32,19 +32,19 @@ final class PDOProductRepository implements ProductRepositoryInterface
     public function save(Product $product): Product
     {
         try {
-            $stmt = $this->db->prepare(
-                'INSERT INTO products (name, description, price, sku) VALUES (?, ?, ?, ?)'
+            $this->db->execute(
+                'INSERT INTO products (name, description, price, sku) VALUES (?, ?, ?, ?)',
+                [
+                    $product->name,
+                    $product->description,
+                    $product->price,
+                    $product->sku,
+                ]
             );
-            $stmt->execute([
-                $product->name,
-                $product->description,
-                $product->price,
-                $product->sku,
-            ]);
             $product->id = (int) $this->db->lastInsertId();
 
             return $product;
-        } catch (PDOException $e) {
+        } catch (Throwable $e) {
             throw new InfrastructureException('Failed to save product', 0, $e);
         }
     }

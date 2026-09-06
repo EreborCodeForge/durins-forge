@@ -14,6 +14,8 @@ use App\Infrastructure\Repositories\PDOUserRepository;
 use App\Infrastructure\Repositories\PDOProductRepository;
 use App\Infrastructure\Repositories\PDOSimulationRepository;
 use Erebor\Mithril\Container;
+use EreborCodeForge\Mazarbul\Connection\ConnectionManager;
+use EreborCodeForge\Mazarbul\Query\Database;
 use PDO;
 
 #[Discoverable(tag: 'provider.database')]
@@ -21,7 +23,9 @@ final class DatabaseProvider implements ServiceProvider
 {
     public function register(Container $c): void
     {
-        $c->singleton(PDO::class, fn() => DB::connection());
+        $c->singleton(ConnectionManager::class, static fn () => DB::manager());
+        $c->singleton(Database::class, static fn () => DB::database());
+        $c->singleton(PDO::class, static fn () => DB::pdo());
         $c->singleton(UserRepositoryInterface::class, PDOUserRepository::class);
         $c->singleton(ProductRepositoryInterface::class, PDOProductRepository::class);
         $c->singleton(SimulationRepositoryInterface::class, PDOSimulationRepository::class);
@@ -31,20 +35,26 @@ final class DatabaseProvider implements ServiceProvider
     {
         return [
             'singletons' => [
+                ConnectionManager::class => [
+                    'call' => DB::class . '::manager',
+                ],
+                Database::class => [
+                    'call' => DB::class . '::database',
+                ],
                 PDO::class => [
-                    'call' => DB::class . '::connection',
+                    'call' => DB::class . '::pdo',
                 ],
                 UserRepositoryInterface::class => [
                     'new' => PDOUserRepository::class,
-                    'deps' => [PDO::class],
+                    'deps' => [Database::class],
                 ],
                 ProductRepositoryInterface::class => [
                     'new' => PDOProductRepository::class,
-                    'deps' => [PDO::class],
+                    'deps' => [Database::class],
                 ],
                 SimulationRepositoryInterface::class => [
                     'new' => PDOSimulationRepository::class,
-                    'deps' => [PDO::class],
+                    'deps' => [Database::class],
                 ],
             ],
             'factories' => [],

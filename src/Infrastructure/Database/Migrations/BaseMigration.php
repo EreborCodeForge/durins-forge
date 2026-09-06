@@ -14,7 +14,7 @@ abstract class BaseMigration implements Migration
 
     public function __construct()
     {
-        $this->db = DB::connection();
+        $this->db = DB::pdo();
     }
 
     abstract public function up(): void;

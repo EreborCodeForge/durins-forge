@@ -22,7 +22,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | All database connections for your application.
-    | You can switch between them using DB::connection('name').
+    | You can switch between them using DB::database('name') / db('name').
     |
     */
     'connections' => [

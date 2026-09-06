@@ -7,7 +7,6 @@ namespace App\Console\Commands;
 use App\Infrastructure\Database\Migrations\MigrationRunner;
 use App\Infrastructure\Database\DB;
 use Erebor\Mithril\Console\Command;
-use Erebor\Mithril\Database\ConnectionFactory;
 use Erebor\Mithril\Environment;
 use PDOException;
 
@@ -15,12 +14,10 @@ abstract class BaseMigrateCommand extends Command
 {
     protected function getRunner(): MigrationRunner
     {
-        $config = $this->ensureDatabaseExists();
-
-        $db = DB::connection($config);
+        $this->ensureDatabaseExists();
 
         return new MigrationRunner(
-            $db,
+            DB::pdo(),
             $this->getMigrationsPath(),
             fn (string $message) => $this->info($message)
         );
@@ -49,7 +46,7 @@ abstract class BaseMigrateCommand extends Command
     private function ensureMysqlDatabase(array $config): void
     {
         try {
-            $pdo = ConnectionFactory::createWithoutDatabase($config);
+            $pdo = DB::pdoWithoutDatabase($config);
 
             $dbname = $config['dbname'];
             $charset = $config['charset'] ?? 'utf8mb4';
@@ -70,17 +67,12 @@ abstract class BaseMigrateCommand extends Command
     private function ensurePostgresDatabase(array $config): void
     {
         try {
-            // PostgreSQL requires connecting to 'postgres' database to create others
-            $tempConfig = $config;
-            $tempConfig['dbname'] = 'postgres';
-
-            $pdo = ConnectionFactory::create($tempConfig);
+            $pdo = DB::pdoWithoutDatabase($config);
 
             $dbname = $config['dbname'] ?? 'appmarket';
 
-            // Check if database exists
             $stmt = $pdo->prepare(
-                "SELECT 1 FROM pg_database WHERE datname = :dbname"
+                'SELECT 1 FROM pg_database WHERE datname = :dbname'
             );
             $stmt->execute(['dbname' => $dbname]);
 
@@ -132,7 +124,7 @@ abstract class BaseMigrateCommand extends Command
         $driverDatabase = Environment::get('DB_CONNECTION', $config['default']);
 
         if (isset($config['connections'])) {
-            return $config['connections'][$driverDatabase] 
+            return $config['connections'][$driverDatabase]
                 ?? throw new \RuntimeException("Default connection '{$driverDatabase}' not found.");
         }
 

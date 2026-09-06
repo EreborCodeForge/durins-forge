@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Core\Http;
 
+use App\Infrastructure\Database\DB;
 use Erebor\Mithril\Contracts\PipelineContract;
 use Erebor\Mithril\Http\HttpContext;
 use Erebor\Mithril\Http\Request;
@@ -22,29 +23,33 @@ final class HttpDispatcher
 
     public function dispatch(Request $request): Response
     {
-        $match = $this->router->match($request);
-        $handler = $this->resolver->resolve($match->handler);
+        try {
+            $match = $this->router->match($request);
+            $handler = $this->resolver->resolve($match->handler);
 
-        $context = new HttpContext($request);
-        $context->set('route.handler', $match->handler);
+            $context = new HttpContext($request);
+            $context->set('route.handler', $match->handler);
 
-        $destination = static function (HttpContext $ctx) use ($handler, $match): Response {
-            $result = $handler($ctx, $match->params);
+            $destination = static function (HttpContext $ctx) use ($handler, $match): Response {
+                $result = $handler($ctx, $match->params);
 
-            return $result instanceof Response
-                ? $result
-                : throw new RuntimeException('Route handler must return a Response instance.');
-        };
+                return $result instanceof Response
+                    ? $result
+                    : throw new RuntimeException('Route handler must return a Response instance.');
+            };
 
-        $result = $this->pipeline
-            ->send($context)
-            ->through($match->middlewares)
-            ->then($destination);
+            $result = $this->pipeline
+                ->send($context)
+                ->through($match->middlewares)
+                ->then($destination);
 
-        if (!$result instanceof Response) {
-            throw new RuntimeException('Pipeline must return a Response instance.');
+            if (!$result instanceof Response) {
+                throw new RuntimeException('Pipeline must return a Response instance.');
+            }
+
+            return $result;
+        } finally {
+            DB::onRequestEnd();
         }
-
-        return $result;
     }
 }

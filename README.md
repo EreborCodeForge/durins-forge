@@ -8,8 +8,8 @@ Framework e forjador de apps sobre **MithrilPHP**, com Clean Architecture. Em pr
 
 ## Requisitos
 
-- PHP **8.3+**
-- Extensões: `json`, **`msgpack`**, **`sockets`**
+- PHP **8.5+** (no Windows use **WSL** se o host ainda estiver em 8.3)
+- Extensões: `json`, `pdo`, **`msgpack`**, **`sockets`**
 - Composer 2
 - Node.js (opcional, frontend Vue/Vite)
 
@@ -28,8 +28,11 @@ php bin/durin migrate
 `composer.json` já pinna:
 
 - `ereborcodeforge/mithrilphp:^2.1`
+- `ereborcodeforge/mazarbul:^1.0` — persistência oficial (lazy connections, stream, bulk)
 - `extra.mithril.kernel = App\\Kernel`
 - `extra.mithril.eregion = v0.3.0`
+
+DX de banco: `db()` / `DB::database('name')` (Mazarbul). Migrations DDL ainda usam `DB::pdo()` quando precisam de atributos PDO.
 
 ---
 
