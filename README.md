@@ -119,6 +119,7 @@ php bin/durins-forge
 | `dev` | Desenvolvimento local via facade → Eregion (`--php` = serve:php) |
 | `serve` | Runtime de produção via facade → Mithril/Eregion (`forge serve`) |
 | `status` | O que está configurado/disponível agora (`--json`; sem `--watch` nesta fatia) |
+| `graph:dependencies` | Grafo de dependências (`--format=text|mermaid|json`, `--module=`) |
 | `migrate` / `migrate:fresh` / `migrate:rollback` | Migrações |
 | `make:module` | Cria `src/Modules/{Name}` com marcador mínimo |
 | `make:usecase` | Gera DTO + Use Case (`Domain/Name` ou `--module=Billing`) |
