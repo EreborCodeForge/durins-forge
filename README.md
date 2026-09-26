@@ -4,11 +4,13 @@ Framework e forjador de apps sobre **MithrilPHP**, com Clean Architecture. Em pr
 
 > **Durin forja a app → Mithril aquece o Worker → Eregion guarda os portões.**
 
+Programa DX V1 (SPECs 001–016) entregue: foundation, doctor, runtime, presets, generators e grafo de dependências.
+
 ---
 
 ## Requisitos
 
-- PHP **8.5+** (no Windows use **WSL** se o host ainda estiver em 8.3)
+- PHP **8.5+** ([ADR-0001](docs/adr/ADR-0001-php-version-baseline.md))
 - Extensões: `json`, `pdo`, **`msgpack`**, **`sockets`**
 - Composer 2
 - Node.js (opcional, frontend Vue/Vite)
@@ -25,7 +27,7 @@ cp .env.example .env
 php bin/durin migrate
 ```
 
-`composer.json` já pinna:
+`composer.json` pinna:
 
 - `ereborcodeforge/mithrilphp:^2.1`
 - `ereborcodeforge/mazarbul:^1.0` — persistência oficial (lazy connections, stream, bulk)
@@ -42,14 +44,13 @@ DX de banco: `db()` / `DB::database('name')` (Mazarbul). Migrations DDL ainda us
 vendor/bin/forge server:install          # baixa Eregion → .mithril/bin
 vendor/bin/forge eregion:craft           # eregion.yaml + var/runtime/eregion.json
 vendor/bin/durin optimize                # após composer install (link-bins)
-# equivalente: php bin/durin optimize
 vendor/bin/forge server:check
 php bin/durin serve --host=0.0.0.0 --port=8080
 ```
 
 ### `durin serve` (produção)
 
-`durin serve` é a entrada **orientada a produção**: orquestra via `RuntimeFacade` → `vendor/bin/forge serve` → Eregion. Durin não implementa o servidor HTTP.
+Entrada **orientada a produção**: `RuntimeFacade` → `vendor/bin/forge serve` → Eregion. Durin não implementa o servidor HTTP.
 
 Defaults: `--host=0.0.0.0`, `--port=8080`. Flags extras são repassadas ao Forge.
 
@@ -57,20 +58,19 @@ Defaults: `--host=0.0.0.0`, `--port=8080`. Flags extras são repassadas ao Forge
 php bin/durin serve --host=0.0.0.0 --port=8080 --workers=4
 ```
 
-Equivalente de baixo nível: `vendor/bin/forge serve ...`.
+### `durin dev` (local)
 
-### Dev local
-
-`durin dev` é a entrada **de desenvolvimento**: defaults locais (`127.0.0.1:8080`, `APP_ENV=development`) e o **mesmo** `RuntimeFacade` de produção (Eregion). Não é um segundo stack de startup.
+Mesmo `RuntimeFacade` de produção, com defaults locais (`127.0.0.1:8080`, `APP_ENV=development`).
 
 ```bash
 php bin/durin doctor
+php bin/durin status
 php bin/durin dev
 ```
 
-Escape hatch (limitado): `--php` chama `forge serve:php`. Neste skeleton o `public/index.php` é worker UDS — `serve:php` / `php -S` tipicamente devolvem **503**. Preferir Eregion também em local.
+Escape hatch: `--php` chama `forge serve:php`. Neste skeleton o `public/index.php` é worker UDS — `serve:php` / `php -S` tipicamente devolvem **503**. Preferir Eregion também em local.
 
-Hot-reload completo depende do que Mithril/Eregion expõem; Durin não finge hot-reload se o runtime não tiver.
+`doctor` = a app **pode** rodar · `status` = o que está **configurado/disponível agora** (binário, `eregion.yaml`, manifesto). Sem `--watch` no V1.
 
 ---
 
@@ -78,11 +78,13 @@ Hot-reload completo depende do que Mithril/Eregion expõem; Durin não finge hot
 
 | Camada | Papel |
 |--------|--------|
-| **Durin’s Forge** | Skeleton, `App\Kernel` (`HttpApplication`), rotas, `durin optimize`, migrate/make |
+| **Durin’s Forge** | Skeleton, `App\Kernel`, presets, generators, doctor/status/graph, `durin optimize`, migrate |
 | **MithrilPHP** | Worker, DI, HTTP, Forge CLI, bridge Eregion (`eregion-worker`) |
 | **Eregion (Go)** | HTTP público, pool, UDS, recycle |
 
-Durin **não** reimplementa UDS/MessagePack nem servidor HTTP de produção.
+Durin **não** reimplementa UDS/MessagePack nem servidor HTTP de produção ([ADR-0002](docs/adr/ADR-0002-cli-runtime-boundaries.md)).
+
+Tooling interno vive em `App\Tooling\` (Project, Scaffold, Doctor, Runtime, Presets, Generators, Graph) — sem pacotes Composer separados no V1 ([ADR-0004](docs/adr/ADR-0004-tooling-package-boundaries.md)).
 
 ---
 
@@ -92,12 +94,11 @@ Durin **não** reimplementa UDS/MessagePack nem servidor HTTP de produção.
 - Preferência: `var/cache/container.php` + `var/cache/routes.php`
 - Fallback (dev): providers via discovery + `require` de `routes/*.php`
 - Request-bound (ex.: `SessionManager`) → `scoped()`; Router/config → singleton
-- Exceções em `handle()` → Response 500 (worker permanece vivo)
 
 ```bash
 php bin/durin optimize           # container + routes
-php bin/durin container:compile  # só container
-php bin/durin routes:compile     # só rotas
+php bin/durin container:compile
+php bin/durin routes:compile
 php bin/durin config:cache
 ```
 
@@ -107,33 +108,34 @@ php bin/durin config:cache
 
 ```bash
 php bin/durin
-# ou
+# alias
 php bin/durins-forge
 ```
 
 | Comando | Descrição |
 |---------|-----------|
-| `new` | Cria projeto a partir de preset (`--preset=minimal|service`) |
+| `new` | Cria projeto a partir de preset (`--preset=minimal\|service`) |
+| `doctor` | Diagnóstico PHP / projeto / Mithril-Eregion / artefatos (`--json`, `--strict`) |
+| `status` | Runtime configurado agora (`--json`) |
+| `dev` | Dev local via facade → Eregion (`--php` = serve:php) |
+| `serve` | Produção via facade → Mithril/Eregion |
 | `optimize` | Compila container + rotas → `var/cache/` |
-| `doctor` | Diagnóstico de PHP, projeto, Mithril/Eregion e artefatos (`--json`, `--strict`) |
-| `dev` | Desenvolvimento local via facade → Eregion (`--php` = serve:php) |
-| `serve` | Runtime de produção via facade → Mithril/Eregion (`forge serve`) |
-| `status` | O que está configurado/disponível agora (`--json`; sem `--watch` nesta fatia) |
-| `graph:dependencies` | Grafo de dependências (`--format=text|mermaid|json`, `--module=`) |
+| `graph:dependencies` | Grafo de deps (`--format=text\|mermaid\|json`, `--module=`) |
+| `make:module` | `src/Modules/{Name}/module.php` (+ `architecture.modules` no `durin.yaml`) |
+| `make:usecase` | DTO + Use Case (`Domain/Name` ou `--module=Billing`) |
+| `make:feature` | Módulo + use case (`Module/Name`; opcional `--http` `--tests`) |
 | `migrate` / `migrate:fresh` / `migrate:rollback` | Migrações |
-| `make:module` | Cria `src/Modules/{Name}` com marcador mínimo |
-| `make:usecase` | Gera DTO + Use Case (`Domain/Name` ou `--module=Billing`) |
-| `make:feature` | Gera módulo + use case (`Module/Name`; opcional `--http` `--tests`) |
-| `config:cache` / `config:clear` | Cache de config em `var/cache/` |
+| `seed` | Seeds |
+| `config:cache` / `config:clear` | Cache de config |
 | `container:compile` / `container:clear` | Container |
 | `routes:compile` / `routes:clear` | Rotas |
 | `routes:postman` | Export Postman |
 
-`vendor/bin/forge` permanece o CLI do **Mithril** (serve, eregion:craft, server:*).
+`vendor/bin/forge` permanece o CLI do **Mithril** (`serve`, `eregion:craft`, `server:*`).
 
-`doctor` = a app **pode** rodar; `status` = o que está **configurado/disponível agora** (binário, `eregion.yaml`, manifesto). Métricas live de workers ficam fora desta fatia (sem `--watch`).
+---
 
-### Presets
+## Presets
 
 ```bash
 php bin/durin new webhook-api --preset=minimal
@@ -143,9 +145,45 @@ php bin/durin new billing --preset=service
 | Preset | Quando usar | Estrutura |
 |--------|-------------|-----------|
 | `minimal` | API pequena / webhook | `src/Http`, `src/Application` (sem Domain) |
-| `service` | Backend service geral | `Domain`, `Application`, `Infrastructure`, `Presentation` (só roots; sem Entity/Repository vazios) |
+| `service` | Backend service geral | roots `Domain`, `Application`, `Infrastructure`, `Presentation` |
 
-Ambos gravam `durin.yaml` e compartilham baseline PHP 8.5 + Mithril.
+Ambos gravam `durin.yaml` e compartilham baseline PHP 8.5 + Mithril ([ADR-0003](docs/adr/ADR-0003-architecture-presets.md)). Presets `modular` / `microservice` / `worker` ficam fora do V1.
+
+---
+
+## Generators
+
+Escrita via `ScaffoldPlan` → `ScaffoldWriter` (conflict-safe; overwrite idêntico é idempotente).
+
+```bash
+# Módulo (marcador mínimo — sem árvores Domain/Http vazias)
+php bin/durin make:module Billing
+
+# Use case — layout legado Application
+php bin/durin make:usecase User/CreateUser
+
+# Use case — layout modular (master §27)
+php bin/durin make:usecase CreateInvoice --module=Billing
+# → src/Modules/Billing/Application/CreateInvoice/{CreateInvoice,CreateInvoiceInput}.php
+
+# Feature = módulo + use case (+ opcional Http/tests) em um único write
+php bin/durin make:feature Billing/CreateInvoice --http --tests
+```
+
+`--repository` / `--migration` em `make:feature` ainda não são suportados (erro explícito).
+
+---
+
+## Grafo de dependências
+
+Fontes V1 (sem AST): marcadores `src/Modules/*/module.php`, `var/cache/routes.php`, e opcionalmente `var/cache/container.descriptor.php` (formato `DescriptorProvider`).
+
+```bash
+php bin/durin graph:dependencies
+php bin/durin graph:dependencies --format=mermaid
+php bin/durin graph:dependencies --format=json
+php bin/durin graph:dependencies --module=Billing
+```
 
 ---
 
@@ -161,7 +199,7 @@ npm run build    # produção → public/build/
 
 ## Docker
 
-Imagem com PHP 8.5 + sockets + msgpack. O entrypoint roda `durin optimize` (modo compiled) e preferencialmente `forge serve`; se o check do Eregion falhar, cai em `forge serve:php`.
+Imagem com PHP 8.5 + sockets + msgpack. O entrypoint roda `durin optimize` e preferencialmente `forge serve`; se o check do Eregion falhar, cai em `forge serve:php`.
 
 ```bash
 make up      # live :8082 | compiled :8081
@@ -169,22 +207,28 @@ make bench
 make down
 ```
 
-Detalhes: [docs/PERFORMANCE.md](docs/PERFORMANCE.md). Spec Eregion: [docs/durins-forge-eregion-spec.md](docs/durins-forge-eregion-spec.md).
-
-DX / tooling (programa): [docs/specs/master-dx-tooling-spec.md](docs/specs/master-dx-tooling-spec.md) · [PRD](docs/product/PRD.md) · [ADRs](docs/adr/) · [specs derivadas](docs/specs/derived/).
-
 ---
 
 ## Estrutura (resumo)
 
 ```
-src/Kernel.php              # HttpApplication
-src/Core/                   # Discovery, compile, HTTP pipeline
-src/Application|Domain|…    # Clean Architecture
-routes/                     # web.php + api.php
-var/cache/                  # artifacts (gitignore)
-var/runtime/eregion.json    # manifesto (gitignore via /var/)
-public/index.php            # Worker + EregionBridge (spawned by Eregion)
+src/Kernel.php                 # HttpApplication
+src/Core/                      # Discovery, compile, HTTP pipeline
+src/Application|Domain|…       # Clean Architecture (preset service)
+src/Modules/{Name}/            # Módulos (make:module / make:feature)
+src/Tooling/                   # DX: Project, Scaffold, Doctor, Runtime,
+                               #     Presets, Generators, Graph
+src/Console/Commands/          # CLI durin
+routes/                        # web.php + api.php
+var/cache/                     # container.php, routes.php, artifacts
+var/runtime/eregion.json       # manifesto Eregion
+public/index.php               # Worker + EregionBridge
+docs/
+  product/PRD.md
+  architecture/
+  adr/
+  specs/master-dx-tooling-spec.md
+  specs/derived/               # SPECs 001–016
 ```
 
 ---
@@ -198,6 +242,20 @@ composer test
 ```
 
 CI (GitHub Actions) executa a suíte em **PHP 8.5** com `msgpack` e `sockets` ([ADR-0001](docs/adr/ADR-0001-php-version-baseline.md)).
+
+---
+
+## Documentação
+
+| Doc | Conteúdo |
+|------|----------|
+| [PRD](docs/product/PRD.md) | Produto DX |
+| [Architecture](docs/architecture/overview.md) | Visão e [fronteiras](docs/architecture/boundaries.md) |
+| [ADRs](docs/adr/) | Decisões (PHP 8.5, CLI/runtime, presets, tooling) |
+| [Master DX spec](docs/specs/master-dx-tooling-spec.md) | Spec canônica |
+| [SPECs derivadas](docs/specs/derived/) | Fatias 001–016 (implementadas) |
+| [Eregion](docs/durins-forge-eregion-spec.md) | Runtime HTTP |
+| [Performance](docs/PERFORMANCE.md) | Docker / bench |
 
 ---
 
