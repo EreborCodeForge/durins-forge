@@ -113,6 +113,7 @@ php bin/durins-forge
 
 | Comando | Descrição |
 |---------|-----------|
+| `new` | Cria projeto a partir de preset (`--preset=minimal`) |
 | `optimize` | Compila container + rotas → `var/cache/` |
 | `doctor` | Diagnóstico de PHP, projeto, Mithril/Eregion e artefatos (`--json`, `--strict`) |
 | `dev` | Desenvolvimento local via facade → Eregion (`--php` = serve:php) |
@@ -128,6 +129,14 @@ php bin/durins-forge
 `vendor/bin/forge` permanece o CLI do **Mithril** (serve, eregion:craft, server:*).
 
 `doctor` = a app **pode** rodar; `status` = o que está **configurado/disponível agora** (binário, `eregion.yaml`, manifesto). Métricas live de workers ficam fora desta fatia (sem `--watch`).
+
+### Presets
+
+```bash
+php bin/durin new webhook-api --preset=minimal
+```
+
+O preset **minimal** gera só o útil: `src/Http`, `src/Application`, `routes`, `config`, `tests` + `durin.yaml` — sem árvore Domain/Entity vazia.
 
 ---
 

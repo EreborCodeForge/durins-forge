@@ -1,6 +1,6 @@
 # SPEC-DX-009 — Preset `minimal`
 
-**Status:** Ready for implementation  
+**Status:** Implemented (pending merge)  
 **Branch:** `feat/dx-009-preset-minimal`  
 **Parent sections:** Master §17, §40-003; depends on SPEC-008
 
@@ -24,11 +24,11 @@ Implement `minimal` preset producing a ScaffoldPlan matching master §17 (small 
 
 ## Proposed design
 
-`MinimalPreset` lists files/dirs actions. Prefer generating into target directory for `durin new <name> --preset=minimal` if `new` is available; otherwise test via engine API writing to temp dir.
+`MinimalPreset` lists files/dirs actions. Thin `durin new <name> --preset=minimal` writes via ScaffoldWriter.
 
 ## Affected files
 
-- Presets definitions, README presets section, maybe templates
+- Presets definitions, README presets section, NewCommand
 
 ## New files
 
@@ -39,8 +39,6 @@ Implement `minimal` preset producing a ScaffoldPlan matching master §17 (small 
 ```bash
 durin new <app> --preset=minimal
 ```
-
-If `durin new` not yet public, expose via engine test + document follow-up — prefer shipping thin `durin new` here if missing, scoped to minimal only.
 
 ## Backward compatibility
 
@@ -63,10 +61,10 @@ N/A.
 
 ## Acceptance criteria
 
-- [ ] Minimal tree matches simplicity-first rules.
-- [ ] Writes `durin.yaml` with preset minimal.
-- [ ] Conflict-safe via ScaffoldWriter.
-- [ ] Integration test green.
+- [x] Minimal tree matches simplicity-first rules.
+- [x] Writes `durin.yaml` with preset minimal.
+- [x] Conflict-safe via ScaffoldWriter.
+- [x] Integration test green.
 
 ## Risks
 
