@@ -117,6 +117,7 @@ php bin/durins-forge
 | `doctor` | Diagnóstico de PHP, projeto, Mithril/Eregion e artefatos (`--json`, `--strict`) |
 | `dev` | Desenvolvimento local via facade → Eregion (`--php` = serve:php) |
 | `serve` | Runtime de produção via facade → Mithril/Eregion (`forge serve`) |
+| `status` | O que está configurado/disponível agora (`--json`; sem `--watch` nesta fatia) |
 | `migrate` / `migrate:fresh` / `migrate:rollback` | Migrações |
 | `make:usecase` | Gera DTO + Use Case |
 | `config:cache` / `config:clear` | Cache de config em `var/cache/` |
@@ -125,6 +126,8 @@ php bin/durins-forge
 | `routes:postman` | Export Postman |
 
 `vendor/bin/forge` permanece o CLI do **Mithril** (serve, eregion:craft, server:*).
+
+`doctor` = a app **pode** rodar; `status` = o que está **configurado/disponível agora** (binário, `eregion.yaml`, manifesto). Métricas live de workers ficam fora desta fatia (sem `--watch`).
 
 ---
 
