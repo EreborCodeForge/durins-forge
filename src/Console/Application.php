@@ -14,6 +14,7 @@ use App\Console\Commands\MigrateCommand;
 use App\Console\Commands\MigrateFreshCommand;
 use App\Console\Commands\MigrateRollbackCommand;
 use App\Console\Commands\MakeUseCaseCommand;
+use App\Console\Commands\NewCommand;
 use App\Console\Commands\OptimizeCommand;
 use App\Console\Commands\RoutesClearCommand;
 use App\Console\Commands\RoutesCompileCommand;
@@ -28,6 +29,7 @@ class Application
     public function run(array $argv): int
     {
         $kernel = new MithrilKernel();
+        $kernel->register(NewCommand::class);
         $kernel->register(MigrateCommand::class);
         $kernel->register(MigrateRollbackCommand::class);
         $kernel->register(MigrateFreshCommand::class);
