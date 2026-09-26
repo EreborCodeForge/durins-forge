@@ -1,6 +1,6 @@
 # SPEC-DX-003 — Doctor core
 
-**Status:** Ready for implementation  
+**Status:** Implemented (pending merge)  
 **Branch:** `feat/dx-003-doctor-core`  
 **Parent sections:** Master §12, §37, Phase 2; [ADR-0002](../../adr/ADR-0002-cli-runtime-boundaries.md)
 
@@ -83,10 +83,10 @@ N/A.
 
 ## Acceptance criteria
 
-- [ ] `durin doctor` runs and reports actionable items.
-- [ ] JSON mode machine-readable.
-- [ ] Does not fork Eregion protocol implementation.
-- [ ] Tests cover at least PHP + project check paths.
+- [x] `durin doctor` runs and reports actionable items.
+- [x] JSON mode machine-readable.
+- [x] Does not fork Eregion protocol implementation.
+- [x] Tests cover at least PHP + project check paths.
 
 ## Risks
 
