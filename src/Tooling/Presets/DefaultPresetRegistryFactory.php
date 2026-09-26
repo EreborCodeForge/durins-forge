@@ -14,6 +14,7 @@ final class DefaultPresetRegistryFactory
         $registry = new PresetRegistry();
         $registry->register(new MinimalPreset());
         $registry->register(new ServicePreset());
+        $registry->register(new WorkerPreset());
 
         return $registry;
     }

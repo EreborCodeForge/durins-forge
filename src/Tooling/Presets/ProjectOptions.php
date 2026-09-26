@@ -18,6 +18,7 @@ final readonly class ProjectOptions
         public string $targetDirectory,
         public string $runtimeEngine = 'mithril',
         public string $runtimeServer = 'eregion',
+        public string $runtimeMode = 'http',
         public bool $http = true,
         public bool $messaging = false,
         public bool $modules = false,

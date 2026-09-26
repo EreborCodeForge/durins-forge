@@ -9,6 +9,7 @@ use App\Tooling\Doctor\CheckResult;
 use App\Tooling\Doctor\DoctorContext;
 use App\Tooling\Doctor\DoctorExitCode;
 use Erebor\Mithril\Contracts\HttpApplication;
+use Erebor\Mithril\Contracts\JobApplication;
 
 final class ProjectKernelCheck implements Check
 {
@@ -20,40 +21,60 @@ final class ProjectKernelCheck implements Check
     public function run(DoctorContext $context): array
     {
         $composerPath = $context->project->paths->composerJson();
-        $kernelClass = 'App\\Kernel';
+        $jobMode = $context->project->manifest?->isJobMode() ?? false;
+        $httpKernel = 'App\\Kernel';
+        $jobKernel = 'App\\JobKernel';
 
         if (is_file($composerPath)) {
             $json = json_decode((string) file_get_contents($composerPath), true);
             if (is_array($json)) {
-                $configured = $json['extra']['mithril']['kernel'] ?? null;
-                if (is_string($configured) && $configured !== '') {
-                    $kernelClass = $configured;
+                $configuredHttp = $json['extra']['mithril']['kernel'] ?? null;
+                if (is_string($configuredHttp) && $configuredHttp !== '') {
+                    $httpKernel = $configuredHttp;
+                }
+                $configuredJob = $json['extra']['mithril']['job_kernel'] ?? null;
+                if (is_string($configuredJob) && $configuredJob !== '') {
+                    $jobKernel = $configuredJob;
+                    $jobMode = true;
                 }
             }
         }
 
-        if (!class_exists($kernelClass)) {
+        if ($jobMode) {
+            return $this->assertImplements($jobKernel, JobApplication::class, 'JobKernel');
+        }
+
+        return $this->assertImplements($httpKernel, HttpApplication::class, 'Kernel');
+    }
+
+    /**
+     * @param class-string $expected
+     * @return list<CheckResult>
+     */
+    private function assertImplements(string $class, string $expected, string $label): array
+    {
+        if (!class_exists($class)) {
             return [
                 CheckResult::fail(
                     $this->id(),
-                    'Kernel',
-                    "class not loadable: {$kernelClass}",
+                    $label,
+                    "class not loadable: {$class}",
                     DoctorExitCode::InvalidConfiguration,
                 ),
             ];
         }
 
-        if (!is_subclass_of($kernelClass, HttpApplication::class)) {
+        if (!is_subclass_of($class, $expected)) {
             return [
                 CheckResult::fail(
                     $this->id(),
-                    'Kernel',
-                    "{$kernelClass} must implement " . HttpApplication::class,
+                    $label,
+                    "{$class} must implement {$expected}",
                     DoctorExitCode::InvalidConfiguration,
                 ),
             ];
         }
 
-        return [CheckResult::ok($this->id(), 'Kernel', $kernelClass)];
+        return [CheckResult::ok($this->id(), $label, $class)];
     }
 }

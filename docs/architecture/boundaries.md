@@ -21,6 +21,8 @@
 | Container compilation orchestration | Durin |
 | Runtime metrics | Eregion |
 | Runtime status presentation | Durin via Eregion |
+| Job / queue worker process loop | MithrilPHP (proposed; see SPEC-017) |
+| Job application DX / preset `worker` | Durin (after SPEC-017) |
 | DB abstraction | Mazarbul |
 | Architecture dependency visualization | Durin |
 | Production monitoring platform | external |
@@ -34,6 +36,7 @@
 ## Durin MUST NOT
 
 - Reimplement UDS transport, MessagePack framing, EREGION protocol, worker supervision, HTTP concurrency, or Eregion backpressure.
+- Route non-HTTP job workers through Eregion’s HTTP protocol (see [SPEC-017](../specs/derived/017-worker-runtime-contract.md)).
 - Introduce graph databases, DX daemons, or remote control planes for basic inspection.
 - Silently change the PHP or runtime compatibility baseline (requires ADR).
 

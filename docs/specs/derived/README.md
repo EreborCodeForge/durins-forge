@@ -22,5 +22,10 @@ Implementation order (one branch / merge each):
 | [014](014-make-feature.md) | `make:feature` | `feat/dx-014-make-feature` |
 | [015](015-dependency-graph-core.md) | Dependency graph core | `feat/dx-015-dependency-graph-core` |
 | [016](016-dependency-graph-renderers.md) | Graph renderers | `feat/dx-016-dependency-graph-renderers` |
+| [017](017-worker-runtime-contract.md) | Worker runtime contract (job / non-HTTP) | `feat/dx-017-worker-runtime-contract` (docs) |
 
 Protocol: implement on branch → commit → push → wait for merge to `main` and maintainer signal → pull `main` → next branch.
+
+Post-V1: SPEC-017 is the prerequisite contract for preset `worker` (master §21). It does **not** require Eregion changes for the first job-worker cut.
+
+Mithril library work: [../mithril/SPEC-MITHRIL-001-job-worker-runtime.md](../mithril/SPEC-MITHRIL-001-job-worker-runtime.md) (implement in `mithrilphp`, not Durin).

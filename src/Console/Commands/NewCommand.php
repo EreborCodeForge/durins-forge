@@ -29,7 +29,7 @@ final class NewCommand extends Command
 
     public static function getDescription(): string
     {
-        return 'Cria um projeto a partir de um preset (ex.: --preset=minimal)';
+        return 'Cria um projeto a partir de um preset (ex.: --preset=minimal|service|worker)';
     }
 
     public function execute(): int
@@ -39,7 +39,7 @@ final class NewCommand extends Command
         $preset = ArgParser::string($parsed['options'], 'preset', 'minimal') ?? 'minimal';
 
         if (!is_string($name) || $name === '') {
-            $this->error('Usage: durin new <name> [--preset=minimal|service]');
+            $this->error('Usage: durin new <name> [--preset=minimal|service|worker]');
 
             return 2;
         }

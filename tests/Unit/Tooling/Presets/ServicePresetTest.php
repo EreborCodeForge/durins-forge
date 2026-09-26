@@ -71,6 +71,7 @@ final class ServicePresetTest extends TestCase
         $registry = (new DefaultPresetRegistryFactory())->create();
         $this->assertTrue($registry->has('service'));
         $this->assertTrue($registry->has('minimal'));
+        $this->assertTrue($registry->has('worker'));
         $this->assertContains('service', $registry->names());
     }
 

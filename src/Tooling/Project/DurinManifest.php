@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tooling\Project;
 
 /**
- * Minimal durin.yaml model (master §22).
+ * Minimal durin.yaml model (master §22 + SPEC-DX-017 runtime.mode).
  */
 final readonly class DurinManifest
 {
@@ -20,7 +20,15 @@ final readonly class DurinManifest
         public string $runtimeServer,
         public array $features,
         public array $architecture,
+        public string $runtimeMode = 'http',
     ) {}
+
+    public function isJobMode(): bool
+    {
+        return $this->runtimeMode === 'job'
+            || $this->preset === 'worker'
+            || ($this->features['messaging'] === true && $this->features['http'] === false);
+    }
 
     /**
      * @param array<string, mixed> $data
@@ -46,8 +54,12 @@ final readonly class DurinManifest
 
         $engine = $runtime['engine'] ?? 'mithril';
         $server = $runtime['server'] ?? 'eregion';
+        $mode = $runtime['mode'] ?? 'http';
         if (!is_string($engine) || $engine === '' || !is_string($server) || $server === '') {
             throw new DurinManifestException('runtime.engine and runtime.server must be non-empty strings.');
+        }
+        if (!is_string($mode) || $mode === '') {
+            throw new DurinManifestException('runtime.mode must be a non-empty string when present.');
         }
 
         $features = $data['features'] ?? ['http' => true, 'messaging' => false];
@@ -72,13 +84,14 @@ final readonly class DurinManifest
             architecture: [
                 'modules' => (bool) ($architecture['modules'] ?? false),
             ],
+            runtimeMode: $mode,
         );
     }
 
     /**
      * @return array{
      *   application: array{name: string, preset: string},
-     *   runtime: array{engine: string, server: string},
+     *   runtime: array{engine: string, server: string, mode: string},
      *   features: array{http: bool, messaging: bool},
      *   architecture: array{modules: bool}
      * }
@@ -93,6 +106,7 @@ final readonly class DurinManifest
             'runtime' => [
                 'engine' => $this->runtimeEngine,
                 'server' => $this->runtimeServer,
+                'mode' => $this->runtimeMode,
             ],
             'features' => $this->features,
             'architecture' => $this->architecture,

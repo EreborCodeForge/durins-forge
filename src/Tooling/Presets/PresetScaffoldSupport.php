@@ -96,7 +96,7 @@ PHP;
                 'php' => '^8.5',
                 'ext-msgpack' => '*',
                 'ext-sockets' => '*',
-                'ereborcodeforge/mithrilphp' => '^2.1',
+                'ereborcodeforge/mithrilphp' => '^2.2',
             ],
             'require-dev' => [
                 'phpunit/phpunit' => '^12.5',
@@ -129,6 +129,104 @@ PHP;
         return json_encode($json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n";
     }
 
+    public function composerJsonWorker(string $package): string
+    {
+        $json = [
+            'name' => $package,
+            'type' => 'project',
+            'require' => [
+                'php' => '^8.5',
+                'ext-msgpack' => '*',
+                'ext-sockets' => '*',
+                'ereborcodeforge/mithrilphp' => '^2.2',
+            ],
+            'require-dev' => [
+                'phpunit/phpunit' => '^12.5',
+            ],
+            'autoload' => [
+                'psr-4' => [
+                    'App\\' => 'src/',
+                ],
+            ],
+            'autoload-dev' => [
+                'psr-4' => [
+                    'App\\Tests\\' => 'tests/',
+                ],
+            ],
+            'extra' => [
+                'mithril' => [
+                    'job_kernel' => 'App\\JobKernel',
+                ],
+            ],
+            'scripts' => [
+                'test' => 'phpunit',
+                'job:work' => 'job-worker',
+            ],
+            'config' => [
+                'sort-packages' => true,
+            ],
+        ];
+
+        return json_encode($json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n";
+    }
+
+    public function jobKernel(string $app): string
+    {
+        return <<<PHP
+<?php
+
+declare(strict_types=1);
+
+namespace App;
+
+use Erebor\Mithril\Container;
+use Erebor\Mithril\Contracts\JobApplication;
+use Erebor\Mithril\Jobs\InMemoryJobTransport;
+use Erebor\Mithril\Jobs\JobEnvelope;
+use Erebor\Mithril\Jobs\JobResult;
+use Erebor\Mithril\Jobs\JobTransport;
+
+/**
+ * Job application kernel for {$app}.
+ * Bind a real JobTransport adapter for production brokers.
+ */
+final class JobKernel implements JobApplication
+{
+    private Container \$container;
+    private bool \$booted = false;
+
+    public function __construct()
+    {
+        \$this->container = new Container();
+    }
+
+    public function boot(): void
+    {
+        if (\$this->booted) {
+            return;
+        }
+
+        // Demo transport — replace with Infrastructure adapter (Redis/SQS/…).
+        \$this->container->singleton(JobTransport::class, new InMemoryJobTransport([]));
+
+        \$this->booted = true;
+    }
+
+    public function handle(JobEnvelope \$job): JobResult
+    {
+        // Dispatch by \$job->name into src/Jobs handlers.
+        return JobResult::ack();
+    }
+
+    public function getContainer(): Container
+    {
+        return \$this->container;
+    }
+}
+
+PHP;
+    }
+
     public function envExample(): string
     {
         return <<<'ENV'
@@ -138,6 +236,50 @@ APP_URL=http://127.0.0.1:8080
 APP_PORT=8080
 
 ENV;
+    }
+
+    public function envExampleWorker(): string
+    {
+        return <<<'ENV'
+APP_ENV=development
+APP_DEBUG=true
+# Optional: MITHRIL_JOB_KERNEL=App\JobKernel
+
+ENV;
+    }
+
+    /**
+     * @param list<string> $structureLines
+     */
+    public function readmeWorker(string $app, array $structureLines): string
+    {
+        $structure = implode("\n", array_map(
+            static fn (string $line): string => '- `' . $line . '`',
+            $structureLines,
+        ));
+
+        return <<<MD
+# {$app}
+
+Created with `durin new` preset **worker** (job / non-HTTP).
+
+## Next steps
+
+```bash
+composer install
+cp .env.example .env
+# bind a real JobTransport in JobKernel::boot()
+php vendor/bin/job-worker
+# or: composer job:work
+```
+
+This app does **not** use Eregion. See Mithril job-worker docs and Durin SPEC-DX-017.
+
+Structure:
+
+{$structure}
+
+MD;
     }
 
     /**

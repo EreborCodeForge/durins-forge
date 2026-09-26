@@ -31,7 +31,7 @@
     "ext-pdo": "*",
     "ext-sockets": "*",
     "ereborcodeforge/mazarbul": "^1.0",
-    "ereborcodeforge/mithrilphp": "^2.1"
+    "ereborcodeforge/mithrilphp": "^2.2"
   },
   "autoload": {
     "psr-4": {

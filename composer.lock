@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5a01c51ec88bb69ddb1db04771114fa2",
+    "content-hash": "9039132c40334abae8fd08ebdb6ab5b1",
     "packages": [
         {
             "name": "ereborcodeforge/mazarbul",
-            "version": "v1.0.1",
+            "version": "v1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/EreborCodeForge/mazarbul.git",
-                "reference": "655c98c4c4fc7ed1c41de4374a8fadd8dbb0a275"
+                "reference": "39016165c8d9080ed6e346cdfb512db637ca4ae2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/EreborCodeForge/mazarbul/zipball/655c98c4c4fc7ed1c41de4374a8fadd8dbb0a275",
-                "reference": "655c98c4c4fc7ed1c41de4374a8fadd8dbb0a275",
+                "url": "https://api.github.com/repos/EreborCodeForge/mazarbul/zipball/39016165c8d9080ed6e346cdfb512db637ca4ae2",
+                "reference": "39016165c8d9080ed6e346cdfb512db637ca4ae2",
                 "shasum": ""
             },
             "require": {
@@ -31,7 +31,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "1.0.x-dev"
+                    "dev-main": "1.1.x-dev"
                 }
             },
             "autoload": {
@@ -64,20 +64,20 @@
                 "issues": "https://github.com/EreborCodeForge/mazarbul/issues",
                 "source": "https://github.com/EreborCodeForge/mazarbul"
             },
-            "time": "2026-08-10T14:38:15+00:00"
+            "time": "2026-09-07T00:58:02+00:00"
         },
         {
             "name": "ereborcodeforge/mithrilphp",
-            "version": "v2.1.0",
+            "version": "v2.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/EreborCodeForge/mithrilphp.git",
-                "reference": "29032ed1a8fb23dac4ff0607b35cb1012030be09"
+                "reference": "6c3a5b087fb8812b6d21e826b33f564714866de1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/EreborCodeForge/mithrilphp/zipball/29032ed1a8fb23dac4ff0607b35cb1012030be09",
-                "reference": "29032ed1a8fb23dac4ff0607b35cb1012030be09",
+                "url": "https://api.github.com/repos/EreborCodeForge/mithrilphp/zipball/6c3a5b087fb8812b6d21e826b33f564714866de1",
+                "reference": "6c3a5b087fb8812b6d21e826b33f564714866de1",
                 "shasum": ""
             },
             "require": {
@@ -91,7 +91,8 @@
             },
             "bin": [
                 "bin/forge",
-                "bin/eregion-worker"
+                "bin/eregion-worker",
+                "bin/job-worker"
             ],
             "type": "library",
             "extra": {
@@ -131,7 +132,7 @@
                 "issues": "https://github.com/EreborCodeForge/mithrilphp/issues",
                 "source": "https://github.com/EreborCodeForge/mithrilphp"
             },
-            "time": "2026-08-05T00:33:50+00:00"
+            "time": "2026-09-26T20:13:45+00:00"
         }
     ],
     "packages-dev": [

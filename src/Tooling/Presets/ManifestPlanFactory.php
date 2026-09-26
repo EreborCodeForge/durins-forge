@@ -20,6 +20,7 @@ final class ManifestPlanFactory
             preset: $options->preset,
             runtimeEngine: $options->runtimeEngine,
             runtimeServer: $options->runtimeServer,
+            runtimeMode: $options->runtimeMode,
             features: [
                 'http' => $options->http,
                 'messaging' => $options->messaging,

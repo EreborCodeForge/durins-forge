@@ -23,6 +23,16 @@ final class EregionRuntimeCheck implements Check
 
     public function run(DoctorContext $context): array
     {
+        if ($context->project->manifest?->isJobMode() === true) {
+            return [
+                CheckResult::ok(
+                    $this->id(),
+                    'Eregion',
+                    'skipped (job mode — see SPEC-DX-017 / bin/job-worker)',
+                ),
+            ];
+        }
+
         $results = [];
         $root = $context->root();
         $resolver = new ApplicationResolver($root);

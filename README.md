@@ -114,7 +114,7 @@ php bin/durins-forge
 
 | Comando | Descrição |
 |---------|-----------|
-| `new` | Cria projeto a partir de preset (`--preset=minimal\|service`) |
+| `new` | Cria projeto a partir de preset (`--preset=minimal\|service\|worker`) |
 | `doctor` | Diagnóstico PHP / projeto / Mithril-Eregion / artefatos (`--json`, `--strict`) |
 | `status` | Runtime configurado agora (`--json`) |
 | `dev` | Dev local via facade → Eregion (`--php` = serve:php) |
@@ -140,14 +140,16 @@ php bin/durins-forge
 ```bash
 php bin/durin new webhook-api --preset=minimal
 php bin/durin new billing --preset=service
+php bin/durin new notifications --preset=worker
 ```
 
 | Preset | Quando usar | Estrutura |
 |--------|-------------|-----------|
 | `minimal` | API pequena / webhook | `src/Http`, `src/Application` (sem Domain) |
 | `service` | Backend service geral | roots `Domain`, `Application`, `Infrastructure`, `Presentation` |
+| `worker` | Job / fila / schedule (sem HTTP) | `JobKernel`, `Application`, `Infrastructure`, `Jobs` |
 
-Ambos gravam `durin.yaml` e compartilham baseline PHP 8.5 + Mithril ([ADR-0003](docs/adr/ADR-0003-architecture-presets.md)). Presets `modular` / `microservice` / `worker` ficam fora do V1.
+Todos gravam `durin.yaml` e compartilham baseline PHP 8.5 + Mithril ([ADR-0003](docs/adr/ADR-0003-architecture-presets.md)). Preset `worker` exige Mithril **^2.2** (`bin/job-worker`, [SPEC-MITHRIL-001](docs/specs/mithril/SPEC-MITHRIL-001-job-worker-runtime.md)); não usa Eregion. Presets `modular` / `microservice` ficam fora do V1.
 
 ---
 
@@ -253,7 +255,8 @@ CI (GitHub Actions) executa a suíte em **PHP 8.5** com `msgpack` e `sockets` ([
 | [Architecture](docs/architecture/overview.md) | Visão e [fronteiras](docs/architecture/boundaries.md) |
 | [ADRs](docs/adr/) | Decisões (PHP 8.5, CLI/runtime, presets, tooling) |
 | [Master DX spec](docs/specs/master-dx-tooling-spec.md) | Spec canônica |
-| [SPECs derivadas](docs/specs/derived/) | Fatias 001–016 (implementadas) |
+| [SPECs derivadas](docs/specs/derived/) | Fatias 001–016 (V1) + [017 worker runtime](docs/specs/derived/017-worker-runtime-contract.md) |
+| [SPEC Mithril job worker](docs/specs/mithril/SPEC-MITHRIL-001-job-worker-runtime.md) | Implementação na lib `mithrilphp` (`JobApplication`, `bin/job-worker`) |
 | [Eregion](docs/durins-forge-eregion-spec.md) | Runtime HTTP |
 | [Performance](docs/PERFORMANCE.md) | Docker / bench |
 

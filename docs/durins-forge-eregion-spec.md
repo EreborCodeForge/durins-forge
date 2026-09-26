@@ -59,6 +59,13 @@ Contratos irmãos:
 - Esconder o contrato `HttpApplication` atrás de um Kernel incompatível
 - Exigir worker PHP custom por app (o entrypoint é `eregion-worker`)
 
+### 1.5 Job workers (não-HTTP)
+
+Consumers de fila / jobs assíncronos **não** usam o protocolo HTTP do Eregion. Contrato: [specs/derived/017-worker-runtime-contract.md](specs/derived/017-worker-runtime-contract.md).
+
+- **Eregion V1:** nenhuma mudança obrigatória para job workers.
+- **HTTP workers** (`eregion-worker`) continuam exclusivos do path Client → Eregion → Mithril → `HttpApplication`.
+
 ---
 
 ## 2. Contrato do Kernel (obrigatório)

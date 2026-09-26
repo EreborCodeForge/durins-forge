@@ -37,9 +37,30 @@ YAML;
         $this->assertSame('service', $manifest->preset);
         $this->assertSame('mithril', $manifest->runtimeEngine);
         $this->assertSame('eregion', $manifest->runtimeServer);
-        $this->assertTrue($manifest->features['http']);
-        $this->assertFalse($manifest->features['messaging']);
-        $this->assertFalse($manifest->architecture['modules']);
+        $this->assertSame('http', $manifest->runtimeMode);
+        $this->assertFalse($manifest->isJobMode());
+    }
+
+    public function test_parses_job_mode_worker_manifest(): void
+    {
+        $manifest = (new DurinManifestParser())->parse(<<<'YAML'
+application:
+  name: notifications
+  preset: worker
+runtime:
+  engine: mithril
+  server: none
+  mode: job
+features:
+  http: false
+  messaging: true
+architecture:
+  modules: false
+YAML);
+
+        $this->assertTrue($manifest->isJobMode());
+        $this->assertSame('job', $manifest->runtimeMode);
+        $this->assertSame('none', $manifest->runtimeServer);
     }
 
     public function test_round_trip_yaml(): void
@@ -78,5 +99,6 @@ YAML);
 
         $this->assertSame('mithril', $manifest->runtimeEngine);
         $this->assertSame('eregion', $manifest->runtimeServer);
+        $this->assertSame('http', $manifest->runtimeMode);
     }
 }
