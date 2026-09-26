@@ -1,6 +1,6 @@
 # SPEC-DX-004 — Runtime facade contract
 
-**Status:** Ready for implementation  
+**Status:** Implemented (pending merge)  
 **Branch:** `feat/dx-004-runtime-facade`  
 **Parent sections:** Master §8, §39; [ADR-0002](../../adr/ADR-0002-cli-runtime-boundaries.md)
 
@@ -72,9 +72,9 @@ N/A.
 
 ## Acceptance criteria
 
-- [ ] Single facade interface used as the extension point for serve/dev/status.
-- [ ] No second startup stack introduced.
-- [ ] Tests with doubles pass.
+- [x] Single facade interface used as the extension point for serve/dev/status.
+- [x] No second startup stack introduced.
+- [x] Tests with doubles pass.
 
 ## Risks
 
