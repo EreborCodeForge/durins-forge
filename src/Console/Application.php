@@ -20,6 +20,7 @@ use App\Console\Commands\RoutesCompileCommand;
 use App\Console\Commands\RoutesPostmanCommand;
 use App\Console\Commands\SeedCommand;
 use App\Console\Commands\ServeCommand;
+use App\Console\Commands\StatusCommand;
 use Erebor\Mithril\Console\Kernel as MithrilKernel;
 
 class Application
@@ -42,6 +43,7 @@ class Application
         $kernel->register(OptimizeCommand::class);
         $kernel->register(ServeCommand::class);
         $kernel->register(DevCommand::class);
+        $kernel->register(StatusCommand::class);
         $kernel->register(DoctorCommand::class);
         return $kernel->handle($argv);
     }
