@@ -10,6 +10,7 @@ use App\Console\Commands\ContainerClearCommand;
 use App\Console\Commands\ContainerCompileCommand;
 use App\Console\Commands\DevCommand;
 use App\Console\Commands\DoctorCommand;
+use App\Console\Commands\GraphDependenciesCommand;
 use App\Console\Commands\MigrateCommand;
 use App\Console\Commands\MigrateFreshCommand;
 use App\Console\Commands\MigrateRollbackCommand;
@@ -51,6 +52,7 @@ class Application
         $kernel->register(DevCommand::class);
         $kernel->register(StatusCommand::class);
         $kernel->register(DoctorCommand::class);
+        $kernel->register(GraphDependenciesCommand::class);
         return $kernel->handle($argv);
     }
 }

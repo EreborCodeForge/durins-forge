@@ -1,6 +1,6 @@
 # SPEC-DX-016 — Dependency graph renderers
 
-**Status:** Ready for implementation  
+**Status:** Implemented (pending merge)  
 **Branch:** `feat/dx-016-dependency-graph-renderers`  
 **Parent sections:** Master §15, §38-005/006; depends on SPEC-015
 
@@ -25,15 +25,15 @@ Implement `durin graph:dependencies` with:
 
 ## Current implementation
 
-- Graph core (015).
+- `TextGraphRenderer`, `MermaidGraphRenderer`, `JsonGraphRenderer` via `GraphRendererRegistry`.
+- `GraphDependenciesCommand` → `ProjectDiscovery` → `DependencyGraphAssembler` → renderer.
+- Formats: `text` (default), `mermaid`, `json`.
 
 ## Proposed design
 
 ```text
-GraphCommand → collectors → render(format)
+GraphCommand → assemblers → render(format)
 ```
-
-Formats: `text` (default), `mermaid`, `json`.
 
 ## Affected files
 
@@ -41,7 +41,7 @@ Formats: `text` (default), `mermaid`, `json`.
 
 ## New files
 
-- Renderers, command, tests
+- Renderers, registry, command, tests
 
 ## Public API / CLI impact
 
@@ -58,7 +58,7 @@ Additive.
 
 ## Migration
 
-N/A.
+N/A. Container edges require optional `var/cache/container.descriptor.php` (DescriptorProvider shape).
 
 ## Implementation phases
 
@@ -69,19 +69,19 @@ N/A.
 
 ## Tests
 
-- Unit: renderers golden strings/fixtures.
-- Integration: CLI smoke with fixture project.
+- Unit: renderer golden assertions.
+- Console smoke with fixture project + module filter.
 
 ## Acceptance criteria
 
-- [ ] Three formats work.
-- [ ] Module filter applied.
-- [ ] Tests green.
-- [ ] README documents command.
+- [x] Three formats work.
+- [x] Module filter applied.
+- [x] Tests green.
+- [x] README documents command.
 
 ## Risks
 
-- Huge graphs in text mode — allow module filter as primary mitigation for V1.
+- Huge graphs in text mode — module filter is the V1 mitigation.
 
 ## Open questions
 
