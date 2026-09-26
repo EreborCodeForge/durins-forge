@@ -1,6 +1,6 @@
 # SPEC-DX-013 — Normalize `make:usecase`
 
-**Status:** Ready for implementation  
+**Status:** Implemented (pending merge)  
 **Branch:** `feat/dx-013-make-usecase-normalization`  
 **Parent sections:** Master §27, §41-003; depends on SPEC-011 (and 012 if module-aware)
 
@@ -19,13 +19,15 @@ Refactor `make:usecase` to use generator core; support module-aware paths when m
 
 ## Current implementation
 
-- `MakeUsecaseCommand` (or equivalent) generates DTO + interface + use case under current layout.
+- `MakeUseCaseCommand` → `UseCaseGenerator` → `GeneratorRunner` / `ScaffoldWriter`.
+- **Default:** `src/Application/DTOs/{Domain}/{Name}DTO.php` + `UseCases/{Domain}/{Name}UseCase(.php|Interface.php)` (legacy-compatible).
+- **Module:** `durin make:usecase CreateInvoice --module=Billing` → `src/Modules/Billing/Application/CreateInvoice/{CreateInvoice,CreateInvoiceInput}.php` (master §27 naming; no interface).
 
 ## Proposed design
 
 - Route generation through Generator core.
-- Detect module argument/option if present (`Billing/CreateInvoice` or `--module=`).
-- Preserve output for current invocations as much as practical; document intentional path changes.
+- Detect `--module=` via ArgParser.
+- Preserve default Application layout; document module layout as additive.
 
 ## Affected files
 
@@ -34,19 +36,22 @@ Refactor `make:usecase` to use generator core; support module-aware paths when m
 
 ## New files
 
-- Possibly usecase templates under Tooling/Generators
+- `UseCaseGenerator`, unit/console tests
 
 ## Public API / CLI impact
 
-Same command name; options may grow (`--module`).
+```bash
+durin make:usecase User/CreateUser
+durin make:usecase CreateInvoice --module=Billing
+```
 
 ## Backward compatibility
 
-Prefer preserving default paths for existing apps. If change required, document migration in SPEC commit.
+Default paths unchanged vs pre-normalization command. Conflict handling now refuses overwrite (ScaffoldWriter) instead of silently skipping — intentional alignment with generator core.
 
 ## Migration
 
-Note in README if paths change.
+If scripts relied on silent skip of existing files, they must delete targets first or handle exit code 1 conflicts.
 
 ## Implementation phases
 
@@ -56,14 +61,14 @@ Note in README if paths change.
 
 ## Tests
 
-- Unit/feature covering current golden paths.
-- Module path case.
+- Unit covering default + module golden paths + conflict.
+- Console command tests for both modes.
 
 ## Acceptance criteria
 
-- [ ] Uses generator core.
-- [ ] Existing happy path still works or documented migration applied.
-- [ ] Tests updated and green.
+- [x] Uses generator core.
+- [x] Existing happy path still works or documented migration applied.
+- [x] Tests updated and green.
 
 ## Risks
 
@@ -71,7 +76,7 @@ Note in README if paths change.
 
 ## Open questions
 
-- Exact module path convention — follow master §27.
+None — module convention settled as master §27 under `src/Modules/{Module}/Application/{Name}/`.
 
 ## Definition of Done
 

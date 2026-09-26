@@ -121,7 +121,7 @@ php bin/durins-forge
 | `status` | O que está configurado/disponível agora (`--json`; sem `--watch` nesta fatia) |
 | `migrate` / `migrate:fresh` / `migrate:rollback` | Migrações |
 | `make:module` | Cria `src/Modules/{Name}` com marcador mínimo |
-| `make:usecase` | Gera DTO + Use Case |
+| `make:usecase` | Gera DTO + Use Case (`Domain/Name` ou `--module=Billing`) |
 | `config:cache` / `config:clear` | Cache de config em `var/cache/` |
 | `container:compile` / `container:clear` | Container |
 | `routes:compile` / `routes:clear` | Rotas |
