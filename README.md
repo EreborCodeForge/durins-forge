@@ -61,13 +61,16 @@ Equivalente de baixo nível: `vendor/bin/forge serve ...`.
 
 ### Dev local
 
-O `public/index.php` é o **worker UDS** (`EregionBridge`), não front FPM. Para HTTP local preferir o caminho canônico com Eregion:
+`durin dev` é a entrada **de desenvolvimento**: defaults locais (`127.0.0.1:8080`, `APP_ENV=development`) e o **mesmo** `RuntimeFacade` de produção (Eregion). Não é um segundo stack de startup.
 
 ```bash
-php bin/durin serve --host=127.0.0.1 --port=8080
+php bin/durin doctor
+php bin/durin dev
 ```
 
-(`forge serve:php` / `php -S -t public` devolve 503 — o entrypoint não fala HTTP. Um `durin dev` dedicado virá em seguida.)
+Escape hatch (limitado): `--php` chama `forge serve:php`. Neste skeleton o `public/index.php` é worker UDS — `serve:php` / `php -S` tipicamente devolvem **503**. Preferir Eregion também em local.
+
+Hot-reload completo depende do que Mithril/Eregion expõem; Durin não finge hot-reload se o runtime não tiver.
 
 ---
 
@@ -112,6 +115,7 @@ php bin/durins-forge
 |---------|-----------|
 | `optimize` | Compila container + rotas → `var/cache/` |
 | `doctor` | Diagnóstico de PHP, projeto, Mithril/Eregion e artefatos (`--json`, `--strict`) |
+| `dev` | Desenvolvimento local via facade → Eregion (`--php` = serve:php) |
 | `serve` | Runtime de produção via facade → Mithril/Eregion (`forge serve`) |
 | `migrate` / `migrate:fresh` / `migrate:rollback` | Migrações |
 | `make:usecase` | Gera DTO + Use Case |

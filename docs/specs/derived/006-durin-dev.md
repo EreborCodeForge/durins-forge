@@ -1,6 +1,6 @@
 # SPEC-DX-006 — `durin dev`
 
-**Status:** Ready for implementation  
+**Status:** Implemented (pending merge)  
 **Branch:** `feat/dx-006-durin-dev`  
 **Parent sections:** Master §9, §39-003; depends on SPEC-004
 
@@ -31,6 +31,14 @@ Implement `durin dev`:
 
 `DevCommand` → `RuntimeFacade::dev` with development defaults (debug-friendly, fewer workers assumptions). Reuse output abstraction from foundation.
 
+### Decision (open question resolved)
+
+Default runtime for `durin dev` is **Eregion via `forge serve`** with local bind defaults (`127.0.0.1:8080`), because this application's `public/index.php` is an UDS worker and `forge serve:php` / `php -S` typically return 503.
+
+Escape hatch: `--php` → `forge serve:php` (documented as limited).
+
+Same `RuntimeFacade` / process runner as `serve` — no second startup stack.
+
 ## Affected files
 
 - Console registration, README
@@ -43,6 +51,7 @@ Implement `durin dev`:
 
 ```bash
 durin dev
+durin dev --php
 ```
 
 ## Backward compatibility
@@ -66,17 +75,17 @@ Encourage `durin dev` in docs; keep `forge serve:php` as lower-level escape hatc
 
 ## Acceptance criteria
 
-- [ ] Command exists and uses shared facade.
-- [ ] Semantics documented as distinct from `serve`.
-- [ ] Tests cover invocation path.
+- [x] Command exists and uses shared facade.
+- [x] Semantics documented as distinct from `serve`.
+- [x] Tests cover invocation path.
 
 ## Risks
 
-- Ambiguity whether default dev uses Eregion or PHP built-in — choose one default, document the other flag/escape.
+- Ambiguity whether default dev uses Eregion or PHP built-in — **resolved**: Eregion default; `--php` escape.
 
 ## Open questions
 
-- Default runtime for dev: prefer Mithril `serve:php` unless project already has Eregion installed and `--eregion` passed — decide in implementation and record in SPEC update if needed.
+- ~~Default runtime for dev~~ → Eregion; `--php` for serve:php.
 
 ## Definition of Done
 
