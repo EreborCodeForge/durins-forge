@@ -1,6 +1,6 @@
 # SPEC-DX-012 — `make:module`
 
-**Status:** Ready for implementation  
+**Status:** Implemented (pending merge)  
 **Branch:** `feat/dx-012-make-module`  
 **Parent sections:** Master §26, §41-002; depends on SPEC-011
 
@@ -19,12 +19,13 @@ Implement `durin make:module <Name>` generating the module skeleton defined in m
 
 ## Current implementation
 
-- Generator core.
-- No `make:module`.
+- Generator core + ScaffoldWriter (conflict-safe, no overwrite by default).
+- `make:module` creates `src/Modules/{Name}/module.php`.
+- When `durin.yaml` exists, `DurinManifestModulesEnabler` sets `architecture.modules: true` after a successful scaffold (managed metadata update outside ScaffoldWriter).
 
 ## Proposed design
 
-Console command → ModuleGenerator → ScaffoldPlan → Writer. Update `durin.yaml` modules flag/list if present.
+Console command → ModuleGenerator → ScaffoldPlan → Writer for the module marker. After success, DurinManifestModulesEnabler updates `architecture.modules` when `durin.yaml` is present (ScaffoldWriter refuses free-form overwrites).
 
 ## Affected files
 
@@ -61,9 +62,9 @@ N/A.
 
 ## Acceptance criteria
 
-- [ ] Creates module structure per §26.
-- [ ] Refuses overwrite by default.
-- [ ] Tests green.
+- [x] Creates module structure per §26.
+- [x] Refuses overwrite by default.
+- [x] Tests green.
 
 ## Risks
 

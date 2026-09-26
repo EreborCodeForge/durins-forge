@@ -120,6 +120,7 @@ php bin/durins-forge
 | `serve` | Runtime de produção via facade → Mithril/Eregion (`forge serve`) |
 | `status` | O que está configurado/disponível agora (`--json`; sem `--watch` nesta fatia) |
 | `migrate` / `migrate:fresh` / `migrate:rollback` | Migrações |
+| `make:module` | Cria `src/Modules/{Name}` com marcador mínimo |
 | `make:usecase` | Gera DTO + Use Case |
 | `config:cache` / `config:clear` | Cache de config em `var/cache/` |
 | `container:compile` / `container:clear` | Container |
