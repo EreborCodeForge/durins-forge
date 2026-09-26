@@ -7,7 +7,7 @@ namespace App\Core\Providers;
 use App\Core\Attributes\Discoverable;
 use App\Core\DescriptorProvider;
 use App\Core\ServiceProvider;
-use App\Domain\Services\StorageServiceInterface;
+use App\Core\Contracts\StorageServiceInterface;
 use App\Infrastructure\Services\StorageServiceBuilder;
 use Erebor\Mithril\Container;
 use Erebor\Mithril\Logger\FileLogger;

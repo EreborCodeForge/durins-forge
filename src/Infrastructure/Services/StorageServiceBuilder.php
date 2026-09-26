@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Services;
 
-use App\Domain\Services\StorageServiceInterface;
+use App\Core\Contracts\StorageServiceInterface;
 use Erebor\Mithril\Container;
 use Erebor\Mithril\Environment;
 use Exception;

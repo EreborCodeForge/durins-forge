@@ -6,11 +6,11 @@ namespace App;
 
 use App\Core\Exceptions\Handler;
 use App\Core\Http\HttpKernel;
+use App\Core\Http\Middleware\CorsMiddleware;
+use App\Core\Http\Middleware\CsrfMiddleware;
+use App\Core\Http\Middleware\ThrottleRequests;
 use App\Core\Routing\ControllerHandlerResolver;
 use App\Infrastructure\Session\SessionManager;
-use App\Presentation\Middleware\CorsMiddleware;
-use App\Presentation\Middleware\CsrfMiddleware;
-use App\Presentation\Middleware\ThrottleRequests;
 use Erebor\Mithril\Container;
 use Erebor\Mithril\Contracts\HttpApplication;
 use Erebor\Mithril\Contracts\PipelineContract;

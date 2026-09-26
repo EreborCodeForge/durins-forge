@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use App\Database\Seeders\ProductSeeder;
-use Throwable;
-
+/**
+ * Framework core ships no domain seeders.
+ * Generated apps may register their own seed command/providers later.
+ */
 final class SeedCommand extends BaseMigrateCommand
 {
     public static function getSignature(): string
@@ -16,24 +17,13 @@ final class SeedCommand extends BaseMigrateCommand
 
     public static function getDescription(): string
     {
-        return 'Run database seeders (ProductSeeder by default)';
+        return 'Database seeders (no-op in framework core; provide seeders in your app)';
     }
 
     public function execute(): int
     {
-        try {
-            // Ensures SQLite file / MySQL DB exist and wires Mazarbul via DB::database()
-            $this->getRunner();
+        $this->comment('Durin core has no built-in seeders. Add them in your application project.');
 
-            $this->info('Seeding products…');
-            (new ProductSeeder())->run();
-            $this->info('Seed complete.');
-
-            return 0;
-        } catch (Throwable $e) {
-            $this->error('Seed failed: ' . $e->getMessage());
-
-            return 1;
-        }
+        return 0;
     }
 }

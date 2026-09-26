@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Services;
+namespace App\Core\Contracts;
 
 use Erebor\Mithril\Http\UploadedFile;
 

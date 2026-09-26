@@ -113,7 +113,7 @@ final class DependencyGraphCoreTest extends TestCase
                 'GET' => [
                     '/api/invoices' => [
                         'handler' => ['App\\Modules\\Billing\\Http\\CreateInvoiceController', 'index'],
-                        'middlewares' => ['App\\Presentation\\Middleware\\AuthMiddleware'],
+                        'middlewares' => ['App\\Core\\Http\\Middleware\\CorsMiddleware'],
                         'path' => '/api/invoices',
                     ],
                 ],

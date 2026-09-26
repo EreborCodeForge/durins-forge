@@ -10,7 +10,7 @@ use App\Core\Http\Cache\CacheResponse;
 use App\Core\Http\Cache\HttpResponseCacheStoreInterface;
 use App\Core\Http\Cache\ResponseCacheKeyBuilder;
 use App\Core\Http\Cache\ResponseCachePolicy;
-use App\Presentation\Middleware\ResponseCacheMiddleware;
+use App\Core\Http\Middleware\ResponseCacheMiddleware;
 use Erebor\Mithril\Http\HttpContext;
 use Erebor\Mithril\Http\Request;
 use Erebor\Mithril\Http\Response;

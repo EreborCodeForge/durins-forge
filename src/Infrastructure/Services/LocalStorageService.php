@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Services;
 
-use App\Domain\Services\StorageServiceInterface;
+use App\Core\Contracts\StorageServiceInterface;
 use App\Infrastructure\Exceptions\InfrastructureException;
 use Erebor\Mithril\Http\UploadedFile;
 
