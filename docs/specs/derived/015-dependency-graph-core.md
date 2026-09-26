@@ -1,6 +1,6 @@
 # SPEC-DX-015 — Dependency graph core
 
-**Status:** Ready for implementation  
+**Status:** Implemented (pending merge)  
 **Branch:** `feat/dx-015-dependency-graph-core`  
 **Parent sections:** Master §15, §38; Phase 6
 
@@ -14,14 +14,18 @@ Deliver graph domain model + project/module discovery + collectors based on **ex
 
 ## Non-goals
 
-- Mermaid/JSON renderers (016).
+- Mermaid/JSON/text renderers and CLI (016).
 - Full architecture rule engine (§44).
 - Graph database.
+- Parsing compiled container closures (use `var/cache/container.descriptor.php` DescriptorProvider shape instead).
 
 ## Current implementation
 
-- Container/route compile artifacts under `var/cache/`.
-- No graph model.
+- `Tooling/Graph`: `DependencyGraph`, nodes/edges, `ProjectModuleDiscovery`, `ContainerDependencyCollector`, `RouteDependencyCollector`, loaders, `DependencyGraphAssembler`.
+- Module markers: `src/Modules/{Name}/module.php`.
+- Container metadata: optional `var/cache/container.descriptor.php` (same shape as `DescriptorProvider`).
+- Routes metadata: optional `var/cache/routes.php` (compiled export).
+- Supports `module` filter input for later CLI.
 
 ## Proposed design
 
@@ -30,21 +34,22 @@ DependencyGraph (nodes/edges)
   ← ProjectModuleDiscovery
   ← ContainerDependencyCollector
   ← RouteDependencyCollector
+  ← DependencyGraphAssembler
 ```
 
-CLI may be stubbed until 016; prefer library + unit tests here.
+CLI deferred to 016.
 
 ## Affected files
 
-- Possibly read compiled artifacts from Core
+- None outside Tooling/Graph (+ tests/SPEC).
 
 ## New files
 
-- `Tooling/Graph/*` model + collectors + tests
+- `src/Tooling/Graph/*` + unit tests
 
 ## Public API / CLI impact
 
-None required (or hidden command).
+None (library only).
 
 ## Backward compatibility
 
@@ -52,7 +57,7 @@ N/A.
 
 ## Migration
 
-N/A.
+N/A. Projects that want container edges in the graph may emit `var/cache/container.descriptor.php` (016/docs can mention).
 
 ## Implementation phases
 
@@ -63,14 +68,14 @@ N/A.
 
 ## Tests
 
-- Unit: graph merge, collector fixtures.
+- Unit: merge/filter, module discovery, container/route collectors, assembler with fixtures.
 
 ## Acceptance criteria
 
-- [ ] Model supports module filter input for later CLI.
-- [ ] Collectors use explicit metadata only.
-- [ ] No AST dependency.
-- [ ] Tests green.
+- [x] Model supports module filter input for later CLI.
+- [x] Collectors use explicit metadata only.
+- [x] No AST dependency.
+- [x] Tests green.
 
 ## Risks
 
