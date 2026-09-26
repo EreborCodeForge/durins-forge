@@ -1,6 +1,6 @@
 # SPEC-DX-008 — Preset engine
 
-**Status:** Ready for implementation  
+**Status:** Implemented (pending merge)  
 **Branch:** `feat/dx-008-preset-engine`  
 **Parent sections:** Master §22, §40-001/002; [ADR-0003](../../adr/ADR-0003-architecture-presets.md); depends on SPEC-002
 
@@ -23,6 +23,7 @@ Deliver preset engine:
 
 - Concrete file trees for all presets.
 - `durin add` capabilities marketplace.
+- Public `durin new` CLI in this slice (engine-only).
 
 ## Current implementation
 
@@ -35,11 +36,11 @@ Deliver preset engine:
 PresetRegistry → Preset::scaffold(options) → ScaffoldPlan → (Writer in callers)
 ```
 
-Validate preset name; refuse unknown presets with clear error.
+Validate preset name; refuse unknown presets with clear error. Engine appends `durin.yaml` via `ManifestPlanFactory` when the preset did not already plan it.
 
 ## Affected files
 
-- Tooling/Presets, possibly Console stub
+- Tooling/Presets
 
 ## New files
 
@@ -47,7 +48,7 @@ Validate preset name; refuse unknown presets with clear error.
 
 ## Public API / CLI impact
 
-Possibly internal only until 009; if CLI needed for test, keep hidden or `--preset` on experimental `new`.
+Internal only until 009/010.
 
 ## Backward compatibility
 
@@ -70,13 +71,13 @@ N/A.
 
 ## Acceptance criteria
 
-- [ ] Engine selects preset by name.
-- [ ] Produces ScaffoldPlan only (no uncontrolled writes inside preset).
-- [ ] Tests pass.
+- [x] Engine selects preset by name.
+- [x] Produces ScaffoldPlan only (no uncontrolled writes inside preset).
+- [x] Tests pass.
 
 ## Risks
 
-- Premature `durin new` scope creep — keep engine-focused.
+- Premature `durin new` scope creep — kept engine-focused.
 
 ## Open questions
 
