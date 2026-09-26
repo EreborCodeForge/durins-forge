@@ -1,6 +1,6 @@
 # SPEC-DX-002 — Tooling foundation
 
-**Status:** Ready for implementation  
+**Status:** Implemented (pending merge)  
 **Branch:** `feat/dx-002-tooling-foundation`  
 **Parent sections:** Master §29–31, §43, Phase 1; [ADR-0004](../../adr/ADR-0004-tooling-package-boundaries.md)
 
@@ -81,9 +81,9 @@ N/A.
 
 ## Acceptance criteria
 
-- [ ] Manifest round-trip for minimal schema (application name/preset, runtime engine/server flags as in master §22).
-- [ ] Writer never overwrites without explicit force API (force may be stubbed/unimplemented until Phase 7).
-- [ ] Unit tests pass via `composer test`.
+- [x] Manifest round-trip for minimal schema (application name/preset, runtime engine/server flags as in master §22).
+- [x] Writer never overwrites without explicit force API (force may be stubbed/unimplemented until Phase 7).
+- [x] Unit tests pass via `composer test`.
 
 ## Risks
 
