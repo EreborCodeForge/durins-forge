@@ -113,7 +113,7 @@ php bin/durins-forge
 
 | Comando | Descrição |
 |---------|-----------|
-| `new` | Cria projeto a partir de preset (`--preset=minimal`) |
+| `new` | Cria projeto a partir de preset (`--preset=minimal|service`) |
 | `optimize` | Compila container + rotas → `var/cache/` |
 | `doctor` | Diagnóstico de PHP, projeto, Mithril/Eregion e artefatos (`--json`, `--strict`) |
 | `dev` | Desenvolvimento local via facade → Eregion (`--php` = serve:php) |
@@ -134,9 +134,15 @@ php bin/durins-forge
 
 ```bash
 php bin/durin new webhook-api --preset=minimal
+php bin/durin new billing --preset=service
 ```
 
-O preset **minimal** gera só o útil: `src/Http`, `src/Application`, `routes`, `config`, `tests` + `durin.yaml` — sem árvore Domain/Entity vazia.
+| Preset | Quando usar | Estrutura |
+|--------|-------------|-----------|
+| `minimal` | API pequena / webhook | `src/Http`, `src/Application` (sem Domain) |
+| `service` | Backend service geral | `Domain`, `Application`, `Infrastructure`, `Presentation` (só roots; sem Entity/Repository vazios) |
+
+Ambos gravam `durin.yaml` e compartilham baseline PHP 8.5 + Mithril.
 
 ---
 

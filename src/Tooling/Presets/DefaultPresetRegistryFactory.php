@@ -13,6 +13,7 @@ final class DefaultPresetRegistryFactory
     {
         $registry = new PresetRegistry();
         $registry->register(new MinimalPreset());
+        $registry->register(new ServicePreset());
 
         return $registry;
     }

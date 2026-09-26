@@ -1,6 +1,6 @@
 # SPEC-DX-010 — Preset `service`
 
-**Status:** Ready for implementation  
+**Status:** Implemented (pending merge)  
 **Branch:** `feat/dx-010-preset-service`  
 **Parent sections:** Master §18, §40-004; depends on SPEC-008/009 patterns
 
@@ -15,7 +15,7 @@ Implement `service` preset per master §18: application layering suited to a sin
 ## Non-goals
 
 - `modular` / `microservice` / `worker`.
-- Changing `minimal`.
+- Changing `minimal` behavior (shared helpers extracted only).
 
 ## Current implementation
 
@@ -23,7 +23,7 @@ Implement `service` preset per master §18: application layering suited to a sin
 
 ## Proposed design
 
-`ServicePreset` builds ScaffoldPlan. Reuse templates/helpers from minimal where shared (composer baseline, PHP 8.5, Mithril pins).
+`ServicePreset` builds ScaffoldPlan with layer roots. Shared file templates live in `PresetScaffoldSupport`.
 
 ## Affected files
 
@@ -59,13 +59,13 @@ N/A.
 
 ## Acceptance criteria
 
-- [ ] Service preset registered and selectable.
-- [ ] Distinct from minimal in documented ways.
-- [ ] Tests green.
+- [x] Service preset registered and selectable.
+- [x] Distinct from minimal in documented ways.
+- [x] Tests green.
 
 ## Risks
 
-- Overbuilding toward modular — reject extra dirs not in §18.
+- Overbuilding toward modular — rejected Entity/Repository empty trees.
 
 ## Open questions
 
