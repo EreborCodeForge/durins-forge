@@ -13,6 +13,7 @@ use App\Console\Commands\DoctorCommand;
 use App\Console\Commands\MigrateCommand;
 use App\Console\Commands\MigrateFreshCommand;
 use App\Console\Commands\MigrateRollbackCommand;
+use App\Console\Commands\MakeFeatureCommand;
 use App\Console\Commands\MakeModuleCommand;
 use App\Console\Commands\MakeUseCaseCommand;
 use App\Console\Commands\NewCommand;
@@ -37,6 +38,7 @@ class Application
         $kernel->register(SeedCommand::class);
         $kernel->register(MakeModuleCommand::class);
         $kernel->register(MakeUseCaseCommand::class);
+        $kernel->register(MakeFeatureCommand::class);
         $kernel->register(RoutesPostmanCommand::class);
         $kernel->register(RoutesCompileCommand::class);
         $kernel->register(RoutesClearCommand::class);
