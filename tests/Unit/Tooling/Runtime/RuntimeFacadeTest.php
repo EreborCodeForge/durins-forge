@@ -54,7 +54,9 @@ final class RuntimeFacadeTest extends TestCase
         $this->assertSame('0.0.0.0', $serve->host);
         $this->assertSame(8080, $serve->port);
         $this->assertSame('127.0.0.1', $dev->host);
-        $this->assertSame(8000, $dev->port);
+        $this->assertSame(8080, $dev->port);
+        $this->assertSame('development', $dev->environment);
+        $this->assertFalse($dev->preferPhpServer);
     }
 
     public function test_options_parse_flags(): void
@@ -88,13 +90,22 @@ final class RuntimeFacadeTest extends TestCase
 
         $cwd = sys_get_temp_dir();
         $serveCode = $facade->serve(new RuntimeOptions($cwd, host: '0.0.0.0', port: 8080));
-        $devCode = $facade->dev(new RuntimeOptions($cwd, host: '127.0.0.1', port: 8000, mode: RuntimeMode::Dev));
+        $devCode = $facade->dev(new RuntimeOptions($cwd, host: '127.0.0.1', port: 8080, mode: RuntimeMode::Dev));
+        $phpDevCode = $facade->dev(new RuntimeOptions(
+            $cwd,
+            host: '127.0.0.1',
+            port: 8000,
+            mode: RuntimeMode::Dev,
+            preferPhpServer: true,
+        ));
 
         $this->assertSame(0, $serveCode);
         $this->assertSame(0, $devCode);
-        $this->assertCount(2, $runner->calls);
+        $this->assertSame(0, $phpDevCode);
+        $this->assertCount(3, $runner->calls);
         $this->assertSame(['serve', '--host=0.0.0.0', '--port=8080'], $runner->calls[0]['arguments']);
-        $this->assertSame(['serve:php', '--host=127.0.0.1', '--port=8000'], $runner->calls[1]['arguments']);
+        $this->assertSame(['serve', '--host=127.0.0.1', '--port=8080'], $runner->calls[1]['arguments']);
+        $this->assertSame(['serve:php', '--host=127.0.0.1', '--port=8000'], $runner->calls[2]['arguments']);
         $this->assertSame('/tmp/fake-forge', $runner->calls[0]['binary']);
         $this->assertSame('/tmp/fake-forge', $runner->calls[1]['binary']);
     }

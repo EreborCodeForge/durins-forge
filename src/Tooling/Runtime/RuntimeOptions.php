@@ -20,6 +20,7 @@ final readonly class RuntimeOptions
         public ?string $environment = null,
         public array $passthroughArgs = [],
         public RuntimeMode $mode = RuntimeMode::Serve,
+        public bool $preferPhpServer = false,
     ) {}
 
     /**
@@ -28,12 +29,21 @@ final readonly class RuntimeOptions
     public static function fromArgv(array $argv, string $workingDirectory, RuntimeMode $mode = RuntimeMode::Serve): self
     {
         $host = $mode === RuntimeMode::Dev ? '127.0.0.1' : '0.0.0.0';
-        $port = $mode === RuntimeMode::Dev ? 8000 : 8080;
+        $port = 8080;
         $workers = 0;
-        $environment = null;
+        $environment = $mode === RuntimeMode::Dev ? 'development' : null;
+        $preferPhp = false;
         $passthrough = [];
 
         foreach ($argv as $arg) {
+            if ($arg === '--php') {
+                $preferPhp = true;
+                continue;
+            }
+            if ($arg === '--eregion') {
+                $preferPhp = false;
+                continue;
+            }
             if (str_starts_with($arg, '--host=')) {
                 $host = substr($arg, 7);
                 continue;
@@ -61,6 +71,7 @@ final readonly class RuntimeOptions
             environment: $environment,
             passthroughArgs: $passthrough,
             mode: $mode,
+            preferPhpServer: $preferPhp,
         );
     }
 

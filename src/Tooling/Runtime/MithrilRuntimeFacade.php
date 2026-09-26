@@ -6,6 +6,10 @@ namespace App\Tooling\Runtime;
 
 /**
  * Mithril-backed facade: one startup path for serve/dev; status via provider.
+ *
+ * Dev default uses Eregion (`forge serve`) with local bind defaults because this
+ * application's public/index.php is an UDS worker (php -S / serve:php → 503).
+ * Escape hatch: RuntimeOptions::$preferPhpServer / CLI `--php`.
  */
 final class MithrilRuntimeFacade implements RuntimeFacade
 {
@@ -26,15 +30,19 @@ final class MithrilRuntimeFacade implements RuntimeFacade
 
     public function dev(RuntimeOptions $options): int
     {
-        // Local PHP path (SPEC-006 will refine UX). Shared runner — no second stack.
-        return $this->processRunner->run(
-            $this->resolveForgeBinary($options->workingDirectory),
-            array_merge(
-                ['serve:php', '--host=' . $options->host, '--port=' . (string) $options->port],
-                $options->passthroughArgs,
-            ),
-            $options->workingDirectory,
-        );
+        if ($options->preferPhpServer) {
+            return $this->processRunner->run(
+                $this->resolveForgeBinary($options->workingDirectory),
+                array_merge(
+                    ['serve:php', '--host=' . $options->host, '--port=' . (string) $options->port],
+                    $options->passthroughArgs,
+                ),
+                $options->workingDirectory,
+            );
+        }
+
+        // Same orchestration stack as serve — only bind/env defaults differ.
+        return $this->serve($options);
     }
 
     public function status(RuntimeOptions $options): RuntimeStatus
