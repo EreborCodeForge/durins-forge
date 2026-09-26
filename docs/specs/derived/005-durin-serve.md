@@ -1,6 +1,6 @@
 # SPEC-DX-005 — `durin serve`
 
-**Status:** Ready for implementation  
+**Status:** Implemented (pending merge)  
 **Branch:** `feat/dx-005-durin-serve`  
 **Parent sections:** Master §10, §39-002; depends on SPEC-004
 
@@ -65,9 +65,9 @@ Document any flag renames; prefer none.
 
 ## Acceptance criteria
 
-- [ ] Uses RuntimeFacade.
-- [ ] Does not duplicate forge serve logic.
-- [ ] README states production semantics.
+- [x] Uses RuntimeFacade.
+- [x] Does not duplicate forge serve logic.
+- [x] README states production semantics.
 
 ## Risks
 
