@@ -2,11 +2,38 @@
 
 namespace App\Tests\Feature;
 
+use App\Infrastructure\Database\DB;
+use App\Infrastructure\Database\Migrations\MigrationRunner;
 use App\Tests\DurinsForgeBaseTest;
 use Erebor\Mithril\Http\Request;
 
 class AuthTest extends DurinsForgeBaseTest
 {
+    private static bool $migrationsApplied = false;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->ensureSchema();
+    }
+
+    private function ensureSchema(): void
+    {
+        if (self::$migrationsApplied) {
+            return;
+        }
+
+        $runner = new MigrationRunner(
+            DB::pdo(),
+            base_path('migrations'),
+            static function (string $_message): void {
+                // silence CLI chatter in PHPUnit output
+            }
+        );
+        $runner->migrate();
+        self::$migrationsApplied = true;
+    }
+
     public function test_register_creates_new_user()
     {
         // Mock data

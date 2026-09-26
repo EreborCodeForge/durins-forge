@@ -165,6 +165,8 @@ composer test
 ./vendor/bin/phpunit
 ```
 
+CI (GitHub Actions) executa a suíte em **PHP 8.5** com `msgpack` e `sockets` ([ADR-0001](docs/adr/ADR-0001-php-version-baseline.md)).
+
 ---
 
 ## Licença

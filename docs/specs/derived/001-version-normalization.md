@@ -1,6 +1,6 @@
 # SPEC-DX-001 — Version normalization
 
-**Status:** Ready for implementation  
+**Status:** Implemented (pending merge)  
 **Branch:** `feat/dx-001-version-normalization`  
 **Parent sections:** Master §5, §36; [ADR-0001](../../adr/ADR-0001-php-version-baseline.md)
 
@@ -65,10 +65,10 @@ Operators must use PHP 8.5+ locally and in images. No app code migration.
 
 ## Acceptance criteria
 
-- [ ] No first-party install/runtime doc recommends PHP 8.3.
-- [ ] Docker app/bench images align with 8.5.
-- [ ] CI runs tests on PHP 8.5.
-- [ ] ADR-0001 remains accurate.
+- [x] No first-party install/runtime doc recommends PHP 8.3.
+- [x] Docker app/bench images align with 8.5 (`php:8.5-cli-bookworm` verified on Docker Hub).
+- [x] CI runs tests on PHP 8.5 (`.github/workflows/ci.yml`).
+- [x] ADR-0001 remains accurate.
 
 ## Risks
 
