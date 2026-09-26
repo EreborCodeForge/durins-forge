@@ -86,7 +86,7 @@ Dev sem Eregion: `vendor/bin/forge serve:php`.
 
 ### Benchmark Docker (live vs compiled)
 
-Ambiente Linux controlado (PHP 8.3, OPcache, sem Xdebug), dois containers:
+Ambiente Linux controlado (PHP 8.5, OPcache, sem Xdebug), dois containers:
 
 | Serviço | Porta host | Modo |
 |---------|------------|------|

@@ -44,7 +44,7 @@ services:
       start_period: 15s
 
   bench:
-    image: php:8.3-cli-bookworm
+    image: php:8.5-cli-bookworm
     profiles: ["bench"]
     working_dir: /bench
     volumes:

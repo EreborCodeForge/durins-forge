@@ -129,7 +129,7 @@ npm run build    # produção → public/build/
 
 ## Docker
 
-Imagem com PHP 8.3 + sockets + msgpack. O entrypoint roda `durin optimize` (modo compiled) e preferencialmente `forge serve`; se o check do Eregion falhar, cai em `forge serve:php`.
+Imagem com PHP 8.5 + sockets + msgpack. O entrypoint roda `durin optimize` (modo compiled) e preferencialmente `forge serve`; se o check do Eregion falhar, cai em `forge serve:php`.
 
 ```bash
 make up      # live :8082 | compiled :8081
@@ -137,7 +137,9 @@ make bench
 make down
 ```
 
-Detalhes: [docs/PERFORMANCE.md](docs/PERFORMANCE.md). Spec completa: [docs/durins-forge-eregion-spec.md](docs/durins-forge-eregion-spec.md).
+Detalhes: [docs/PERFORMANCE.md](docs/PERFORMANCE.md). Spec Eregion: [docs/durins-forge-eregion-spec.md](docs/durins-forge-eregion-spec.md).
+
+DX / tooling (programa): [docs/specs/master-dx-tooling-spec.md](docs/specs/master-dx-tooling-spec.md) · [PRD](docs/product/PRD.md) · [ADRs](docs/adr/) · [specs derivadas](docs/specs/derived/).
 
 ---
 
