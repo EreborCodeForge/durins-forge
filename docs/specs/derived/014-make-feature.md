@@ -1,6 +1,6 @@
 # SPEC-DX-014 — `make:feature`
 
-**Status:** Ready for implementation  
+**Status:** Implemented (pending merge)  
 **Branch:** `feat/dx-014-make-feature`  
 **Parent sections:** Master §28, §41-004; depends on SPEC-011–013
 
@@ -16,22 +16,25 @@ Implement `durin make:feature` per master §28, composing generator primitives (
 
 - All remaining `make:command|query|repository|adapter|migration` commands.
 - Preset changes.
+- `--repository` / `--migration` flags (rejected with clear error until later slices).
 
 ## Current implementation
 
-- Module + usecase generators.
+- `FeatureGenerator` merges `ModuleGenerator` + `UseCaseGenerator` (module layout) into one `ScaffoldPlan`, then optional Http controller + Feature test stubs.
+- Single `GeneratorRunner` write; conflict-safe.
+- Enables `architecture.modules` via `DurinManifestModulesEnabler` when `durin.yaml` exists.
 
 ## Proposed design
 
-Feature generator orchestrates multiple ScaffoldPlan merges then single write. Flags like `--http` / `--tests` as in master examples.
+Feature generator orchestrates multiple ScaffoldPlan merges then single write. Flags `--http` / `--tests` as in master examples.
 
 ## Affected files
 
-- Console, README
+- Console Application, README
 
 ## New files
 
-- Feature generator + integration tests
+- `FeatureGenerator`, `MakeFeatureCommand`, unit/console tests
 
 ## Public API / CLI impact
 
@@ -52,17 +55,18 @@ N/A.
 1. Plan composition.
 2. CLI flags.
 3. Integration test.
-4. Docs (journey §45).
+4. Docs.
 
 ## Tests
 
-- Integration temp project with module fixture.
+- Temp-root unit tests for composition, flags, conflicts.
+- Console tests for happy path and deferred flags.
 
 ## Acceptance criteria
 
-- [ ] Composes primitives; no duplicate write stacks.
-- [ ] Conflict-safe.
-- [ ] Tests green.
+- [x] Composes primitives; no duplicate write stacks.
+- [x] Conflict-safe.
+- [x] Tests green.
 
 ## Risks
 
