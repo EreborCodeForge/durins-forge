@@ -203,7 +203,7 @@ cd my-app
 composer require ereborcodeforge/mithrilphp:^2.1
 # (ou já vem no skeleton)
 
-# PHP 8.3+, ext-msgpack, ext-sockets
+# PHP 8.5+, ext-msgpack, ext-sockets
 
 vendor/bin/forge server:install          # baixa Eregion pinado → .mithril/bin
 vendor/bin/forge eregion:craft           # eregion.yaml + var/runtime/eregion.json
@@ -232,7 +232,7 @@ vendor/bin/forge serve:php --port=8000
 
 ### Requisitos de máquina
 
-- PHP **8.3+**
+- PHP **8.5+**
 - Extensões: `json`, **`msgpack`**, **`sockets`**
 - Composer 2
 - OS: Linux/macOS preferencial para UDS em produção; Windows ok para craft/install/dev (AF_UNIX conforme suporte local)
@@ -242,7 +242,7 @@ vendor/bin/forge serve:php --port=8000
 ```json
 {
   "require": {
-    "php": "^8.3",
+    "php": "^8.5",
     "ereborcodeforge/mithrilphp": "^2.1",
     "ext-msgpack": "*",
     "ext-sockets": "*"
@@ -296,7 +296,7 @@ Mesmo Kernel + Worker; um request por processo (`FpmOnceBridge`).
 
 Imagem com:
 
-- PHP 8.3-cli + msgpack + sockets  
+- PHP 8.5-cli + msgpack + sockets  
 - `composer install --no-dev`  
 - `forge server:install` no build ou entrypoint  
 - `durin optimize` no build  
