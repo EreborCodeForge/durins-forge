@@ -4,13 +4,23 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Tooling\Runtime\MithrilRuntimeFacade;
+use App\Tooling\Runtime\RuntimeFacade;
+use App\Tooling\Runtime\RuntimeMode;
+use App\Tooling\Runtime\RuntimeOptions;
+use App\Tooling\Runtime\RuntimeOrchestrationException;
 use Erebor\Mithril\Console\Command;
 
 /**
- * Thin alias — Durin does not fork the Eregion protocol; Forge owns serve.
+ * Production-oriented runtime entry via shared RuntimeFacade (ADR-0002).
+ * Delegates to Mithril forge serve → Eregion; does not fork the server.
  */
 final class ServeCommand extends Command
 {
+    public function __construct(
+        private readonly ?RuntimeFacade $facade = null,
+    ) {}
+
     public static function getSignature(): string
     {
         return 'serve';
@@ -18,24 +28,21 @@ final class ServeCommand extends Command
 
     public static function getDescription(): string
     {
-        return 'Alias para vendor/bin/forge serve (Eregion)';
+        return 'Sobe o runtime de produção via Mithril/Eregion (forge serve)';
     }
 
     public function execute(): int
     {
-        $forge = base_path('vendor/bin/forge');
-        if (!is_file($forge)) {
-            $this->error('vendor/bin/forge não encontrado. Rode composer install.');
+        $cwd = getcwd() ?: base_path();
+        $options = RuntimeOptions::fromArgv($this->args, $cwd, RuntimeMode::Serve);
+        $facade = $this->facade ?? new MithrilRuntimeFacade();
+
+        try {
+            return $facade->serve($options);
+        } catch (RuntimeOrchestrationException $e) {
+            $this->error($e->getMessage());
+
             return 1;
         }
-
-        $args = array_slice($_SERVER['argv'] ?? [], 2);
-        $cmd = escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($forge) . ' serve';
-        foreach ($args as $arg) {
-            $cmd .= ' ' . escapeshellarg($arg);
-        }
-
-        passthru($cmd, $code);
-        return (int) $code;
     }
 }

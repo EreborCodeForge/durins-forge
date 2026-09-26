@@ -44,24 +44,30 @@ vendor/bin/forge eregion:craft           # eregion.yaml + var/runtime/eregion.js
 vendor/bin/durin optimize                # após composer install (link-bins)
 # equivalente: php bin/durin optimize
 vendor/bin/forge server:check
-vendor/bin/forge serve --host=0.0.0.0 --port=8080
+php bin/durin serve --host=0.0.0.0 --port=8080
 ```
 
-### Dev sem Eregion
+### `durin serve` (produção)
 
-O `public/index.php` é o **worker UDS** (`EregionBridge`), não front FPM. Para HTTP local use o caminho canônico:
+`durin serve` é a entrada **orientada a produção**: orquestra via `RuntimeFacade` → `vendor/bin/forge serve` → Eregion. Durin não implementa o servidor HTTP.
+
+Defaults: `--host=0.0.0.0`, `--port=8080`. Flags extras são repassadas ao Forge.
 
 ```bash
-vendor/bin/forge serve --host=127.0.0.1 --port=8080
+php bin/durin serve --host=0.0.0.0 --port=8080 --workers=4
 ```
 
-(`forge serve:php` / `php -S -t public` devolve 503 — o entrypoint não fala HTTP.)
+Equivalente de baixo nível: `vendor/bin/forge serve ...`.
 
-Alias opcional:
+### Dev local
+
+O `public/index.php` é o **worker UDS** (`EregionBridge`), não front FPM. Para HTTP local preferir o caminho canônico com Eregion:
 
 ```bash
-php bin/durin serve --host=0.0.0.0 --port=8080   # → vendor/bin/forge serve
+php bin/durin serve --host=127.0.0.1 --port=8080
 ```
+
+(`forge serve:php` / `php -S -t public` devolve 503 — o entrypoint não fala HTTP. Um `durin dev` dedicado virá em seguida.)
 
 ---
 
@@ -106,7 +112,7 @@ php bin/durins-forge
 |---------|-----------|
 | `optimize` | Compila container + rotas → `var/cache/` |
 | `doctor` | Diagnóstico de PHP, projeto, Mithril/Eregion e artefatos (`--json`, `--strict`) |
-| `serve` | Alias fino para `forge serve` |
+| `serve` | Runtime de produção via facade → Mithril/Eregion (`forge serve`) |
 | `migrate` / `migrate:fresh` / `migrate:rollback` | Migrações |
 | `make:usecase` | Gera DTO + Use Case |
 | `config:cache` / `config:clear` | Cache de config em `var/cache/` |
