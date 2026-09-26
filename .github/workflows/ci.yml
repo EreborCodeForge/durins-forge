@@ -57,5 +57,8 @@ jobs:
           mkdir -p var/cache var/runtime storage/framework/cache storage/logs logs
           touch database.sqlite
 
+      - name: Run database migrations
+        run: php bin/durin migrate
+
       - name: Run tests
         run: composer test
