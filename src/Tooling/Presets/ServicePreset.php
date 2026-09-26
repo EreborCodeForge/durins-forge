@@ -7,9 +7,10 @@ namespace App\Tooling\Presets;
 use App\Tooling\Scaffold\ScaffoldPlan;
 
 /**
- * Small HTTP API / webhook preset (master §17). No Domain ceremony.
+ * General-purpose backend service preset (master §18).
+ * Layer roots only — no empty Entity/Repository ceremony trees.
  */
-final class MinimalPreset implements Preset
+final class ServicePreset implements Preset
 {
     public function __construct(
         private readonly PresetScaffoldSupport $files = new PresetScaffoldSupport(),
@@ -17,7 +18,7 @@ final class MinimalPreset implements Preset
 
     public function name(): string
     {
-        return 'minimal';
+        return 'service';
     }
 
     public function scaffold(ProjectOptions $options): ScaffoldPlan
@@ -26,32 +27,51 @@ final class MinimalPreset implements Preset
         $app = $options->name;
         $package = $this->files->composerPackageName($app);
 
+        // Align options for service-oriented manifest defaults.
+        $serviceOptions = new ProjectOptions(
+            name: $options->name,
+            preset: 'service',
+            targetDirectory: $options->targetDirectory,
+            runtimeEngine: $options->runtimeEngine,
+            runtimeServer: $options->runtimeServer,
+            http: true,
+            messaging: false,
+            modules: false,
+            extra: $options->extra,
+        );
+
         $plan
-            ->directory('src/Http')
+            ->directory('src/Domain')
             ->directory('src/Application')
+            ->directory('src/Infrastructure')
+            ->directory('src/Presentation')
             ->directory('routes')
             ->directory('config')
             ->directory('tests')
             ->directory('public')
             ->directory('var/cache')
             ->directory('var/runtime')
-            ->file('src/Http/.gitkeep', '')
+            ->file('src/Domain/.gitkeep', '')
             ->file('src/Application/.gitkeep', '')
+            ->file('src/Infrastructure/.gitkeep', '')
+            ->file('src/Presentation/.gitkeep', '')
             ->file('routes/api.php', $this->files->routesApi())
             ->file('config/app.php', $this->files->configApp($app))
-            ->file('public/index.php', $this->files->publicIndex('Minimal'))
+            ->file('public/index.php', $this->files->publicIndex('Service'))
             ->file('tests/ExampleTest.php', $this->files->exampleTest())
             ->file('composer.json', $this->files->composerJson($package))
             ->file('.env.example', $this->files->envExample())
-            ->file('README.md', $this->files->readme($app, 'minimal', [
-                'src/Http',
+            ->file('README.md', $this->files->readme($app, 'service', [
+                'src/Domain',
                 'src/Application',
+                'src/Infrastructure',
+                'src/Presentation',
                 'routes',
                 'config',
                 'tests',
             ]));
 
-        (new ManifestPlanFactory())->appendManifest($plan, $options);
+        (new ManifestPlanFactory())->appendManifest($plan, $serviceOptions);
 
         return $plan;
     }

@@ -39,7 +39,7 @@ final class NewCommand extends Command
         $preset = ArgParser::string($parsed['options'], 'preset', 'minimal') ?? 'minimal';
 
         if (!is_string($name) || $name === '') {
-            $this->error('Usage: durin new <name> [--preset=minimal]');
+            $this->error('Usage: durin new <name> [--preset=minimal|service]');
 
             return 2;
         }
