@@ -1,6 +1,6 @@
 # SPEC-DX-011 — Generator core
 
-**Status:** Ready for implementation  
+**Status:** Implemented (pending merge)  
 **Branch:** `feat/dx-011-generator-core`  
 **Parent sections:** Master §41-001, §43; depends on SPEC-002
 
@@ -21,6 +21,7 @@ Deliver generator core on top of ScaffoldPlan/Writer:
 
 - Implementing all `make:*` commands here.
 - AST refactor tools.
+- Rewriting `make:usecase` (SPEC-013).
 
 ## Current implementation
 
@@ -30,14 +31,12 @@ Deliver generator core on top of ScaffoldPlan/Writer:
 ## Proposed design
 
 ```text
-Generator → builds ScaffoldPlan → ScaffoldWriter
+CodeGenerator::plan() → ScaffoldPlan → GeneratorRunner → ScaffoldWriter
 ```
-
-Migrate shared bits from MakeUsecase only as needed without breaking behavior (full alignment is SPEC-013).
 
 ## Affected files
 
-- Possibly extract helpers from existing make command
+- None of existing make commands (left for 013).
 
 ## New files
 
@@ -49,7 +48,7 @@ None required.
 
 ## Backward compatibility
 
-Do not break `make:usecase` in this slice.
+`make:usecase` unchanged.
 
 ## Migration
 
@@ -59,21 +58,21 @@ Internal only.
 
 1. Core API + templates.
 2. Conflict tests.
-3. Optional thin adapter used by one existing path without behavior change.
+3. Placeholder generator for proof (not a public command).
 
 ## Tests
 
-- Unit: path helpers, conflict detection, idempotent re-run when files identical (if supported).
+- Unit: path helpers, conflict detection, idempotent re-run when files identical.
 
 ## Acceptance criteria
 
-- [ ] Generators produce plans, not ad-hoc writes.
-- [ ] Default no overwrite.
-- [ ] Unit tests pass.
+- [x] Generators produce plans, not ad-hoc writes.
+- [x] Default no overwrite.
+- [x] Unit tests pass.
 
 ## Risks
 
-- Big-bang rewrite of make:usecase — avoid; wait for 013.
+- Big-bang rewrite of make:usecase — avoided.
 
 ## Open questions
 
