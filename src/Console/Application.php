@@ -8,6 +8,7 @@ use App\Console\Commands\ConfigCacheCommand;
 use App\Console\Commands\ConfigClearCommand;
 use App\Console\Commands\ContainerClearCommand;
 use App\Console\Commands\ContainerCompileCommand;
+use App\Console\Commands\DoctorCommand;
 use App\Console\Commands\MigrateCommand;
 use App\Console\Commands\MigrateFreshCommand;
 use App\Console\Commands\MigrateRollbackCommand;
@@ -39,6 +40,7 @@ class Application
         $kernel->register(ContainerClearCommand::class);
         $kernel->register(OptimizeCommand::class);
         $kernel->register(ServeCommand::class);
+        $kernel->register(DoctorCommand::class);
         return $kernel->handle($argv);
     }
 }

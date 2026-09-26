@@ -105,6 +105,7 @@ php bin/durins-forge
 | Comando | Descrição |
 |---------|-----------|
 | `optimize` | Compila container + rotas → `var/cache/` |
+| `doctor` | Diagnóstico de PHP, projeto, Mithril/Eregion e artefatos (`--json`, `--strict`) |
 | `serve` | Alias fino para `forge serve` |
 | `migrate` / `migrate:fresh` / `migrate:rollback` | Migrações |
 | `make:usecase` | Gera DTO + Use Case |
