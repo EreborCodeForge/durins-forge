@@ -1,6 +1,8 @@
 # Durin's Forge
 
-Framework e forjador de apps sobre **MithrilPHP**, com Clean Architecture. Em produção, **Eregion** guarda o HTTP; o Worker Mithril mantém o Kernel aquecido.
+Framework e forjador de apps sobre **MithrilPHP**. Este repositório é o **core** (Kernel, Core, Tooling, CLI) — não um domínio de negócio pré-montado. Apps nascem com `durin new` + generators.
+
+Em produção, **Eregion** guarda o HTTP; o Worker Mithril mantém o Kernel aquecido.
 
 > **Durin forja a app → Mithril aquece o Worker → Eregion guarda os portões.**
 
@@ -214,24 +216,24 @@ make down
 ## Estrutura (resumo)
 
 ```
-src/Kernel.php                 # HttpApplication
-src/Core/                      # Discovery, compile, HTTP pipeline
-src/Application|Domain|…       # Clean Architecture (preset service)
-src/Modules/{Name}/            # Módulos (make:module / make:feature)
+src/Kernel.php                 # HttpApplication (framework entry)
+src/Core/                      # Discovery, providers, HTTP pipeline, middleware
 src/Tooling/                   # DX: Project, Scaffold, Doctor, Runtime,
                                #     Presets, Generators, Graph
 src/Console/Commands/          # CLI durin
-routes/                        # web.php + api.php
+src/Infrastructure/            # DB (Mazarbul), session, cache, storage adapters
+routes/                        # health mínimo; apps geradas expandem daqui
 var/cache/                     # container.php, routes.php, artifacts
-var/runtime/eregion.json       # manifesto Eregion
+var/runtime/eregion.json       # manifesto Eregion (apps HTTP)
 public/index.php               # Worker + EregionBridge
 docs/
   product/PRD.md
   architecture/
   adr/
-  specs/master-dx-tooling-spec.md
-  specs/derived/               # SPECs 001–016
+  specs/
 ```
+
+Apps de negócio **não** vivem neste repo: use `durin new --preset=minimal|service|worker` e generators.
 
 ---
 

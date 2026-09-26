@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Presentation\Middleware;
+namespace App\Core\Http\Middleware;
 
 use Erebor\Mithril\Contracts\RouterMiddlewareContract;
 use Erebor\Mithril\Http\HttpContext;

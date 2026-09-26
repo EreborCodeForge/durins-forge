@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Presentation\Middleware;
+namespace App\Core\Http\Middleware;
 
 use App\Core\Http\Cache\CachedResponse;
 use App\Core\Http\Cache\HttpResponseCacheStoreFactory;
