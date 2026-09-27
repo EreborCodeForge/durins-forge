@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tooling\Presets;
 
-final class PresetRegistry
+use EreborCodeForge\Durin\Core\Contract\Preset;
+use EreborCodeForge\Durin\Core\Contract\PresetRegistry as PresetRegistryContract;
+
+final class PresetRegistry implements PresetRegistryContract
 {
     /** @var array<string, Preset> */
     private array $presets = [];

@@ -6,8 +6,8 @@ namespace App\Console\Commands;
 
 use App\Tooling\Graph\DependencyGraphAssembler;
 use App\Tooling\Graph\GraphRendererRegistry;
-use App\Tooling\Project\DurinManifestException;
-use App\Tooling\Project\ProjectDiscovery;
+use EreborCodeForge\Durin\Core\Manifest\DurinManifestException;
+use EreborCodeForge\Durin\Core\Project\ProjectDiscovery;
 use Erebor\Mithril\Console\ArgParser;
 use Erebor\Mithril\Console\Command;
 

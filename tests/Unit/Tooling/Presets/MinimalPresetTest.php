@@ -6,9 +6,9 @@ namespace App\Tests\Unit\Tooling\Presets;
 
 use App\Tooling\Presets\DefaultPresetRegistryFactory;
 use App\Tooling\Presets\MinimalPreset;
-use App\Tooling\Presets\ProjectOptions;
-use App\Tooling\Project\DurinManifestParser;
-use App\Tooling\Scaffold\ScaffoldWriter;
+use EreborCodeForge\Durin\Core\Contract\ProjectOptions;
+use EreborCodeForge\Durin\Core\Manifest\DurinManifestParser;
+use EreborCodeForge\Durin\Core\Mutation\ScaffoldWriter;
 use PHPUnit\Framework\TestCase;
 
 final class MinimalPresetTest extends TestCase

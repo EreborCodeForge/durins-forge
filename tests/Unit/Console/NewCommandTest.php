@@ -6,7 +6,7 @@ namespace App\Tests\Unit\Console;
 
 use App\Console\Commands\NewCommand;
 use App\Tooling\Presets\DefaultPresetRegistryFactory;
-use App\Tooling\Scaffold\ScaffoldWriter;
+use EreborCodeForge\Durin\Core\Mutation\ScaffoldWriter;
 use PHPUnit\Framework\TestCase;
 
 final class NewCommandTest extends TestCase

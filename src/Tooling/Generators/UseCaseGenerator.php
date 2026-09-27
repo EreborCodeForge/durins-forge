@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tooling\Generators;
 
-use App\Tooling\Scaffold\ScaffoldPlan;
+use EreborCodeForge\Durin\Core\Scaffold\ScaffoldPlan;
 
 /**
  * Plans DTO + use case artifacts (master §27).

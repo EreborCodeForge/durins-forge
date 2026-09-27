@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tooling\Presets;
 
-use App\Tooling\Scaffold\ScaffoldPlan;
+use EreborCodeForge\Durin\Core\Contract\ProjectOptions;
+use EreborCodeForge\Durin\Core\Scaffold\ScaffoldPlan;
 
 /**
  * Resolves a preset by name and returns a ScaffoldPlan (no filesystem writes).

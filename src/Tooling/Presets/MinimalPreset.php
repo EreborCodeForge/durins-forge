@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tooling\Presets;
 
-use App\Tooling\Scaffold\ScaffoldPlan;
+use EreborCodeForge\Durin\Core\Contract\Preset;
+use EreborCodeForge\Durin\Core\Contract\ProjectOptions;
+use EreborCodeForge\Durin\Core\Scaffold\ScaffoldPlan;
 
 /**
  * Small HTTP API / webhook preset (master §17). No Domain ceremony.

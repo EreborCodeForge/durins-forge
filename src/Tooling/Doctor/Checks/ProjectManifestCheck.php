@@ -8,8 +8,8 @@ use App\Tooling\Doctor\Check;
 use App\Tooling\Doctor\CheckResult;
 use App\Tooling\Doctor\DoctorContext;
 use App\Tooling\Doctor\DoctorExitCode;
-use App\Tooling\Project\DurinManifestException;
-use App\Tooling\Project\DurinManifestParser;
+use EreborCodeForge\Durin\Core\Manifest\DurinManifestException;
+use EreborCodeForge\Durin\Core\Manifest\DurinManifestParser;
 
 final class ProjectManifestCheck implements Check
 {

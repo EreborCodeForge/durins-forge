@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tooling\Runtime;
 
-use App\Tooling\Project\Project;
-use App\Tooling\Project\ProjectDiscovery;
+use EreborCodeForge\Durin\Core\Project\Project;
+use EreborCodeForge\Durin\Core\Project\ProjectDiscovery;
 
 /**
  * Human-readable summary printed before `durin dev` starts the runtime.

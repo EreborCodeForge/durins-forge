@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Tooling\Project;
 
-use App\Tooling\Project\DurinManifestException;
-use App\Tooling\Project\ProjectDiscovery;
+use EreborCodeForge\Durin\Core\Manifest\DurinManifestException;
+use EreborCodeForge\Durin\Core\Project\ProjectDiscovery;
 use PHPUnit\Framework\TestCase;
 
 final class ProjectDiscoveryTest extends TestCase

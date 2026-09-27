@@ -8,8 +8,8 @@ use App\Tooling\Doctor\DoctorContext;
 use App\Tooling\Doctor\DoctorRunner;
 use App\Tooling\Doctor\JsonDoctorRenderer;
 use App\Tooling\Doctor\TextDoctorRenderer;
-use App\Tooling\Project\DurinManifestException;
-use App\Tooling\Project\ProjectDiscovery;
+use EreborCodeForge\Durin\Core\Manifest\DurinManifestException;
+use EreborCodeForge\Durin\Core\Project\ProjectDiscovery;
 use Erebor\Mithril\Console\ArgParser;
 use Erebor\Mithril\Console\Command;
 

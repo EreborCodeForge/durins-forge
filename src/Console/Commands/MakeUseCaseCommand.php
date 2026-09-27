@@ -8,7 +8,7 @@ use App\Tooling\Generators\GeneratorRequest;
 use App\Tooling\Generators\GeneratorRunner;
 use App\Tooling\Generators\NameInflector;
 use App\Tooling\Generators\UseCaseGenerator;
-use App\Tooling\Scaffold\ScaffoldWriter;
+use EreborCodeForge\Durin\Core\Mutation\ScaffoldWriter;
 use Erebor\Mithril\Console\ArgParser;
 use Erebor\Mithril\Console\Command;
 

@@ -12,8 +12,8 @@ use App\Tooling\Graph\GraphNode;
 use App\Tooling\Graph\GraphNodeKind;
 use App\Tooling\Graph\ProjectModuleDiscovery;
 use App\Tooling\Graph\RouteDependencyCollector;
-use App\Tooling\Project\Project;
-use App\Tooling\Project\ProjectPaths;
+use EreborCodeForge\Durin\Core\Project\Project;
+use EreborCodeForge\Durin\Core\Project\ProjectPaths;
 use PHPUnit\Framework\TestCase;
 
 final class DependencyGraphCoreTest extends TestCase

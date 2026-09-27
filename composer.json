@@ -25,11 +25,26 @@
       "email": "thales.rup@gmail.com"
     }
   ],
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/EreborCodeForge/durin-core"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/EreborCodeForge/durin-presets"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/EreborCodeForge/durin-architecture"
+    }
+  ],
   "require": {
     "php": "^8.5",
     "ext-msgpack": "*",
     "ext-pdo": "*",
     "ext-sockets": "*",
+    "ereborcodeforge/durin-core": "^0.1",
     "ereborcodeforge/mazarbul": "^1.0",
     "ereborcodeforge/mithrilphp": "^2.2"
   },

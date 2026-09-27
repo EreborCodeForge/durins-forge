@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tooling\Generators;
 
-use App\Tooling\Scaffold\ScaffoldPlan;
+use EreborCodeForge\Durin\Core\Scaffold\ScaffoldPlan;
 
 /**
  * Tiny generator used to prove the core API (not a public make:* command).

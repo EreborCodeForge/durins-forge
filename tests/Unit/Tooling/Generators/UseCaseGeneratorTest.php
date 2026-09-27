@@ -7,7 +7,7 @@ namespace App\Tests\Unit\Tooling\Generators;
 use App\Tooling\Generators\GeneratorRequest;
 use App\Tooling\Generators\GeneratorRunner;
 use App\Tooling\Generators\UseCaseGenerator;
-use App\Tooling\Scaffold\ScaffoldWriter;
+use EreborCodeForge\Durin\Core\Mutation\ScaffoldWriter;
 use PHPUnit\Framework\TestCase;
 
 final class UseCaseGeneratorTest extends TestCase

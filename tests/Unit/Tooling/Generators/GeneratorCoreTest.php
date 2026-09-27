@@ -9,7 +9,7 @@ use App\Tooling\Generators\GeneratorRunner;
 use App\Tooling\Generators\NameInflector;
 use App\Tooling\Generators\PlaceholderClassGenerator;
 use App\Tooling\Generators\StubTemplate;
-use App\Tooling\Scaffold\ScaffoldWriter;
+use EreborCodeForge\Durin\Core\Mutation\ScaffoldWriter;
 use PHPUnit\Framework\TestCase;
 
 final class GeneratorCoreTest extends TestCase

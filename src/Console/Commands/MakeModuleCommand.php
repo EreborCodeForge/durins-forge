@@ -8,8 +8,8 @@ use App\Tooling\Generators\GeneratorRequest;
 use App\Tooling\Generators\GeneratorRunner;
 use App\Tooling\Generators\ModuleGenerator;
 use App\Tooling\Generators\NameInflector;
-use App\Tooling\Project\DurinManifestModulesEnabler;
-use App\Tooling\Scaffold\ScaffoldWriter;
+use EreborCodeForge\Durin\Core\Manifest\DurinManifestModulesEnabler;
+use EreborCodeForge\Durin\Core\Mutation\ScaffoldWriter;
 use Erebor\Mithril\Console\Command;
 
 final class MakeModuleCommand extends Command
