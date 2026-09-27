@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tooling\Generators;
 
-use App\Tooling\Scaffold\ScaffoldWriteResult;
-use App\Tooling\Scaffold\ScaffoldWriter;
+use EreborCodeForge\Durin\Core\Scaffold\ScaffoldWriteResult;
+use EreborCodeForge\Durin\Core\Mutation\ScaffoldWriter;
 
 /**
  * Applies a CodeGenerator plan through ScaffoldWriter (conflict-safe by default).

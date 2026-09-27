@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Tooling\Presets;
 
-use App\Tooling\Presets\ManifestPlanFactory;
-use App\Tooling\Presets\Preset;
-use App\Tooling\Presets\PresetEngine;
-use App\Tooling\Presets\PresetRegistry;
-use App\Tooling\Presets\ProjectOptions;
-use App\Tooling\Presets\UnknownPresetException;
-use App\Tooling\Project\DurinManifestParser;
-use App\Tooling\Scaffold\ScaffoldActionType;
-use App\Tooling\Scaffold\ScaffoldPlan;
+use EreborCodeForge\Durin\Presets\Preset\ManifestPlanFactory;
+use EreborCodeForge\Durin\Core\Contract\Preset;
+use EreborCodeForge\Durin\Presets\Registry\PresetEngine;
+use EreborCodeForge\Durin\Presets\Registry\PresetRegistry;
+use EreborCodeForge\Durin\Core\Contract\ProjectOptions;
+use EreborCodeForge\Durin\Presets\Preset\UnknownPresetException;
+use EreborCodeForge\Durin\Core\Manifest\DurinManifestParser;
+use EreborCodeForge\Durin\Core\Scaffold\ScaffoldActionType;
+use EreborCodeForge\Durin\Core\Scaffold\ScaffoldPlan;
 use PHPUnit\Framework\TestCase;
 
 final class FakePreset implements Preset

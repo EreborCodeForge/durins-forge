@@ -14,8 +14,8 @@ use App\Tooling\Doctor\DoctorRunner;
 use App\Tooling\Doctor\JsonDoctorRenderer;
 use App\Tooling\Doctor\Checks\PhpVersionCheck;
 use App\Tooling\Doctor\Checks\ProjectComposerCheck;
-use App\Tooling\Project\Project;
-use App\Tooling\Project\ProjectPaths;
+use EreborCodeForge\Durin\Core\Project\Project;
+use EreborCodeForge\Durin\Core\Project\ProjectPaths;
 use PHPUnit\Framework\TestCase;
 
 final class DoctorRunnerTest extends TestCase

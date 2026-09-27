@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tooling\Graph;
 
-use App\Tooling\Project\Project;
+use EreborCodeForge\Durin\Core\Project\Project;
 
 /**
  * Assembles a DependencyGraph from module discovery + explicit container/route metadata.

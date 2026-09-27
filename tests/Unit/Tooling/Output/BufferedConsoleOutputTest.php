@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Tooling\Output;
 
-use App\Tooling\Output\BufferedConsoleOutput;
+use EreborCodeForge\Durin\Core\Output\BufferedConsoleOutput;
 use PHPUnit\Framework\TestCase;
 
 final class BufferedConsoleOutputTest extends TestCase

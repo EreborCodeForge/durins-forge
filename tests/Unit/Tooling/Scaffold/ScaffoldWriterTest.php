@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Tooling\Scaffold;
 
-use App\Tooling\Output\BufferedConsoleOutput;
-use App\Tooling\Scaffold\ScaffoldPlan;
-use App\Tooling\Scaffold\ScaffoldWriter;
+use EreborCodeForge\Durin\Core\Output\BufferedConsoleOutput;
+use EreborCodeForge\Durin\Core\Scaffold\ScaffoldPlan;
+use EreborCodeForge\Durin\Core\Mutation\ScaffoldWriter;
 use PHPUnit\Framework\TestCase;
 
 final class ScaffoldWriterTest extends TestCase

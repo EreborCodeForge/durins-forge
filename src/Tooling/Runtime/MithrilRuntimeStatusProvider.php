@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tooling\Runtime;
 
-use App\Tooling\Project\DurinManifestException;
-use App\Tooling\Project\DurinManifestParser;
+use EreborCodeForge\Durin\Core\Manifest\DurinManifestException;
+use EreborCodeForge\Durin\Core\Manifest\DurinManifestParser;
 use Erebor\Mithril\Runtime\Eregion\ApplicationResolver;
 
 /**

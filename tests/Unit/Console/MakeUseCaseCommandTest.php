@@ -8,7 +8,7 @@ use App\Console\Commands\MakeUseCaseCommand;
 use App\Tooling\Generators\GeneratorRunner;
 use App\Tooling\Generators\NameInflector;
 use App\Tooling\Generators\UseCaseGenerator;
-use App\Tooling\Scaffold\ScaffoldWriter;
+use EreborCodeForge\Durin\Core\Mutation\ScaffoldWriter;
 use PHPUnit\Framework\TestCase;
 
 final class MakeUseCaseCommandTest extends TestCase

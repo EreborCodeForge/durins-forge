@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use App\Tooling\Presets\DefaultPresetRegistryFactory;
-use App\Tooling\Presets\PresetEngine;
-use App\Tooling\Presets\ProjectOptions;
-use App\Tooling\Presets\UnknownPresetException;
-use App\Tooling\Scaffold\ScaffoldWriter;
+use EreborCodeForge\Durin\Presets\Registry\DefaultPresetRegistryFactory;
+use EreborCodeForge\Durin\Presets\Registry\PresetEngine;
+use EreborCodeForge\Durin\Core\Contract\ProjectOptions;
+use EreborCodeForge\Durin\Presets\Preset\UnknownPresetException;
+use EreborCodeForge\Durin\Core\Mutation\ScaffoldWriter;
 use Erebor\Mithril\Console\ArgParser;
 use Erebor\Mithril\Console\Command;
 

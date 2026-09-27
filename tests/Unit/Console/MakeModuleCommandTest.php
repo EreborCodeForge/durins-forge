@@ -8,7 +8,7 @@ use App\Console\Commands\MakeModuleCommand;
 use App\Tooling\Generators\GeneratorRunner;
 use App\Tooling\Generators\ModuleGenerator;
 use App\Tooling\Generators\NameInflector;
-use App\Tooling\Scaffold\ScaffoldWriter;
+use EreborCodeForge\Durin\Core\Mutation\ScaffoldWriter;
 use PHPUnit\Framework\TestCase;
 
 final class MakeModuleCommandTest extends TestCase

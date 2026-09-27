@@ -4,8 +4,167 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9039132c40334abae8fd08ebdb6ab5b1",
+    "content-hash": "9e6ef8aecae6947ae2c9cb248f34b13d",
     "packages": [
+        {
+            "name": "ereborcodeforge/durin-architecture",
+            "version": "0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/EreborCodeForge/durin-architecture.git",
+                "reference": "8210e623ca7c4d148823a3f29ca26ce0e286fe0a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/EreborCodeForge/durin-architecture/zipball/8210e623ca7c4d148823a3f29ca26ce0e286fe0a",
+                "reference": "8210e623ca7c4d148823a3f29ca26ce0e286fe0a",
+                "shasum": ""
+            },
+            "require": {
+                "ereborcodeforge/durin-core": "^0.1",
+                "ereborcodeforge/durin-presets": "^0.1",
+                "php": "^8.5"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^12.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "EreborCodeForge\\Durin\\Architecture\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "EreborCodeForge\\Durin\\Architecture\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "phpunit"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Thales Ruppenthal",
+                    "email": "thales.rup@gmail.com"
+                }
+            ],
+            "description": "Architecture detection, drift and migration planning for Durin projects.",
+            "support": {
+                "source": "https://github.com/EreborCodeForge/durin-architecture/tree/v0.1.0",
+                "issues": "https://github.com/EreborCodeForge/durin-architecture/issues"
+            },
+            "time": "2026-09-27T00:37:48+00:00"
+        },
+        {
+            "name": "ereborcodeforge/durin-core",
+            "version": "0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/EreborCodeForge/durin-core.git",
+                "reference": "e3ea91e4d5238da0229d3f07a35d4915d7087579"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/EreborCodeForge/durin-core/zipball/e3ea91e4d5238da0229d3f07a35d4915d7087579",
+                "reference": "e3ea91e4d5238da0229d3f07a35d4915d7087579",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.5"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^12.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "EreborCodeForge\\Durin\\Core\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "EreborCodeForge\\Durin\\Core\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "phpunit"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Thales Ruppenthal",
+                    "email": "thales.rup@gmail.com"
+                }
+            ],
+            "description": "Project model and deterministic tooling primitives for Durin.",
+            "support": {
+                "source": "https://github.com/EreborCodeForge/durin-core/tree/v0.1.0",
+                "issues": "https://github.com/EreborCodeForge/durin-core/issues"
+            },
+            "time": "2026-09-27T00:36:55+00:00"
+        },
+        {
+            "name": "ereborcodeforge/durin-presets",
+            "version": "0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/EreborCodeForge/durin-presets.git",
+                "reference": "a12ad2634b1f0bed5ec63f6b8174e6e9840e159d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/EreborCodeForge/durin-presets/zipball/a12ad2634b1f0bed5ec63f6b8174e6e9840e159d",
+                "reference": "a12ad2634b1f0bed5ec63f6b8174e6e9840e159d",
+                "shasum": ""
+            },
+            "require": {
+                "ereborcodeforge/durin-core": "^0.1",
+                "php": "^8.5"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^12.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "EreborCodeForge\\Durin\\Presets\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "EreborCodeForge\\Durin\\Presets\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "phpunit"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Thales Ruppenthal",
+                    "email": "thales.rup@gmail.com"
+                }
+            ],
+            "description": "Architecture presets and project-shape policies for Durin.",
+            "support": {
+                "source": "https://github.com/EreborCodeForge/durin-presets/tree/v0.1.0",
+                "issues": "https://github.com/EreborCodeForge/durin-presets/issues"
+            },
+            "time": "2026-09-27T00:37:16+00:00"
+        },
         {
             "name": "ereborcodeforge/mazarbul",
             "version": "v1.1.0",
@@ -1824,10 +1983,10 @@
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "php": "^8.5",
         "ext-msgpack": "*",
         "ext-pdo": "*",
-        "ext-sockets": "*"
+        "ext-sockets": "*",
+        "php": "^8.5"
     },
     "platform-dev": {},
     "plugin-api-version": "2.9.0"

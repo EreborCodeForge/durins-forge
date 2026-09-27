@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tooling\Graph;
 
-use App\Tooling\Project\Project;
+use EreborCodeForge\Durin\Core\Project\Project;
 
 /**
  * Loads compiled route descriptors from var/cache/routes.php when present.

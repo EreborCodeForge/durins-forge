@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Tooling\Presets;
 
-use App\Tooling\Presets\DefaultPresetRegistryFactory;
-use App\Tooling\Presets\ProjectOptions;
-use App\Tooling\Presets\WorkerPreset;
-use App\Tooling\Project\DurinManifestParser;
-use App\Tooling\Scaffold\ScaffoldWriter;
+use EreborCodeForge\Durin\Presets\Registry\DefaultPresetRegistryFactory;
+use EreborCodeForge\Durin\Core\Contract\ProjectOptions;
+use EreborCodeForge\Durin\Presets\Preset\WorkerPreset;
+use EreborCodeForge\Durin\Core\Manifest\DurinManifestParser;
+use EreborCodeForge\Durin\Core\Mutation\ScaffoldWriter;
 use PHPUnit\Framework\TestCase;
 
 final class WorkerPresetTest extends TestCase

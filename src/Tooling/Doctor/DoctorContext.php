@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tooling\Doctor;
 
-use App\Tooling\Project\Project;
+use EreborCodeForge\Durin\Core\Project\Project;
 
 final readonly class DoctorContext
 {
