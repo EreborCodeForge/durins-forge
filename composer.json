@@ -3,7 +3,6 @@
     "description": "Durin’s Forge is the official framework and project forger built atop MithrilPHP — crafting applications using Clean Architecture",
     "type": "library",
     "license": "MIT",
-    "version": "0.1.0",
     "keywords": [
         "php",
         "framework",
