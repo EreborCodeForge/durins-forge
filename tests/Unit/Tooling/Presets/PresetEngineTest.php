@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Tooling\Presets;
 
-use App\Tooling\Presets\ManifestPlanFactory;
+use EreborCodeForge\Durin\Presets\Preset\ManifestPlanFactory;
 use EreborCodeForge\Durin\Core\Contract\Preset;
-use App\Tooling\Presets\PresetEngine;
-use App\Tooling\Presets\PresetRegistry;
+use EreborCodeForge\Durin\Presets\Registry\PresetEngine;
+use EreborCodeForge\Durin\Presets\Registry\PresetRegistry;
 use EreborCodeForge\Durin\Core\Contract\ProjectOptions;
-use App\Tooling\Presets\UnknownPresetException;
+use EreborCodeForge\Durin\Presets\Preset\UnknownPresetException;
 use EreborCodeForge\Durin\Core\Manifest\DurinManifestParser;
 use EreborCodeForge\Durin\Core\Scaffold\ScaffoldActionType;
 use EreborCodeForge\Durin\Core\Scaffold\ScaffoldPlan;

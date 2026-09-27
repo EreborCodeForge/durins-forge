@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Console;
 
 use App\Console\Commands\NewCommand;
-use App\Tooling\Presets\DefaultPresetRegistryFactory;
+use EreborCodeForge\Durin\Presets\Registry\DefaultPresetRegistryFactory;
 use EreborCodeForge\Durin\Core\Mutation\ScaffoldWriter;
 use PHPUnit\Framework\TestCase;
 
