@@ -1,10 +1,10 @@
 # Package contract — current state (Phase 0 audit)
 
-Audit date: 2026-09-27  
-Branch: `feat/package-contract-distribution` (on top of `main` after PR #28 / consumer-mode)  
+Audit date: 2026-09-27 (updated after `v0.1.0` / presets `v0.1.2` tags)  
+Branch: `main` (package-contract via PR #29; consumer-mode via PR #28)  
 Spec: [durins-forge-package-contract-distribution-spec.md](../../durins-forge-package-contract-distribution-spec.md)
 
-Consumer-mode is **already on `main`** — do not treat it as pending merge.
+Consumer-mode is **already on `main`**. First stable Forge tag **`v0.1.0`** is published and resolved on Packagist.
 
 ---
 
@@ -29,11 +29,11 @@ Consumer-mode is **already on `main`** — do not treat it as pending merge.
 | Package | Constraint | Packagist | Rationale |
 |---------|------------|-----------|-----------|
 | `ereborcodeforge/durin-core` | `^0.1` | yes (`0.1.0`) | Project/scaffold/manifest primitives |
-| `ereborcodeforge/durin-presets` | `^0.1.1` | yes (`0.1.1`) | `durin new` / preset engine |
+| `ereborcodeforge/durin-presets` | `^0.1.1` | yes (`0.1.2`) | `durin new` / preset engine |
 | `ereborcodeforge/durin-architecture` | `^0.1` | yes (`0.1.0`) | **Retained** (decision A) — capability dependency; no production `src/` imports yet |
 | `ereborcodeforge/mithrilphp` | `^2.2` | yes | Runtime / console kernel |
 | `ereborcodeforge/mazarbul` | `^1.0` | yes | Data layer / `db()` |
-| `ereborcodeforge/durins-forge` | — | **no (404)** | This package — release gate |
+| `ereborcodeforge/durins-forge` | `^0.1` | yes (`v0.1.0`) | This package |
 
 ---
 
@@ -58,7 +58,7 @@ Binary bootstrap (`bin/durin`):
 
 These apply when developing **this** repository; they are **not** inherited by consumers of the package:
 
-- `repositories` (removed in this initiative once Packagist resolves Durin deps)
+- `repositories` (removed — Packagist resolves Durin deps)
 - `minimum-stability` / `prefer-stable`
 - `config` (`sort-packages`, `optimize-autoloader`, `github-protocols`, `preferred-install`)
 - `scripts` (`test`, `link-bins`, `post-install-cmd`, `post-update-cmd`)
@@ -83,18 +83,20 @@ Canonical consumer DX: `vendor/bin/durin`.
 | Package | Packagist | Stable tags observed |
 |---------|-----------|----------------------|
 | durin-core | published | `0.1.0` |
-| durin-presets | published | `0.1.0`, `0.1.1` |
+| durin-presets | published | `0.1.0`, `0.1.1`, **`0.1.2`** |
 | durin-architecture | published | `0.1.0` |
 | mithrilphp / mazarbul | published | yes |
-| **durins-forge** | **not published** | no `v0.1.0` tag yet |
+| **durins-forge** | **published** | **`v0.1.0`** (GitHub release + Packagist) |
+
+Verified: empty-dir `composer require ereborcodeforge/durins-forge:^0.1` installs `v0.1.0` and exposes `vendor/bin/durin`.
 
 ---
 
-## Blockers (release / DoD)
+## Remaining follow-ups
 
-1. **`ereborcodeforge/durins-forge` not on Packagist** — EMPTY DIR `composer require` DoD cannot pass without path/VCS workaround (forbidden as a fake green gate).
-2. **Preset generated apps** — nested Durin VCS removed on branch `feat/drop-nested-vcs-repos` of `durin-presets` (pending merge + Packagist `0.1.2`). Transitional Forge-only VCS remains until (1).
-3. **Tag `v0.1.0`** — explicit maintainer action after distribution smoke is green on Packagist.
+1. Generated apps still emit a **transitional Forge-only VCS** entry (presets `0.1.2`). Remove that list entirely in a later presets patch once consumers reliably resolve Forge from Packagist alone.
+2. Run / watch CI `distribution-smoke` job (enabled after Packagist sync).
+3. Optional: drop Forge VCS from fixtures once presets stop emitting it.
 
 ---
 
@@ -107,12 +109,12 @@ Canonical consumer DX: `vendor/bin/durin`.
 - [x] CLI contract documented
 - [x] Consumer root contract documented
 - [x] Vendor mutation invariant tested (consumer-mode integration)
-- [x] Composer binary works in dependency-style bootstrap (unit/integration; Packagist install pending)
-- [x] Stable Durin deps resolve without Forge `repositories` VCS (after Phase 3)
+- [x] Composer binary works from dependency install (`vendor/bin/durin` after Packagist require)
+- [x] Stable Durin deps resolve without Forge `repositories` VCS
 - [x] Generated app requires Forge (preset contract tests)
-- [ ] Generated standard app needs no Durin VCS — **blocked** on presets patch + Forge Packagist
+- [ ] Generated standard app needs no Durin VCS — transitional Forge VCS remains in presets `0.1.2`
 - [x] Package contract tests present
-- [ ] Distribution smoke on Packagist — **blocked** (job prepared, gated)
+- [x] Distribution smoke job present (CI); Packagist require verified locally
 - [x] README aligned
 - [x] ADR-0006 exists
-- [ ] Release ready for maintainer tag `v0.1.0` — pending Packagist publish + smoke
+- [x] Tagged **`v0.1.0`** and synced to Packagist

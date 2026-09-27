@@ -15,9 +15,8 @@ permissions:
 jobs:
   distribution-smoke:
     name: Packagist consumer smoke
-    # Re-enable when https://packagist.org/packages/ereborcodeforge/durins-forge returns 200
-    # and a stable 0.1.x tag exists. See docs/refactoring/package-contract/current-state.md.
-    if: ${{ false }}
+    # Stable v0.1.0 is on Packagist — run real EMPTY DIR DoD.
+    if: ${{ true }}
     runs-on: ubuntu-latest
 
     steps:

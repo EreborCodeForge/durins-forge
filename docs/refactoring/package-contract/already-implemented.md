@@ -65,14 +65,12 @@ durin-presets/src/Preset/PresetScaffoldSupport.php
   → composerRepositories() / formerly vcsRepositories()
 ```
 
-**Patch prepared and pushed** (not yet merged / released as `0.1.2` on Packagist at audit time):
+**Patch released as `0.1.2`** on Packagist (merged `feat/drop-nested-vcs-repos`):
 
-- Branch: `https://github.com/EreborCodeForge/durin-presets/tree/feat/drop-nested-vcs-repos`
-- Change: drop VCS for `durin-core` / `durin-presets` / `durin-architecture`; keep transitional Forge-only VCS until Forge Packagist publish
-- Version metadata bumped to `0.1.2` in that branch
+- Drop VCS for `durin-core` / `durin-presets` / `durin-architecture`
+- Keep transitional Forge-only VCS until consumers no longer need it
+- GitHub tag/release: `v0.1.2`
 
-Forge fixtures under `tests/Fixtures/generated-*/composer.json` already encode the target repository shape. Live engine asserts for nested-VCS absence activate when installed presets ≥ `0.1.2`.
+Forge itself is published as **`v0.1.0`** on Packagist. Next presets patch can empty `composerRepositories()` entirely.
 
-Exact intended final step after Forge is on Packagist: empty `composerRepositories()` so generated apps have **no** Durin VCS entries.
-
-See `current-state.md` blockers for publication status of Forge itself (Packagist 404) — that gate still blocks the EMPTY DIR DoD even after this Forge-side alignment.
+See [current-state.md](current-state.md).

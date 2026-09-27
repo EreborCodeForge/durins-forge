@@ -96,7 +96,7 @@ Contrato público: [`docs/public-api.md`](docs/public-api.md) · arquitetura do 
 
 Skeleton de aplicação (não autoloadado como framework): [`resources/skeleton/application/`](resources/skeleton/application/).
 
-> **Nota de distribuição:** `durin-core`, `durin-presets` e `durin-architecture` já estão no Packagist. A publicação de `ereborcodeforge/durins-forge` e a tag `v0.1.0` são ações explícitas do maintainer (ver [current-state](docs/refactoring/package-contract/current-state.md)). Até lá, o fluxo EMPTY DIR via Packagist permanece bloqueado. Pacotes futuros `durin-app` / `durin-installer` não existem ainda — não use `create-project` nesses nomes.
+> **Distribuição:** `ereborcodeforge/durins-forge` **`v0.1.0`** está no Packagist. Pacotes futuros `durin-app` / `durin-installer` ainda não existem — não use `create-project` nesses nomes.
 
 ---
 
