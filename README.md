@@ -47,7 +47,7 @@ php bin/durin migrate
 - `ereborcodeforge/mithrilphp:^2.2`
 - `ereborcodeforge/mazarbul:^1.0`
 - `ereborcodeforge/durin-core:^0.1`
-- `ereborcodeforge/durin-presets:^0.1.1`
+- `ereborcodeforge/durin-presets:^0.1.3`
 - `ereborcodeforge/durin-architecture:^0.1`
 
 DX de banco: `db()` / `DB::database('name')` (Mazarbul). Migrations DDL ainda usam `DB::pdo()` quando precisam de atributos PDO.
@@ -96,7 +96,7 @@ Contrato público: [`docs/public-api.md`](docs/public-api.md) · arquitetura do 
 
 Skeleton de aplicação (não autoloadado como framework): [`resources/skeleton/application/`](resources/skeleton/application/).
 
-> **Distribuição:** `ereborcodeforge/durins-forge` **`v0.1.0`** está no Packagist. Pacotes futuros `durin-app` / `durin-installer` ainda não existem — não use `create-project` nesses nomes.
+> **Distribuição:** `ereborcodeforge/durins-forge` **`v0.1.0`** está no Packagist (tag apontando para o merge do package-contract). Apps geradas (`durin-presets` ≥ `0.1.3`) dependem só de Forge — sem `repositories` VCS. Pacotes futuros `durin-app` / `durin-installer` ainda não existem.
 
 ---
 
