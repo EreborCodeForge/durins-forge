@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace EreborCodeForge\Durin\Forge\Tests\Unit\Package;
 
+use EreborCodeForge\Durin\Forge\Core\DiscoveryServiceProvider;
 use EreborCodeForge\Durin\Forge\Core\Http\HttpApplicationKernel;
 use EreborCodeForge\Durin\Forge\Support\ApplicationPath;
 use PHPUnit\Framework\TestCase;
@@ -50,7 +51,24 @@ final class PackageContractTest extends TestCase
     {
         $this->assertTrue(class_exists(ApplicationPath::class));
         $this->assertTrue(class_exists(HttpApplicationKernel::class));
+        $this->assertTrue(class_exists(DiscoveryServiceProvider::class));
         $this->assertTrue(function_exists('base_path'));
         $this->assertTrue(function_exists('db'));
+    }
+
+    public function test_public_api_doc_whitelists_consumer_bootstrap_classes(): void
+    {
+        $doc = (string) file_get_contents(dirname(__DIR__, 3) . '/docs/public-api.md');
+        foreach ([
+            'EreborCodeForge\\Durin\\Forge\\Support\\ApplicationPath',
+            'EreborCodeForge\\Durin\\Forge\\Core\\Http\\HttpApplicationKernel',
+            'EreborCodeForge\\Durin\\Forge\\Core\\DiscoveryServiceProvider',
+        ] as $class) {
+            $this->assertStringContainsString($class, $doc);
+        }
+        $this->assertStringNotContainsString(
+            'EreborCodeForge\\Durin\\Forge\\Core\\Http\\Controllers\\HealthCheckController',
+            $doc
+        );
     }
 }
