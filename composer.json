@@ -27,16 +27,6 @@
     ],
     "repositories": [
         {
-            "type": "path",
-            "url": "../ereborcodeforge/durin-presets",
-            "options": {
-                "symlink": true,
-                "versions": {
-                    "ereborcodeforge/durin-presets": "0.1.1"
-                }
-            }
-        },
-        {
             "type": "vcs",
             "url": "https://github.com/EreborCodeForge/durin-core"
         },
