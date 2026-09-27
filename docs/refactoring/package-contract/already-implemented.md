@@ -52,7 +52,7 @@ Base for this work: `refactor/consumer-mode-package-hardening`, **already merged
 - `ereborcodeforge/durin-installer`
 - Architecture CLI commands (`adopt` / `evolve` / …)
 - Renaming package to `ereborcodeforge/durin-forge`
-- Tag / Packagist publish of Forge (`v0.1.0`) — maintainer action
+- Further presets patch to remove the transitional Forge-only VCS entry
 
 ---
 
