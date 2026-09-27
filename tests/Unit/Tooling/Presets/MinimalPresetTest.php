@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Tooling\Presets;
 
-use App\Tooling\Presets\DefaultPresetRegistryFactory;
-use App\Tooling\Presets\MinimalPreset;
+use EreborCodeForge\Durin\Presets\Registry\DefaultPresetRegistryFactory;
+use EreborCodeForge\Durin\Presets\Preset\MinimalPreset;
 use EreborCodeForge\Durin\Core\Contract\ProjectOptions;
 use EreborCodeForge\Durin\Core\Manifest\DurinManifestParser;
 use EreborCodeForge\Durin\Core\Mutation\ScaffoldWriter;

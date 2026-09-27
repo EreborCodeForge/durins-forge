@@ -45,6 +45,7 @@
     "ext-pdo": "*",
     "ext-sockets": "*",
     "ereborcodeforge/durin-core": "^0.1",
+    "ereborcodeforge/durin-presets": "^0.1",
     "ereborcodeforge/mazarbul": "^1.0",
     "ereborcodeforge/mithrilphp": "^2.2"
   },
