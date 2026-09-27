@@ -1,8 +1,10 @@
 # Package contract — current state (Phase 0 audit)
 
 Audit date: 2026-09-27  
-Branch: `feat/package-contract-distribution` (from `refactor/consumer-mode-package-hardening`)  
+Branch: `feat/package-contract-distribution` (on top of `main` after PR #28 / consumer-mode)  
 Spec: [durins-forge-package-contract-distribution-spec.md](../../durins-forge-package-contract-distribution-spec.md)
+
+Consumer-mode is **already on `main`** — do not treat it as pending merge.
 
 ---
 

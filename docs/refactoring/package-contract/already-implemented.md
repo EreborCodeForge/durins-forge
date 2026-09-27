@@ -3,7 +3,7 @@
 Inventory of work already delivered before / alongside this initiative.
 Canonical reference: [durins-forge-package-contract-distribution-spec.md](../../durins-forge-package-contract-distribution-spec.md).
 
-Base branch for this work: `refactor/consumer-mode-package-hardening` (merged into `feat/package-contract-distribution`).
+Base for this work: `refactor/consumer-mode-package-hardening`, **already merged to `main`** via PR #28. This initiative continues on `feat/package-contract-distribution` on top of that merge.
 
 ---
 
