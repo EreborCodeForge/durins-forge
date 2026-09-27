@@ -1,0 +1,5 @@
+date: 2026-09-27T01:45:22Z
+php: 8.5.10
+commit: e149ab4
+presets: minimal,service,worker
+exit_codes: minimal=0 service=0 worker=0 (captured at generation)

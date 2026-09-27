@@ -1,0 +1,10 @@
+./.env.example
+./composer.json
+./config/app.php
+./durin.yaml
+./README.md
+./src/Application/.gitkeep
+./src/Infrastructure/.gitkeep
+./src/JobKernel.php
+./src/Jobs/.gitkeep
+./tests/ExampleTest.php
