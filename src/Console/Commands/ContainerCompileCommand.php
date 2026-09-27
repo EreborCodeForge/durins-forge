@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Console\Commands;
+namespace EreborCodeForge\Durin\Forge\Console\Commands;
 
-use App\Core\Container\ContainerCompiler;
-use App\Core\DescriptorProvider;
+use EreborCodeForge\Durin\Forge\Core\Container\ContainerCompiler;
+use EreborCodeForge\Durin\Forge\Core\DescriptorProvider;
 use Erebor\Mithril\Console\Command;
 use Erebor\Mithril\Environment;
 

@@ -3,12 +3,93 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/../vendor/autoload.php';
+/**
+ * Consumer-aware Durin CLI bootstrap.
+ *
+ * Works when installed as:
+ *   vendor/bin/durin
+ *   vendor/ereborcodeforge/durins-forge/bin/durin
+ * and when developing this repository via:
+ *   php bin/durin
+ */
 
-use App\Console\Application;
+$autoload = durin_locate_autoload(__DIR__);
+if ($autoload === null) {
+    fwrite(STDERR, "Unable to locate Composer autoload.php for the consuming project.\n");
+    exit(1);
+}
+
+require $autoload;
+
+use EreborCodeForge\Durin\Forge\Console\Application;
+use EreborCodeForge\Durin\Forge\Support\ApplicationPath;
 use Erebor\Mithril\Environment;
 
-Environment::load(dirname(__DIR__) . '/.env');
+$appRoot = durin_locate_application_root(dirname($autoload, 2), __DIR__);
+ApplicationPath::setRoot($appRoot);
+
+$envFile = ApplicationPath::path('.env');
+if (is_file($envFile)) {
+    Environment::load($envFile);
+}
 
 $app = new Application();
 exit($app->run($argv));
+
+/**
+ * Find the consuming project's vendor/autoload.php.
+ */
+function durin_locate_autoload(string $binDir): ?string
+{
+    $candidates = [
+        // Developing Forge repository: bin/ → ../vendor/autoload.php
+        $binDir . '/../vendor/autoload.php',
+        // Composer bin proxy / symlink target under vendor/bin
+        $binDir . '/../autoload.php',
+        // Physical package path: vendor/ereborcodeforge/durins-forge/bin
+        $binDir . '/../../../autoload.php',
+    ];
+
+    foreach ($candidates as $path) {
+        $resolved = realpath($path);
+        if ($resolved !== false && is_file($resolved)) {
+            return $resolved;
+        }
+    }
+
+    // Walk up from CWD as last resort
+    $dir = getcwd() ?: $binDir;
+    while (true) {
+        $candidate = $dir . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
+        if (is_file($candidate)) {
+            return realpath($candidate) ?: $candidate;
+        }
+        $parent = dirname($dir);
+        if ($parent === $dir) {
+            break;
+        }
+        $dir = $parent;
+    }
+
+    return null;
+}
+
+/**
+ * Application root is the directory that owns the Composer project, not the Forge package.
+ */
+function durin_locate_application_root(string $autoloadProjectRoot, string $binDir): string
+{
+    $normalizedBin = str_replace('\\', '/', $binDir);
+    // When bin lives inside vendor/ereborcodeforge/durins-forge/bin, autoloadProjectRoot
+    // from dirname(autoload, 2) for vendor/autoload is the consumer root.
+    if (str_contains($normalizedBin, '/vendor/ereborcodeforge/')) {
+        return $autoloadProjectRoot;
+    }
+
+    // Forge repo development: bin/ next to composer.json
+    if (is_file($autoloadProjectRoot . DIRECTORY_SEPARATOR . 'composer.json')) {
+        return $autoloadProjectRoot;
+    }
+
+    return $autoloadProjectRoot;
+}

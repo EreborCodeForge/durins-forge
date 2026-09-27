@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Tooling\Presets;
+namespace EreborCodeForge\Durin\Forge\Tests\Unit\Tooling\Presets;
 
 use EreborCodeForge\Durin\Presets\Preset\ManifestPlanFactory;
 use EreborCodeForge\Durin\Core\Contract\Preset;

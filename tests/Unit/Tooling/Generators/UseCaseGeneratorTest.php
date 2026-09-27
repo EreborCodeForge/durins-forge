@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Tooling\Generators;
+namespace EreborCodeForge\Durin\Forge\Tests\Unit\Tooling\Generators;
 
-use App\Tooling\Generators\GeneratorRequest;
-use App\Tooling\Generators\GeneratorRunner;
-use App\Tooling\Generators\UseCaseGenerator;
+use EreborCodeForge\Durin\Forge\Tooling\Generators\GeneratorRequest;
+use EreborCodeForge\Durin\Forge\Tooling\Generators\GeneratorRunner;
+use EreborCodeForge\Durin\Forge\Tooling\Generators\UseCaseGenerator;
 use EreborCodeForge\Durin\Core\Mutation\ScaffoldWriter;
 use PHPUnit\Framework\TestCase;
 

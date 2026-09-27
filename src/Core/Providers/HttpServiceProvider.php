@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace App\Core\Providers;
+namespace EreborCodeForge\Durin\Forge\Core\Providers;
 
-use App\Core\Attributes\Discoverable;
-use App\Core\Http\Controllers\HealthCheckController;
-use App\Core\Http\HttpDispatcher;
-use App\Core\Http\HttpKernel;
-use App\Core\Http\Middleware\ApiRateLimitMiddleware;
-use App\Core\Http\Middleware\CorsMiddleware;
-use App\Core\Http\Middleware\CsrfMiddleware;
-use App\Core\Http\Middleware\ResponseCacheMiddleware;
-use App\Core\Http\Middleware\ThrottleRequests;
-use App\Core\Routing\ControllerHandlerResolver;
-use App\Core\ServiceProvider;
-use App\Infrastructure\Security\RateLimiter;
+use EreborCodeForge\Durin\Forge\Core\Attributes\Discoverable;
+use EreborCodeForge\Durin\Forge\Core\Http\Controllers\HealthCheckController;
+use EreborCodeForge\Durin\Forge\Core\Http\HttpDispatcher;
+use EreborCodeForge\Durin\Forge\Core\Http\HttpKernel;
+use EreborCodeForge\Durin\Forge\Core\Http\Middleware\ApiRateLimitMiddleware;
+use EreborCodeForge\Durin\Forge\Core\Http\Middleware\CorsMiddleware;
+use EreborCodeForge\Durin\Forge\Core\Http\Middleware\CsrfMiddleware;
+use EreborCodeForge\Durin\Forge\Core\Http\Middleware\ResponseCacheMiddleware;
+use EreborCodeForge\Durin\Forge\Core\Http\Middleware\ThrottleRequests;
+use EreborCodeForge\Durin\Forge\Core\Routing\ControllerHandlerResolver;
+use EreborCodeForge\Durin\Forge\Core\ServiceProvider;
+use EreborCodeForge\Durin\Forge\Infrastructure\Security\RateLimiter;
 use Erebor\Mithril\Container;
 use Erebor\Mithril\Contracts\PipelineContract;
 use Erebor\Mithril\Router;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Core\Cache;
+namespace EreborCodeForge\Durin\Forge\Core\Cache;
 
 interface CacheInterface
 {

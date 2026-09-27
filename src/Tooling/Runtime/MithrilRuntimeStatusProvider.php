@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tooling\Runtime;
+namespace EreborCodeForge\Durin\Forge\Tooling\Runtime;
 
 use EreborCodeForge\Durin\Core\Manifest\DurinManifestException;
 use EreborCodeForge\Durin\Core\Manifest\DurinManifestParser;

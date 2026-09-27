@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tooling\Generators;
+namespace EreborCodeForge\Durin\Forge\Tooling\Generators;
 
 use EreborCodeForge\Durin\Core\Scaffold\ScaffoldPlan;
 
@@ -112,7 +112,7 @@ STUB,
 
 declare(strict_types=1);
 
-namespace App\Tests\Feature\Modules\{{module}};
+namespace EreborCodeForge\Durin\Forge\Tests\Feature\Modules\{{module}};
 
 use {{useCaseNamespace}}\{{class}};
 use {{useCaseNamespace}}\{{class}}Input;

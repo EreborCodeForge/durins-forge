@@ -22,15 +22,17 @@ Earlier candidate names (`durin-project`, `durin-inspector`) were superseded by 
 2. **Forge retains:** CLI orchestration, terminal UX, framework bootstrap, Doctor/Status/Dev/Serve/Optimize, generators, dependency graph, Mithril/Eregion runtime integration.
 3. **Dependency direction:** CLI → Forge tooling adapters → package libraries → (runtime) Mithril/Eregion; packages must not depend on Forge.
 4. **Further extraction** (e.g. `durin-app`, installer, architecture CLI wiring) requires a separate ADR/spec — do not mix into package-consumption work.
+5. **Consumer mode** (Forge as installable library, no `App\` ownership) is recorded in [ADR-0005](ADR-0005-forge-consumer-mode.md).
 
 ## Consequences
 
 - Composer `repositories` VCS entries (until Packagist publishing) and `^0.1` constraints are the integration path.
 - Derived DX specs that assumed in-tree Project/Presets should treat package classes as the implementation.
 - Architecture planning APIs exist in `durin-architecture`; public Forge commands for adopt/evolve remain future work.
+- Forge production code lives under `EreborCodeForge\Durin\Forge\`; consumers own `App\`.
 
 ## Non-goals
 
-- Redesigning package APIs during consumption.
+- Redesigning package APIs during consumption (preset *template* alignment for Forge dependency is allowed — see ADR-0005).
 - Creating `durin-app` / `durin-installer` in this ADR.
 - A custom package manager.

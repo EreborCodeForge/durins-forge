@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Tooling\Output;
+namespace EreborCodeForge\Durin\Forge\Tests\Unit\Tooling\Output;
 
 use EreborCodeForge\Durin\Core\Output\BufferedConsoleOutput;
 use PHPUnit\Framework\TestCase;

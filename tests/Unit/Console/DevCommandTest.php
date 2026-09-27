@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Console;
+namespace EreborCodeForge\Durin\Forge\Tests\Unit\Console;
 
-use App\Console\Commands\DevCommand;
-use App\Tooling\Runtime\DevRuntimeSummary;
-use App\Tooling\Runtime\RuntimeFacade;
-use App\Tooling\Runtime\RuntimeOptions;
-use App\Tooling\Runtime\RuntimeStatus;
+use EreborCodeForge\Durin\Forge\Console\Commands\DevCommand;
+use EreborCodeForge\Durin\Forge\Tooling\Runtime\DevRuntimeSummary;
+use EreborCodeForge\Durin\Forge\Tooling\Runtime\RuntimeFacade;
+use EreborCodeForge\Durin\Forge\Tooling\Runtime\RuntimeOptions;
+use EreborCodeForge\Durin\Forge\Tooling\Runtime\RuntimeStatus;
 use PHPUnit\Framework\TestCase;
 
 final class FakeDevFacade implements RuntimeFacade

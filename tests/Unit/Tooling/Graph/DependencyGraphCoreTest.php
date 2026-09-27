@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Tooling\Graph;
+namespace EreborCodeForge\Durin\Forge\Tests\Unit\Tooling\Graph;
 
-use App\Tooling\Graph\ContainerDependencyCollector;
-use App\Tooling\Graph\DependencyGraph;
-use App\Tooling\Graph\DependencyGraphAssembler;
-use App\Tooling\Graph\GraphEdge;
-use App\Tooling\Graph\GraphNode;
-use App\Tooling\Graph\GraphNodeKind;
-use App\Tooling\Graph\ProjectModuleDiscovery;
-use App\Tooling\Graph\RouteDependencyCollector;
+use EreborCodeForge\Durin\Forge\Tooling\Graph\ContainerDependencyCollector;
+use EreborCodeForge\Durin\Forge\Tooling\Graph\DependencyGraph;
+use EreborCodeForge\Durin\Forge\Tooling\Graph\DependencyGraphAssembler;
+use EreborCodeForge\Durin\Forge\Tooling\Graph\GraphEdge;
+use EreborCodeForge\Durin\Forge\Tooling\Graph\GraphNode;
+use EreborCodeForge\Durin\Forge\Tooling\Graph\GraphNodeKind;
+use EreborCodeForge\Durin\Forge\Tooling\Graph\ProjectModuleDiscovery;
+use EreborCodeForge\Durin\Forge\Tooling\Graph\RouteDependencyCollector;
 use EreborCodeForge\Durin\Core\Project\Project;
 use EreborCodeForge\Durin\Core\Project\ProjectPaths;
 use PHPUnit\Framework\TestCase;
@@ -113,7 +113,7 @@ final class DependencyGraphCoreTest extends TestCase
                 'GET' => [
                     '/api/invoices' => [
                         'handler' => ['App\\Modules\\Billing\\Http\\CreateInvoiceController', 'index'],
-                        'middlewares' => ['App\\Core\\Http\\Middleware\\CorsMiddleware'],
+                        'middlewares' => ['EreborCodeForge\\Durin\\Forge\\Core\\Http\\Middleware\\CorsMiddleware'],
                         'path' => '/api/invoices',
                     ],
                 ],

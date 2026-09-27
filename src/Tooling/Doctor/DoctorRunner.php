@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace App\Tooling\Doctor;
+namespace EreborCodeForge\Durin\Forge\Tooling\Doctor;
 
-use App\Tooling\Doctor\Checks\CompiledArtifactsCheck;
-use App\Tooling\Doctor\Checks\EregionRuntimeCheck;
-use App\Tooling\Doctor\Checks\MithrilPackageCheck;
-use App\Tooling\Doctor\Checks\PhpExtensionsCheck;
-use App\Tooling\Doctor\Checks\PhpVersionCheck;
-use App\Tooling\Doctor\Checks\ProjectComposerCheck;
-use App\Tooling\Doctor\Checks\ProjectKernelCheck;
-use App\Tooling\Doctor\Checks\ProjectManifestCheck;
+use EreborCodeForge\Durin\Forge\Tooling\Doctor\Checks\CompiledArtifactsCheck;
+use EreborCodeForge\Durin\Forge\Tooling\Doctor\Checks\EregionRuntimeCheck;
+use EreborCodeForge\Durin\Forge\Tooling\Doctor\Checks\MithrilPackageCheck;
+use EreborCodeForge\Durin\Forge\Tooling\Doctor\Checks\PhpExtensionsCheck;
+use EreborCodeForge\Durin\Forge\Tooling\Doctor\Checks\PhpVersionCheck;
+use EreborCodeForge\Durin\Forge\Tooling\Doctor\Checks\ProjectComposerCheck;
+use EreborCodeForge\Durin\Forge\Tooling\Doctor\Checks\ProjectKernelCheck;
+use EreborCodeForge\Durin\Forge\Tooling\Doctor\Checks\ProjectManifestCheck;
 
 final class DoctorRunner
 {

@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Tooling\Graph;
+namespace EreborCodeForge\Durin\Forge\Tests\Unit\Tooling\Graph;
 
-use App\Tooling\Graph\DependencyGraph;
-use App\Tooling\Graph\GraphEdge;
-use App\Tooling\Graph\GraphNode;
-use App\Tooling\Graph\GraphNodeKind;
-use App\Tooling\Graph\GraphRendererRegistry;
-use App\Tooling\Graph\JsonGraphRenderer;
-use App\Tooling\Graph\MermaidGraphRenderer;
-use App\Tooling\Graph\TextGraphRenderer;
+use EreborCodeForge\Durin\Forge\Tooling\Graph\DependencyGraph;
+use EreborCodeForge\Durin\Forge\Tooling\Graph\GraphEdge;
+use EreborCodeForge\Durin\Forge\Tooling\Graph\GraphNode;
+use EreborCodeForge\Durin\Forge\Tooling\Graph\GraphNodeKind;
+use EreborCodeForge\Durin\Forge\Tooling\Graph\GraphRendererRegistry;
+use EreborCodeForge\Durin\Forge\Tooling\Graph\JsonGraphRenderer;
+use EreborCodeForge\Durin\Forge\Tooling\Graph\MermaidGraphRenderer;
+use EreborCodeForge\Durin\Forge\Tooling\Graph\TextGraphRenderer;
 use PHPUnit\Framework\TestCase;
 
 final class GraphRendererTest extends TestCase

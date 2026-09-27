@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Core\Http\Cache;
+namespace EreborCodeForge\Durin\Forge\Tests\Unit\Core\Http\Cache;
 
-use App\Core\Http\Cache\ArrayHttpResponseCacheStore;
-use App\Core\Http\Cache\CachedResponse;
-use App\Core\Http\Cache\CacheResponse;
-use App\Core\Http\Cache\HttpResponseCacheStoreInterface;
-use App\Core\Http\Cache\ResponseCacheKeyBuilder;
-use App\Core\Http\Cache\ResponseCachePolicy;
-use App\Core\Http\Middleware\ResponseCacheMiddleware;
+use EreborCodeForge\Durin\Forge\Core\Http\Cache\ArrayHttpResponseCacheStore;
+use EreborCodeForge\Durin\Forge\Core\Http\Cache\CachedResponse;
+use EreborCodeForge\Durin\Forge\Core\Http\Cache\CacheResponse;
+use EreborCodeForge\Durin\Forge\Core\Http\Cache\HttpResponseCacheStoreInterface;
+use EreborCodeForge\Durin\Forge\Core\Http\Cache\ResponseCacheKeyBuilder;
+use EreborCodeForge\Durin\Forge\Core\Http\Cache\ResponseCachePolicy;
+use EreborCodeForge\Durin\Forge\Core\Http\Middleware\ResponseCacheMiddleware;
 use Erebor\Mithril\Http\HttpContext;
 use Erebor\Mithril\Http\Request;
 use Erebor\Mithril\Http\Response;

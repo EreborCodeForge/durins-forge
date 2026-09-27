@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Infrastructure\Database;
+namespace EreborCodeForge\Durin\Forge\Infrastructure\Database;
 
-use App\Infrastructure\Database\Sqlite\SqliteDriverFactory;
+use EreborCodeForge\Durin\Forge\Infrastructure\Database\Sqlite\SqliteDriverFactory;
 use EreborCodeForge\Mazarbul\Connection\ConnectionDefinition;
 use EreborCodeForge\Mazarbul\Connection\ConnectionManager;
 use EreborCodeForge\Mazarbul\Connection\ManagedConnection;

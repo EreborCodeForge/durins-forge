@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Tests\Unit;
+namespace EreborCodeForge\Durin\Forge\Tests\Unit;
 
-use App\Tests\DurinsForgeBaseTest;
+use EreborCodeForge\Durin\Forge\Tests\DurinsForgeBaseTest;
 use Erebor\Mithril\Container;
 use Erebor\Mithril\Contracts\PipelineContract;
 use Erebor\Mithril\Http\HttpContext;

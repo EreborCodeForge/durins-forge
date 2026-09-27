@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
-/** @var \Erebor\Mithril\Router $router */
+use EreborCodeForge\Durin\Forge\Core\Http\Controllers\HealthCheckController;
+use Erebor\Mithril\Router;
 
-$router->get('/api/health', static fn () => ['status' => 'ok']);
+return function (Router $router): void {
+    $router->get('/api/health', [HealthCheckController::class, 'check']);
+};

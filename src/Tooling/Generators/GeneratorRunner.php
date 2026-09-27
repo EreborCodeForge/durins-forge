@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tooling\Generators;
+namespace EreborCodeForge\Durin\Forge\Tooling\Generators;
 
 use EreborCodeForge\Durin\Core\Scaffold\ScaffoldWriteResult;
 use EreborCodeForge\Durin\Core\Mutation\ScaffoldWriter;

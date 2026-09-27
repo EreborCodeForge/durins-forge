@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Core\Routing;
+namespace EreborCodeForge\Durin\Forge\Core\Routing;
 
 use Erebor\Mithril\Container;
 use Erebor\Mithril\Http\HttpContext;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Core\Http;
+namespace EreborCodeForge\Durin\Forge\Core\Http;
 
 use Closure;
 use Erebor\Mithril\Container;

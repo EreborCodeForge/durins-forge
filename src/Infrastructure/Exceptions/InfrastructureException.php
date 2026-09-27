@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Infrastructure\Exceptions;
+namespace EreborCodeForge\Durin\Forge\Infrastructure\Exceptions;
 
-use App\Core\Exceptions\AppException;
+use EreborCodeForge\Durin\Forge\Core\Exceptions\AppException;
 
 class InfrastructureException extends AppException
 {

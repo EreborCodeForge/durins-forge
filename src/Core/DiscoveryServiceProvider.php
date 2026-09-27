@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Core;
+namespace EreborCodeForge\Durin\Forge\Core;
 
-use App\Core\Attributes\Discoverable;
-use App\Core\ServiceProvider;
+use EreborCodeForge\Durin\Forge\Core\Attributes\Discoverable;
+use EreborCodeForge\Durin\Forge\Support\ApplicationPath;
 use Erebor\Mithril\Container;
 use Erebor\Mithril\Environment;
 use FilesystemIterator;
@@ -17,7 +17,6 @@ final class DiscoveryServiceProvider implements ServiceProvider
 {
     public function register(Container $c): void
     {
-        // Descobre apenas classes marcadas como providers
         $providers = self::discover(tag: 'provider');
 
         foreach ($providers as $meta) {
@@ -34,7 +33,6 @@ final class DiscoveryServiceProvider implements ServiceProvider
             /** @var ServiceProvider $provider */
             $provider = new $providerClass();
             $provider->register($c);
-
         }
     }
 
@@ -44,8 +42,7 @@ final class DiscoveryServiceProvider implements ServiceProvider
     }
 
     /**
-     * Descobre classes em src/ marcadas com #[Discoverable].
-     * Em produção (APP_DEBUG !== true) usa cache em arquivo para não rodar scan+reflection a cada request.
+     * Discover #[Discoverable] classes in Forge package src and application src.
      *
      * @return array<int, array{class: class-string, tag: string}>
      */
@@ -70,54 +67,93 @@ final class DiscoveryServiceProvider implements ServiceProvider
 
     private static function runDiscovery(?string $tag): array
     {
-        $base = base_path('src');
-        if (!is_dir($base)) {
-            return [];
-        }
-
         $found = [];
-        $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($base, FilesystemIterator::SKIP_DOTS)
-        );
+        $seen = [];
 
-        foreach ($iterator as $file) {
-            if ($file->getExtension() !== 'php') {
+        foreach (self::scanRoots() as $root) {
+            $base = $root['path'];
+            $namespace = $root['namespace'];
+            if (!is_dir($base)) {
                 continue;
             }
 
-            $fqcn = self::fqcnFromFile($file->getPathname());
-            if (!$fqcn || !class_exists($fqcn)) {
+            $realBase = realpath($base);
+            if ($realBase === false) {
                 continue;
             }
+            $realBase .= DIRECTORY_SEPARATOR;
 
-            try {
-                $ref = new ReflectionClass($fqcn);
-                if ($ref->isAbstract() || $ref->isInterface()) {
+            $iterator = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($base, FilesystemIterator::SKIP_DOTS)
+            );
+
+            foreach ($iterator as $file) {
+                if ($file->getExtension() !== 'php') {
                     continue;
                 }
 
-                foreach ($ref->getAttributes(Discoverable::class) as $attr) {
-                    /** @var Discoverable $meta */
-                    $meta = $attr->newInstance();
-                    if ($tag !== null && $meta->tag !== $tag && !str_starts_with((string) $meta->tag, $tag . '.')) {
+                $fqcn = self::fqcnFromFile($file->getPathname(), $realBase, $namespace);
+                if (!$fqcn || isset($seen[$fqcn]) || !class_exists($fqcn)) {
+                    continue;
+                }
+                $seen[$fqcn] = true;
+
+                try {
+                    $ref = new ReflectionClass($fqcn);
+                    if ($ref->isAbstract() || $ref->isInterface()) {
                         continue;
                     }
-                    $found[] = [
-                        'class' => $fqcn,
-                        'tag'   => $meta->tag,
-                    ];
+
+                    foreach ($ref->getAttributes(Discoverable::class) as $attr) {
+                        /** @var Discoverable $meta */
+                        $meta = $attr->newInstance();
+                        if ($tag !== null && $meta->tag !== $tag && !str_starts_with((string) $meta->tag, $tag . '.')) {
+                            continue;
+                        }
+                        $found[] = [
+                            'class' => $fqcn,
+                            'tag' => $meta->tag,
+                        ];
+                    }
+                } catch (\Throwable) {
+                    continue;
                 }
-            } catch (\Throwable) {
-                continue;
             }
         }
 
         return $found;
     }
 
+    /**
+     * @return list<array{path: string, namespace: string}>
+     */
+    private static function scanRoots(): array
+    {
+        $forgeSrc = ApplicationPath::forgePackageRoot() . DIRECTORY_SEPARATOR . 'src';
+        $roots = [
+            [
+                'path' => $forgeSrc,
+                'namespace' => 'EreborCodeForge\\Durin\\Forge\\',
+            ],
+        ];
+
+        $appSrc = base_path('src');
+        $forgeReal = realpath($forgeSrc);
+        $appReal = realpath($appSrc);
+        if ($appReal !== false && $appReal !== $forgeReal) {
+            $roots[] = [
+                'path' => $appSrc,
+                'namespace' => ApplicationPath::applicationNamespace(),
+            ];
+        }
+
+        return $roots;
+    }
+
     private static function discoveryCachePath(string $tag): string
     {
         $safe = preg_replace('/[^a-z0-9_-]/i', '_', $tag);
+
         return base_path('storage/framework/cache/discovered_providers_' . $safe . '.php');
     }
 
@@ -132,17 +168,16 @@ final class DiscoveryServiceProvider implements ServiceProvider
         file_put_contents($path, $export);
     }
 
-    private static function fqcnFromFile(string $path): ?string
+    private static function fqcnFromFile(string $path, string $realBaseWithSep, string $namespace): ?string
     {
-        $base = realpath(base_path('src')) . DIRECTORY_SEPARATOR;
-
-        if (!str_starts_with($path, $base)) {
+        $real = realpath($path);
+        if ($real === false || !str_starts_with($real, $realBaseWithSep)) {
             return null;
         }
 
-        $relative = substr($path, strlen($base));
+        $relative = substr($real, strlen($realBaseWithSep));
         $relative = str_replace(DIRECTORY_SEPARATOR, '\\', $relative);
 
-        return 'App\\' . preg_replace('/\.php$/', '', $relative);
+        return $namespace . preg_replace('/\.php$/', '', $relative);
     }
 }

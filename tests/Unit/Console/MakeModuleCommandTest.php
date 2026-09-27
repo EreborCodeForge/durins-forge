@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Console;
+namespace EreborCodeForge\Durin\Forge\Tests\Unit\Console;
 
-use App\Console\Commands\MakeModuleCommand;
-use App\Tooling\Generators\GeneratorRunner;
-use App\Tooling\Generators\ModuleGenerator;
-use App\Tooling\Generators\NameInflector;
+use EreborCodeForge\Durin\Forge\Console\Commands\MakeModuleCommand;
+use EreborCodeForge\Durin\Forge\Tooling\Generators\GeneratorRunner;
+use EreborCodeForge\Durin\Forge\Tooling\Generators\ModuleGenerator;
+use EreborCodeForge\Durin\Forge\Tooling\Generators\NameInflector;
 use EreborCodeForge\Durin\Core\Mutation\ScaffoldWriter;
 use PHPUnit\Framework\TestCase;
 

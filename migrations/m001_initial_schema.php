@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Infrastructure\Database\Migrations\BaseMigration;
+use EreborCodeForge\Durin\Forge\Infrastructure\Database\Migrations\BaseMigration;
 
 return new class extends BaseMigration
 {

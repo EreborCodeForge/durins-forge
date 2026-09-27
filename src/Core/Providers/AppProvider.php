@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Core\Providers;
+namespace EreborCodeForge\Durin\Forge\Core\Providers;
 
-use App\Core\Attributes\Discoverable;
-use App\Core\DescriptorProvider;
-use App\Core\ServiceProvider;
-use App\Core\Contracts\StorageServiceInterface;
-use App\Infrastructure\Services\StorageServiceBuilder;
+use EreborCodeForge\Durin\Forge\Core\Attributes\Discoverable;
+use EreborCodeForge\Durin\Forge\Core\DescriptorProvider;
+use EreborCodeForge\Durin\Forge\Core\ServiceProvider;
+use EreborCodeForge\Durin\Forge\Core\Contracts\StorageServiceInterface;
+use EreborCodeForge\Durin\Forge\Infrastructure\Services\StorageServiceBuilder;
 use Erebor\Mithril\Container;
 use Erebor\Mithril\Logger\FileLogger;
 use Erebor\Mithril\Logger\LoggerInterface;
@@ -18,9 +18,9 @@ final class AppProvider implements ServiceProvider
 {
     public function register(Container $c): void
     {
-        // SessionManager is request-scoped — registered in App\Kernel::registerScopedBindings()
+        // SessionManager is request-scoped — registered in HttpApplicationKernel
 
-        $c->bind(LoggerInterface::class, fn() => new FileLogger(__DIR__ . '/../../../logs/app.log'));
+        $c->bind(LoggerInterface::class, fn () => new FileLogger(base_path('logs/app.log')));
 
         $c->bind(StorageServiceInterface::class, fn(Container $c) => StorageServiceBuilder::build($c));
     }

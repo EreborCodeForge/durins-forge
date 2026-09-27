@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Core\Http\Middleware;
+namespace EreborCodeForge\Durin\Forge\Core\Http\Middleware;
 
-use App\Infrastructure\Security\RateLimiter;
+use EreborCodeForge\Durin\Forge\Infrastructure\Security\RateLimiter;
 use Erebor\Mithril\Contracts\RouterMiddlewareContract;
 use Erebor\Mithril\Http\HttpContext;
 use Erebor\Mithril\Http\Response;

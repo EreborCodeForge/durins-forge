@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tooling\Generators;
+namespace EreborCodeForge\Durin\Forge\Tooling\Generators;
 
 /**
  * Input for a code generator.

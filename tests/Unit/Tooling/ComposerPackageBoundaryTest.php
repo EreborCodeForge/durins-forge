@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Tooling;
+namespace EreborCodeForge\Durin\Forge\Tests\Unit\Tooling;
 
 use PHPUnit\Framework\TestCase;
 

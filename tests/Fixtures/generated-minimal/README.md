@@ -7,8 +7,8 @@ Created with `durin new` preset **minimal**.
 ```bash
 composer install
 cp .env.example .env
-php bin/durin doctor
-php bin/durin dev
+vendor/bin/durin doctor
+vendor/bin/durin dev
 ```
 
 Structure:

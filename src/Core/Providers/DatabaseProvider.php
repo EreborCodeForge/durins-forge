@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Core\Providers;
+namespace EreborCodeForge\Durin\Forge\Core\Providers;
 
-use App\Core\Attributes\Discoverable;
-use App\Core\ServiceProvider;
-use App\Infrastructure\Database\DB;
+use EreborCodeForge\Durin\Forge\Core\Attributes\Discoverable;
+use EreborCodeForge\Durin\Forge\Core\ServiceProvider;
+use EreborCodeForge\Durin\Forge\Infrastructure\Database\DB;
 use Erebor\Mithril\Container;
 use EreborCodeForge\Mazarbul\Connection\ConnectionManager;
 use EreborCodeForge\Mazarbul\Query\Database;

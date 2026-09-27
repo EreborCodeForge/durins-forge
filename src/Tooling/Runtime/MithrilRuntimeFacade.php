@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tooling\Runtime;
+namespace EreborCodeForge\Durin\Forge\Tooling\Runtime;
 
 /**
  * Mithril-backed facade: one startup path for serve/dev; status via provider.

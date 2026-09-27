@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Console\Commands;
+namespace EreborCodeForge\Durin\Forge\Console\Commands;
 
-use App\Tooling\Generators\FeatureGenerator;
-use App\Tooling\Generators\GeneratorRequest;
-use App\Tooling\Generators\GeneratorRunner;
-use App\Tooling\Generators\NameInflector;
+use EreborCodeForge\Durin\Forge\Tooling\Generators\FeatureGenerator;
+use EreborCodeForge\Durin\Forge\Tooling\Generators\GeneratorRequest;
+use EreborCodeForge\Durin\Forge\Tooling\Generators\GeneratorRunner;
+use EreborCodeForge\Durin\Forge\Tooling\Generators\NameInflector;
 use EreborCodeForge\Durin\Core\Manifest\DurinManifestModulesEnabler;
 use EreborCodeForge\Durin\Core\Mutation\ScaffoldWriter;
 use Erebor\Mithril\Console\ArgParser;

@@ -1,8 +1,9 @@
 {
     "name": "ereborcodeforge/durins-forge",
     "description": "Durin’s Forge is the official framework and project forger built atop MithrilPHP — crafting applications using Clean Architecture",
-    "type": "project",
+    "type": "library",
     "license": "MIT",
+    "version": "0.1.0",
     "keywords": [
         "php",
         "framework",
@@ -27,6 +28,16 @@
     ],
     "repositories": [
         {
+            "type": "path",
+            "url": "../ereborcodeforge/durin-presets",
+            "options": {
+                "symlink": true,
+                "versions": {
+                    "ereborcodeforge/durin-presets": "0.1.1"
+                }
+            }
+        },
+        {
             "type": "vcs",
             "url": "https://github.com/EreborCodeForge/durin-core"
         },
@@ -42,7 +53,7 @@
     "require": {
         "ereborcodeforge/durin-architecture": "^0.1",
         "ereborcodeforge/durin-core": "^0.1",
-        "ereborcodeforge/durin-presets": "^0.1",
+        "ereborcodeforge/durin-presets": "^0.1.1",
         "ereborcodeforge/mazarbul": "^1.0",
         "ereborcodeforge/mithrilphp": "^2.2",
         "ext-msgpack": "*",
@@ -52,28 +63,25 @@
     },
     "autoload": {
         "psr-4": {
-            "App\\": "src/"
+            "EreborCodeForge\\Durin\\Forge\\": "src/"
         },
         "files": [
-            "src/Core/helpers.php"
+            "src/Support/helpers.php"
         ]
     },
     "autoload-dev": {
         "psr-4": {
-            "App\\Tests\\": "tests/"
-        }
+            "EreborCodeForge\\Durin\\Forge\\Tests\\": "tests/",
+            "App\\": "resources/skeleton/application/src/"
+        },
+        "exclude-from-classmap": [
+            "/tests/Fixtures/"
+        ]
     },
     "bin": [
         "bin/durin",
         "bin/durins-forge"
     ],
-    "extra": {
-        "mithril": {
-            "kernel": "App\\Kernel",
-            "eregion": "v0.3.0",
-            "eregion_repo": "EreborCodeForge/eregion"
-        }
-    },
     "scripts": {
         "test": "phpunit",
         "link-bins": "php scripts/link-vendor-bins.php",

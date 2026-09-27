@@ -5,7 +5,7 @@ declare(strict_types=1);
 require __DIR__ . '/../vendor/autoload.php';
 require __DIR__ . '/../src/Core/helpers.php';
 
-use App\Core\Http\HttpDispatcher;
+use EreborCodeForge\Durin\Forge\Core\Http\HttpDispatcher;
 use App\Kernel;
 use Erebor\Mithril\Http\Request;
 

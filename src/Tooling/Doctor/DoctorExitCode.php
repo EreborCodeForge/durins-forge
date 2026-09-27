@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tooling\Doctor;
+namespace EreborCodeForge\Durin\Forge\Tooling\Doctor;
 
 /**
  * Exit code contract (master §12 / SPEC-003):

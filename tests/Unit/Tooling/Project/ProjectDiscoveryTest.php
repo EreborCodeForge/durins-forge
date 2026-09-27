@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Tooling\Project;
+namespace EreborCodeForge\Durin\Forge\Tests\Unit\Tooling\Project;
 
 use EreborCodeForge\Durin\Core\Manifest\DurinManifestException;
 use EreborCodeForge\Durin\Core\Project\ProjectDiscovery;

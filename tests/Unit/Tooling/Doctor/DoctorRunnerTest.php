@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Tooling\Doctor;
+namespace EreborCodeForge\Durin\Forge\Tests\Unit\Tooling\Doctor;
 
-use App\Tooling\Doctor\Check;
-use App\Tooling\Doctor\CheckResult;
-use App\Tooling\Doctor\CheckStatus;
-use App\Tooling\Doctor\DoctorContext;
-use App\Tooling\Doctor\DoctorExitCode;
-use App\Tooling\Doctor\DoctorReport;
-use App\Tooling\Doctor\DoctorRunner;
-use App\Tooling\Doctor\JsonDoctorRenderer;
-use App\Tooling\Doctor\Checks\PhpVersionCheck;
-use App\Tooling\Doctor\Checks\ProjectComposerCheck;
+use EreborCodeForge\Durin\Forge\Tooling\Doctor\Check;
+use EreborCodeForge\Durin\Forge\Tooling\Doctor\CheckResult;
+use EreborCodeForge\Durin\Forge\Tooling\Doctor\CheckStatus;
+use EreborCodeForge\Durin\Forge\Tooling\Doctor\DoctorContext;
+use EreborCodeForge\Durin\Forge\Tooling\Doctor\DoctorExitCode;
+use EreborCodeForge\Durin\Forge\Tooling\Doctor\DoctorReport;
+use EreborCodeForge\Durin\Forge\Tooling\Doctor\DoctorRunner;
+use EreborCodeForge\Durin\Forge\Tooling\Doctor\JsonDoctorRenderer;
+use EreborCodeForge\Durin\Forge\Tooling\Doctor\Checks\PhpVersionCheck;
+use EreborCodeForge\Durin\Forge\Tooling\Doctor\Checks\ProjectComposerCheck;
 use EreborCodeForge\Durin\Core\Project\Project;
 use EreborCodeForge\Durin\Core\Project\ProjectPaths;
 use PHPUnit\Framework\TestCase;

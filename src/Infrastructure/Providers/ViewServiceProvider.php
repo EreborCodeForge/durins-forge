@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Infrastructure\Providers;
+namespace EreborCodeForge\Durin\Forge\Infrastructure\Providers;
 
-use App\Core\Attributes\Discoverable;
-use App\Core\DescriptorProvider;
-use App\Core\ServiceProvider;
-use App\Infrastructure\Bridge\VueViewHandler;
-use App\Infrastructure\Bridge\VueViewHandlerBuilder;
+use EreborCodeForge\Durin\Forge\Core\Attributes\Discoverable;
+use EreborCodeForge\Durin\Forge\Core\DescriptorProvider;
+use EreborCodeForge\Durin\Forge\Core\ServiceProvider;
+use EreborCodeForge\Durin\Forge\Infrastructure\Bridge\VueViewHandler;
+use EreborCodeForge\Durin\Forge\Infrastructure\Bridge\VueViewHandlerBuilder;
 use Erebor\Mithril\Container;
 
 #[Discoverable(tag: 'provider.view')]

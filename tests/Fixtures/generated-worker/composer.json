@@ -1,11 +1,29 @@
 {
     "name": "app/fixture-worker",
     "type": "project",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/EreborCodeForge/durins-forge"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/EreborCodeForge/durin-core"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/EreborCodeForge/durin-presets"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/EreborCodeForge/durin-architecture"
+        }
+    ],
     "require": {
         "php": "^8.5",
         "ext-msgpack": "*",
         "ext-sockets": "*",
-        "ereborcodeforge/mithrilphp": "^2.2"
+        "ereborcodeforge/durins-forge": "^0.1"
     },
     "require-dev": {
         "phpunit/phpunit": "^12.5"

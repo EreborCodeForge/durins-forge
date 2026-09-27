@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Tooling\Scaffold;
+namespace EreborCodeForge\Durin\Forge\Tests\Unit\Tooling\Scaffold;
 
 use EreborCodeForge\Durin\Core\Output\BufferedConsoleOutput;
 use EreborCodeForge\Durin\Core\Scaffold\ScaffoldPlan;

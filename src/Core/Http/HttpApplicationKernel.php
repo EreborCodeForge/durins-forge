@@ -2,17 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App;
+namespace EreborCodeForge\Durin\Forge\Core\Http;
 
-use App\Core\Exceptions\Handler;
-use App\Core\Http\HttpKernel;
-use App\Core\Http\Middleware\CorsMiddleware;
-use App\Core\Http\Middleware\CsrfMiddleware;
-use App\Core\Http\Middleware\ThrottleRequests;
-use App\Core\Routing\ControllerHandlerResolver;
-use App\Infrastructure\Session\SessionManager;
+use EreborCodeForge\Durin\Forge\Core\Exceptions\Handler;
+use EreborCodeForge\Durin\Forge\Core\Http\Middleware\CorsMiddleware;
+use EreborCodeForge\Durin\Forge\Core\Http\Middleware\CsrfMiddleware;
+use EreborCodeForge\Durin\Forge\Core\Http\Middleware\ThrottleRequests;
+use EreborCodeForge\Durin\Forge\Core\Routing\ControllerHandlerResolver;
+use EreborCodeForge\Durin\Forge\Infrastructure\Session\SessionManager;
 use Erebor\Mithril\Container;
-use Erebor\Mithril\Contracts\HttpApplication;
 use Erebor\Mithril\Contracts\PipelineContract;
 use Erebor\Mithril\Environment;
 use Erebor\Mithril\Http\HttpContext;
@@ -23,18 +21,38 @@ use Erebor\Mithril\Routing\Contracts\HandlerResolver;
 use Throwable;
 
 /**
- * Durin application kernel — warm Worker entry via Mithril HttpApplication.
- * Boot once per process; request state must be scoped, not singleton.
+ * Reusable HTTP application boot/dispatch used by consumer App\Kernel.
  */
-final class Kernel implements HttpApplication
+final class HttpApplicationKernel
 {
     private Container $container;
-    private Router $router;
+    private ?Router $router = null;
     private bool $booted = false;
 
-    public function __construct(?Container $container = null)
-    {
+    /** @var list<class-string> */
+    private array $apiMiddlewares;
+
+    /** @var list<class-string> */
+    private array $webMiddlewares;
+
+    /**
+     * @param list<class-string>|null $apiMiddlewares
+     * @param list<class-string>|null $webMiddlewares
+     */
+    public function __construct(
+        ?Container $container = null,
+        ?array $apiMiddlewares = null,
+        ?array $webMiddlewares = null,
+    ) {
         $this->container = $container ?? new Container();
+        $this->apiMiddlewares = $apiMiddlewares ?? [
+            CorsMiddleware::class,
+        ];
+        $this->webMiddlewares = $webMiddlewares ?? [
+            ThrottleRequests::class,
+            CorsMiddleware::class,
+            CsrfMiddleware::class,
+        ];
     }
 
     public function boot(): void
@@ -45,8 +63,9 @@ final class Kernel implements HttpApplication
 
         Environment::load(base_path('.env'));
 
+        $testing = Environment::get('APP_ENV', 'production') === 'testing';
         $containerCachePath = base_path('var/cache/container.php');
-        if (file_exists($containerCachePath)) {
+        if (!$testing && file_exists($containerCachePath)) {
             $data = require $containerCachePath;
             $factories = $data['factories'] ?? [];
             $singletons = $data['singletons'] ?? [];
@@ -85,23 +104,24 @@ final class Kernel implements HttpApplication
 
     public function getRouter(): Router
     {
+        if ($this->router === null) {
+            throw new \RuntimeException('Kernel has not been booted.');
+        }
+
         return $this->router;
     }
 
     private function registerBaseBindings(): void
     {
-        $this->container->singleton(Container::class, fn() => $this->container);
-        $this->container->singleton(Router::class, fn() => new Router());
-        $this->container->singleton(HandlerResolver::class, fn() => new ControllerHandlerResolver($this->container));
-        $this->container->singleton(Handler::class, fn() => new Handler());
+        $this->container->singleton(Container::class, fn () => $this->container);
+        $this->container->singleton(Router::class, fn () => new Router());
+        $this->container->singleton(HandlerResolver::class, fn () => new ControllerHandlerResolver($this->container));
+        $this->container->singleton(Handler::class, fn () => new Handler());
     }
 
-    /**
-     * Request-bound services — survive beginScope/endScope isolation in the Worker.
-     */
     private function registerScopedBindings(): void
     {
-        $this->container->scoped(SessionManager::class, fn() => new SessionManager());
+        $this->container->scoped(SessionManager::class, fn () => new SessionManager());
     }
 
     private function dispatch(Request $request): Response
@@ -114,7 +134,7 @@ final class Kernel implements HttpApplication
         return $pipeline
             ->send($context)
             ->through($this->httpMiddlewaresFor($request))
-            ->then(fn(HttpContext $context) => $httpKernel->handle($context->request));
+            ->then(fn (HttpContext $context) => $httpKernel->handle($context->request));
     }
 
     /**
@@ -123,22 +143,17 @@ final class Kernel implements HttpApplication
     private function httpMiddlewaresFor(Request $request): array
     {
         if ($this->isApiRequest($request)) {
-            return [
-                CorsMiddleware::class,
-            ];
+            return $this->apiMiddlewares;
         }
 
-        return [
-            ThrottleRequests::class,
-            CorsMiddleware::class,
-            CsrfMiddleware::class,
-        ];
+        return $this->webMiddlewares;
     }
 
     private function loadRoutes(Router $router): void
     {
+        $testing = Environment::get('APP_ENV', 'production') === 'testing';
         $routesCachePath = base_path('var/cache/routes.php');
-        if (file_exists($routesCachePath)) {
+        if (!$testing && file_exists($routesCachePath)) {
             $compiled = require $routesCachePath;
             $router->loadCompiledRoutes($compiled);
         } else {
@@ -148,7 +163,7 @@ final class Kernel implements HttpApplication
             $apiRoutes($router);
         }
 
-        $this->container->singleton(Router::class, fn() => $router);
+        $this->container->singleton(Router::class, fn () => $router);
     }
 
     private function registerProviders(): void
@@ -164,8 +179,9 @@ final class Kernel implements HttpApplication
 
     private function loadConfig(): array
     {
+        $testing = Environment::get('APP_ENV', 'production') === 'testing';
         $cachePath = base_path('var/cache/config.php');
-        if (file_exists($cachePath)) {
+        if (!$testing && file_exists($cachePath)) {
             return require $cachePath;
         }
 

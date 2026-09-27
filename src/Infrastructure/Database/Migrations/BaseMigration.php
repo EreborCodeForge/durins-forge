@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Infrastructure\Database\Migrations;
+namespace EreborCodeForge\Durin\Forge\Infrastructure\Database\Migrations;
 
-use App\Infrastructure\Database\DB;
-use App\Infrastructure\Database\Migrations\Interface\Migration;
+use EreborCodeForge\Durin\Forge\Infrastructure\Database\DB;
+use EreborCodeForge\Durin\Forge\Infrastructure\Database\Migrations\Interface\Migration;
 use PDO;
 
 abstract class BaseMigration implements Migration

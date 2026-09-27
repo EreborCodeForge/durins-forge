@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Core\Contracts;
+namespace EreborCodeForge\Durin\Forge\Core\Contracts;
 
 use Erebor\Mithril\Http\UploadedFile;
 
