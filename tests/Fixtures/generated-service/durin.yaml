@@ -1,0 +1,12 @@
+application:
+  name: fixture-service
+  preset: service
+runtime:
+  engine: mithril
+  server: eregion
+  mode: http
+features:
+  http: true
+  messaging: false
+architecture:
+  modules: false

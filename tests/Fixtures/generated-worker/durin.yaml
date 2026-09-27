@@ -1,0 +1,12 @@
+application:
+  name: fixture-worker
+  preset: worker
+runtime:
+  engine: mithril
+  server: none
+  mode: job
+features:
+  http: false
+  messaging: true
+architecture:
+  modules: false

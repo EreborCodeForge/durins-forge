@@ -1,0 +1,12 @@
+application:
+  name: fixture-minimal
+  preset: minimal
+runtime:
+  engine: mithril
+  server: eregion
+  mode: http
+features:
+  http: true
+  messaging: false
+architecture:
+  modules: false
