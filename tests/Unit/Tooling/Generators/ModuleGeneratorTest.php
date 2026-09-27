@@ -7,9 +7,9 @@ namespace App\Tests\Unit\Tooling\Generators;
 use App\Tooling\Generators\GeneratorRequest;
 use App\Tooling\Generators\GeneratorRunner;
 use App\Tooling\Generators\ModuleGenerator;
-use App\Tooling\Project\DurinManifestModulesEnabler;
-use App\Tooling\Project\DurinManifestParser;
-use App\Tooling\Scaffold\ScaffoldWriter;
+use EreborCodeForge\Durin\Core\Manifest\DurinManifestModulesEnabler;
+use EreborCodeForge\Durin\Core\Manifest\DurinManifestParser;
+use EreborCodeForge\Durin\Core\Mutation\ScaffoldWriter;
 use PHPUnit\Framework\TestCase;
 
 final class ModuleGeneratorTest extends TestCase

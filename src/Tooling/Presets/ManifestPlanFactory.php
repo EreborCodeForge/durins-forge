@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tooling\Presets;
 
-use App\Tooling\Project\DurinManifest;
-use App\Tooling\Scaffold\ScaffoldPlan;
+use EreborCodeForge\Durin\Core\Contract\ProjectOptions;
+use EreborCodeForge\Durin\Core\Manifest\DurinManifest;
+use EreborCodeForge\Durin\Core\Scaffold\ScaffoldPlan;
 
 /**
  * Helpers to attach durin.yaml (and related metadata) to a ScaffoldPlan.

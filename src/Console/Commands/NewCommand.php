@@ -6,9 +6,9 @@ namespace App\Console\Commands;
 
 use App\Tooling\Presets\DefaultPresetRegistryFactory;
 use App\Tooling\Presets\PresetEngine;
-use App\Tooling\Presets\ProjectOptions;
+use EreborCodeForge\Durin\Core\Contract\ProjectOptions;
 use App\Tooling\Presets\UnknownPresetException;
-use App\Tooling\Scaffold\ScaffoldWriter;
+use EreborCodeForge\Durin\Core\Mutation\ScaffoldWriter;
 use Erebor\Mithril\Console\ArgParser;
 use Erebor\Mithril\Console\Command;
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tooling\Generators;
 
-use App\Tooling\Scaffold\ScaffoldPlan;
+use EreborCodeForge\Durin\Core\Scaffold\ScaffoldPlan;
 
 /**
  * Higher-level generator: Module + UseCase (+ optional Http/tests) in one plan (master §28).

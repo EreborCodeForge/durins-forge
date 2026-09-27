@@ -7,7 +7,7 @@ namespace App\Tests\Unit\Console;
 use App\Console\Commands\GraphDependenciesCommand;
 use App\Tooling\Graph\DependencyGraphAssembler;
 use App\Tooling\Graph\GraphRendererRegistry;
-use App\Tooling\Project\ProjectDiscovery;
+use EreborCodeForge\Durin\Core\Project\ProjectDiscovery;
 use PHPUnit\Framework\TestCase;
 
 final class GraphDependenciesCommandTest extends TestCase
