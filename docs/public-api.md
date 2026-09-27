@@ -28,6 +28,7 @@ Related: [package-architecture.md](package-architecture.md), [ADR-0006](adr/ADR-
 |-------|------|
 | `EreborCodeForge\Durin\Forge\Support\ApplicationPath` | Canonical application root / path resolution for consumers and CLI |
 | `EreborCodeForge\Durin\Forge\Core\Http\HttpApplicationKernel` | HTTP kernel composed by consumer `App\Kernel` |
+| `EreborCodeForge\Durin\Forge\Core\DiscoveryServiceProvider` | Application `config/app.php` provider entry for Mithril service discovery |
 
 Any Forge class imported by **generated application code** (skeleton / presets) **must** be added to this whitelist.
 
