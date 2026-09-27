@@ -1,12 +1,12 @@
 # Durin's Forge
 
-Framework e forjador de apps sobre **MithrilPHP**. Este repositório é o **core** (Kernel, Core, Tooling, CLI) — não um domínio de negócio pré-montado. Apps nascem com `durin new` + generators.
+Framework e forjador de apps sobre **MithrilPHP**. Este repositório é o pacote Composer **`ereborcodeforge/durins-forge`** (`type: library`) — não um domínio de negócio pré-montado. Apps consumidoras nascem com `durin new` + generators e dependem deste package.
+
+Namespace de produção: **`EreborCodeForge\Durin\Forge\`**. O namespace **`App\`** pertence exclusivamente à aplicação consumidora.
 
 Em produção, **Eregion** guarda o HTTP; o Worker Mithril mantém o Kernel aquecido.
 
 > **Durin forja a app → Mithril aquece o Worker → Eregion guarda os portões.**
-
-Programa DX V1 (SPECs 001–016) entregue: foundation, doctor, runtime, presets, generators e grafo de dependências.
 
 ---
 
@@ -19,7 +19,20 @@ Programa DX V1 (SPECs 001–016) entregue: foundation, doctor, runtime, presets,
 
 ---
 
-## Instalação
+## Consumo (caminho canônico)
+
+Numa aplicação:
+
+```bash
+composer require ereborcodeforge/durins-forge
+vendor/bin/durin doctor
+vendor/bin/durin dev
+vendor/bin/durin make:feature ...
+```
+
+Apps geradas por `durin new` já declaram `ereborcodeforge/durins-forge` e documentam `vendor/bin/durin`.
+
+### Desenvolvimento deste repositório
 
 ```bash
 composer install
@@ -29,79 +42,72 @@ cp .env.example .env
 php bin/durin migrate
 ```
 
-`composer.json` pinna:
+`composer.json` pinna (entre outros):
 
-- `ereborcodeforge/mithrilphp:^2.1`
-- `ereborcodeforge/mazarbul:^1.0` — persistência oficial (lazy connections, stream, bulk)
-- `extra.mithril.kernel = App\\Kernel`
-- `extra.mithril.eregion = v0.3.0`
+- `ereborcodeforge/mithrilphp:^2.2`
+- `ereborcodeforge/mazarbul:^1.0`
+- `ereborcodeforge/durin-core:^0.1`
+- `ereborcodeforge/durin-presets:^0.1.1`
+- `ereborcodeforge/durin-architecture:^0.1`
 
 DX de banco: `db()` / `DB::database('name')` (Mazarbul). Migrations DDL ainda usam `DB::pdo()` quando precisam de atributos PDO.
 
 ---
 
-## Como rodar (caminho canônico)
+## Como rodar (runtime)
 
 ```bash
 vendor/bin/forge server:install          # baixa Eregion → .mithril/bin
 vendor/bin/forge eregion:craft           # eregion.yaml + var/runtime/eregion.json
-vendor/bin/durin optimize                # após composer install (link-bins)
+vendor/bin/durin optimize
 vendor/bin/forge server:check
-php bin/durin serve --host=0.0.0.0 --port=8080
+vendor/bin/durin serve --host=0.0.0.0 --port=8080
 ```
 
-### `durin serve` (produção)
+Neste repo (DX local), `php bin/durin` é equivalente.
 
-Entrada **orientada a produção**: `RuntimeFacade` → `vendor/bin/forge serve` → Eregion. Durin não implementa o servidor HTTP.
+### `durin serve` / `durin dev`
 
-Defaults: `--host=0.0.0.0`, `--port=8080`. Flags extras são repassadas ao Forge.
+Entrada orientada a produção via `RuntimeFacade` → Mithril/Eregion. Defaults de `dev` usam `127.0.0.1:8080` e `APP_ENV=development`.
 
 ```bash
-php bin/durin serve --host=0.0.0.0 --port=8080 --workers=4
+vendor/bin/durin doctor
+vendor/bin/durin status
+vendor/bin/durin dev
 ```
 
-### `durin dev` (local)
-
-Mesmo `RuntimeFacade` de produção, com defaults locais (`127.0.0.1:8080`, `APP_ENV=development`).
-
-```bash
-php bin/durin doctor
-php bin/durin status
-php bin/durin dev
-```
-
-Escape hatch: `--php` chama `forge serve:php`. Neste skeleton o `public/index.php` é worker UDS — `serve:php` / `php -S` tipicamente devolvem **503**. Preferir Eregion também em local.
-
-`doctor` = a app **pode** rodar · `status` = o que está **configurado/disponível agora** (binário, `eregion.yaml`, manifesto). Sem `--watch` no V1.
+`doctor` = a app **pode** rodar · `status` = o que está **configurado/disponível agora**. Sem `--watch` no V1.
 
 ---
 
-## Fronteira de responsabilidade
+## Ownership
 
-| Camada | Papel |
-|--------|--------|
-| **Durin’s Forge** | Skeleton, `App\Kernel`, presets, generators, doctor/status/graph, `durin optimize`, migrate |
-| **MithrilPHP** | Worker, DI, HTTP, Forge CLI, bridge Eregion (`eregion-worker`) |
-| **Eregion (Go)** | HTTP público, pool, UDS, recycle |
+| Pacote / área | Responsabilidade |
+|---------------|------------------|
+| **`durin-core`** | Project/manifest/scaffold primitives |
+| **`durin-presets`** | Presets e templates de `durin new` |
+| **`durin-architecture`** | Planners/detectors de arquitetura |
+| **`durins-forge` Tooling** | Doctor, Generators, Graph, Runtime + CLI |
+| **App consumidora** | `App\Kernel`, `config/`, `routes/`, `public/`, `.env` |
 
-Durin **não** reimplementa UDS/MessagePack nem servidor HTTP de produção ([ADR-0002](docs/adr/ADR-0002-cli-runtime-boundaries.md)).
+Ver [ADR-0004](docs/adr/ADR-0004-tooling-package-boundaries.md) e [ADR-0005](docs/adr/ADR-0005-forge-consumer-mode.md).
 
-Tooling interno vive em `App\Tooling\` (Project, Scaffold, Doctor, Runtime, Presets, Generators, Graph) — sem pacotes Composer separados no V1 ([ADR-0004](docs/adr/ADR-0004-tooling-package-boundaries.md)).
+Skeleton de aplicação (não autoloadado como framework): [`resources/skeleton/application/`](resources/skeleton/application/).
 
 ---
 
 ## Kernel e artifacts
 
-- [`src/Kernel.php`](src/Kernel.php) — `implements HttpApplication`, boot **idempotente**
-- Preferência: `var/cache/container.php` + `var/cache/routes.php`
+- Consumidor: `App\Kernel` compõe `EreborCodeForge\Durin\Forge\Core\Http\HttpApplicationKernel`
+- Preferência: `var/cache/container.php` + `var/cache/routes.php` (ignorados com `APP_ENV=testing`)
 - Fallback (dev): providers via discovery + `require` de `routes/*.php`
-- Request-bound (ex.: `SessionManager`) → `scoped()`; Router/config → singleton
+- `ApplicationPath` / `base_path()` resolvem a **raiz da aplicação**, não o path do package em `vendor/`
 
 ```bash
-php bin/durin optimize           # container + routes
-php bin/durin container:compile
-php bin/durin routes:compile
-php bin/durin config:cache
+vendor/bin/durin optimize
+vendor/bin/durin container:compile
+vendor/bin/durin routes:compile
+vendor/bin/durin config:cache
 ```
 
 ---
@@ -109,8 +115,9 @@ php bin/durin config:cache
 ## CLI Durin
 
 ```bash
+vendor/bin/durin
+# neste repo:
 php bin/durin
-# alias
 php bin/durins-forge
 ```
 
@@ -118,122 +125,12 @@ php bin/durins-forge
 |---------|-----------|
 | `new` | Cria projeto a partir de preset (`--preset=minimal\|service\|worker`) |
 | `doctor` | Diagnóstico PHP / projeto / Mithril-Eregion / artefatos (`--json`, `--strict`) |
-| `status` | Runtime configurado agora (`--json`) |
-| `dev` | Dev local via facade → Eregion (`--php` = serve:php) |
-| `serve` | Produção via facade → Mithril/Eregion |
-| `optimize` | Compila container + rotas → `var/cache/` |
-| `graph:dependencies` | Grafo de deps (`--format=text\|mermaid\|json`, `--module=`) |
-| `make:module` | `src/Modules/{Name}/module.php` (+ `architecture.modules` no `durin.yaml`) |
-| `make:usecase` | DTO + Use Case (`Domain/Name` ou `--module=Billing`) |
-| `make:feature` | Módulo + use case (`Module/Name`; opcional `--http` `--tests`) |
-| `migrate` / `migrate:fresh` / `migrate:rollback` | Migrações |
-| `seed` | Seeds |
-| `config:cache` / `config:clear` | Cache de config |
-| `container:compile` / `container:clear` | Container |
-| `routes:compile` / `routes:clear` | Rotas |
-| `routes:postman` | Export Postman |
-
-`vendor/bin/forge` permanece o CLI do **Mithril** (`serve`, `eregion:craft`, `server:*`).
-
----
-
-## Presets
-
-```bash
-php bin/durin new webhook-api --preset=minimal
-php bin/durin new billing --preset=service
-php bin/durin new notifications --preset=worker
-```
-
-| Preset | Quando usar | Estrutura |
-|--------|-------------|-----------|
-| `minimal` | API pequena / webhook | `src/Http`, `src/Application` (sem Domain) |
-| `service` | Backend service geral | roots `Domain`, `Application`, `Infrastructure`, `Presentation` |
-| `worker` | Job / fila / schedule (sem HTTP) | `JobKernel`, `Application`, `Infrastructure`, `Jobs` |
-
-Todos gravam `durin.yaml` e compartilham baseline PHP 8.5 + Mithril ([ADR-0003](docs/adr/ADR-0003-architecture-presets.md)). Preset `worker` exige Mithril **^2.2** (`bin/job-worker`, [SPEC-MITHRIL-001](docs/specs/mithril/SPEC-MITHRIL-001-job-worker-runtime.md)); não usa Eregion. Presets `modular` / `microservice` ficam fora do V1.
-
----
-
-## Generators
-
-Escrita via `ScaffoldPlan` → `ScaffoldWriter` (conflict-safe; overwrite idêntico é idempotente).
-
-```bash
-# Módulo (marcador mínimo — sem árvores Domain/Http vazias)
-php bin/durin make:module Billing
-
-# Use case — layout legado Application
-php bin/durin make:usecase User/CreateUser
-
-# Use case — layout modular (master §27)
-php bin/durin make:usecase CreateInvoice --module=Billing
-# → src/Modules/Billing/Application/CreateInvoice/{CreateInvoice,CreateInvoiceInput}.php
-
-# Feature = módulo + use case (+ opcional Http/tests) em um único write
-php bin/durin make:feature Billing/CreateInvoice --http --tests
-```
-
-`--repository` / `--migration` em `make:feature` ainda não são suportados (erro explícito).
-
----
-
-## Grafo de dependências
-
-Fontes V1 (sem AST): marcadores `src/Modules/*/module.php`, `var/cache/routes.php`, e opcionalmente `var/cache/container.descriptor.php` (formato `DescriptorProvider`).
-
-```bash
-php bin/durin graph:dependencies
-php bin/durin graph:dependencies --format=mermaid
-php bin/durin graph:dependencies --format=json
-php bin/durin graph:dependencies --module=Billing
-```
-
----
-
-## Frontend (opcional)
-
-```bash
-npm install
-npm run dev      # desenvolvimento
-npm run build    # produção → public/build/
-```
-
----
-
-## Docker
-
-Imagem com PHP 8.5 + sockets + msgpack. O entrypoint roda `durin optimize` e preferencialmente `forge serve`; se o check do Eregion falhar, cai em `forge serve:php`.
-
-```bash
-make up      # live :8082 | compiled :8081
-make bench
-make down
-```
-
----
-
-## Estrutura (resumo)
-
-```
-src/Kernel.php                 # HttpApplication (framework entry)
-src/Core/                      # Discovery, providers, HTTP pipeline, middleware
-src/Tooling/                   # DX: Project, Scaffold, Doctor, Runtime,
-                               #     Presets, Generators, Graph
-src/Console/Commands/          # CLI durin
-src/Infrastructure/            # DB (Mazarbul), session, cache, storage adapters
-routes/                        # health mínimo; apps geradas expandem daqui
-var/cache/                     # container.php, routes.php, artifacts
-var/runtime/eregion.json       # manifesto Eregion (apps HTTP)
-public/index.php               # Worker + EregionBridge
-docs/
-  product/PRD.md
-  architecture/
-  adr/
-  specs/
-```
-
-Apps de negócio **não** vivem neste repo: use `durin new --preset=minimal|service|worker` e generators.
+| `status` | Status do runtime / tooling |
+| `dev` / `serve` | Sobe runtime via Mithril/Eregion |
+| `optimize` | Compila container + routes |
+| `graph:dependencies` | Grafo de dependências |
+| `make:module` / `make:usecase` / `make:feature` | Generators |
+| `migrate` / `migrate:rollback` / `migrate:fresh` | Migrations |
 
 ---
 
@@ -241,29 +138,12 @@ Apps de negócio **não** vivem neste repo: use `durin new --preset=minimal|serv
 
 ```bash
 composer test
-# ou
-./vendor/bin/phpunit
 ```
 
-CI (GitHub Actions) executa a suíte em **PHP 8.5** com `msgpack` e `sockets` ([ADR-0001](docs/adr/ADR-0001-php-version-baseline.md)).
+Inclui fronteira de namespace (`App\` proibido em `src/`), contrato dos presets gerados e integração consumer-mode (writes só na app).
 
 ---
 
-## Documentação
+## Próximo passo
 
-| Doc | Conteúdo |
-|------|----------|
-| [PRD](docs/product/PRD.md) | Produto DX |
-| [Architecture](docs/architecture/overview.md) | Visão e [fronteiras](docs/architecture/boundaries.md) |
-| [ADRs](docs/adr/) | Decisões (PHP 8.5, CLI/runtime, presets, tooling) |
-| [Master DX spec](docs/specs/master-dx-tooling-spec.md) | Spec canônica |
-| [SPECs derivadas](docs/specs/derived/) | Fatias 001–016 (V1) + [017 worker runtime](docs/specs/derived/017-worker-runtime-contract.md) |
-| [SPEC Mithril job worker](docs/specs/mithril/SPEC-MITHRIL-001-job-worker-runtime.md) | Implementação na lib `mithrilphp` (`JobApplication`, `bin/job-worker`) |
-| [Eregion](docs/durins-forge-eregion-spec.md) | Runtime HTTP |
-| [Performance](docs/PERFORMANCE.md) | Docker / bench |
-
----
-
-## Licença
-
-MIT — *Build with Mithril. Shape with Durin. Run in Eregion.*
+O pacote de aplicação mínima **`durin-app`** (e depois `durin-installer`) ainda não faz parte deste repositório. Este package está pronto para ser consumido via Composer conforme [ADR-0005](docs/adr/ADR-0005-forge-consumer-mode.md).

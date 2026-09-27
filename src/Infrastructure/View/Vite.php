@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Infrastructure\View;
+namespace EreborCodeForge\Durin\Forge\Infrastructure\View;
 
 class Vite
 {

@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Console\Commands;
+namespace EreborCodeForge\Durin\Forge\Console\Commands;
 
-use App\Tooling\Runtime\JsonRuntimeStatusRenderer;
-use App\Tooling\Runtime\MithrilRuntimeFacade;
-use App\Tooling\Runtime\RuntimeFacade;
-use App\Tooling\Runtime\RuntimeMode;
-use App\Tooling\Runtime\RuntimeOptions;
-use App\Tooling\Runtime\TextRuntimeStatusRenderer;
+use EreborCodeForge\Durin\Forge\Tooling\Runtime\JsonRuntimeStatusRenderer;
+use EreborCodeForge\Durin\Forge\Tooling\Runtime\MithrilRuntimeFacade;
+use EreborCodeForge\Durin\Forge\Tooling\Runtime\RuntimeFacade;
+use EreborCodeForge\Durin\Forge\Tooling\Runtime\RuntimeMode;
+use EreborCodeForge\Durin\Forge\Tooling\Runtime\RuntimeOptions;
+use EreborCodeForge\Durin\Forge\Tooling\Runtime\TextRuntimeStatusRenderer;
 use Erebor\Mithril\Console\ArgParser;
 use Erebor\Mithril\Console\Command;
 

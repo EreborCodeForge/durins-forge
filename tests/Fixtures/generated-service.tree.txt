@@ -5,8 +5,10 @@
 ./public/index.php
 ./README.md
 ./routes/api.php
+./routes/web.php
 ./src/Application/.gitkeep
 ./src/Domain/.gitkeep
 ./src/Infrastructure/.gitkeep
+./src/Kernel.php
 ./src/Presentation/.gitkeep
 ./tests/ExampleTest.php

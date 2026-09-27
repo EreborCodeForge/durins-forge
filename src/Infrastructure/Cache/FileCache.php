@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Infrastructure\Cache;
+namespace EreborCodeForge\Durin\Forge\Infrastructure\Cache;
 
-use App\Core\Cache\CacheInterface;
+use EreborCodeForge\Durin\Forge\Core\Cache\CacheInterface;
 
 class FileCache implements CacheInterface
 {

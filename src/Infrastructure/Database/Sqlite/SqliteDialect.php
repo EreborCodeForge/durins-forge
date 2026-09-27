@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Infrastructure\Database\Sqlite;
+namespace EreborCodeForge\Durin\Forge\Infrastructure\Database\Sqlite;
 
 use EreborCodeForge\Mazarbul\Driver\Support\AbstractDialect;
 

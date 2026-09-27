@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Core\Http;
+namespace EreborCodeForge\Durin\Forge\Core\Http;
 
-use App\Infrastructure\Database\DB;
+use EreborCodeForge\Durin\Forge\Infrastructure\Database\DB;
 use Erebor\Mithril\Contracts\PipelineContract;
 use Erebor\Mithril\Http\HttpContext;
 use Erebor\Mithril\Http\Request;

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Console\Commands;
+namespace EreborCodeForge\Durin\Forge\Console\Commands;
 
-use App\Tooling\Doctor\DoctorContext;
-use App\Tooling\Doctor\DoctorRunner;
-use App\Tooling\Doctor\JsonDoctorRenderer;
-use App\Tooling\Doctor\TextDoctorRenderer;
+use EreborCodeForge\Durin\Forge\Tooling\Doctor\DoctorContext;
+use EreborCodeForge\Durin\Forge\Tooling\Doctor\DoctorRunner;
+use EreborCodeForge\Durin\Forge\Tooling\Doctor\JsonDoctorRenderer;
+use EreborCodeForge\Durin\Forge\Tooling\Doctor\TextDoctorRenderer;
 use EreborCodeForge\Durin\Core\Manifest\DurinManifestException;
 use EreborCodeForge\Durin\Core\Project\ProjectDiscovery;
 use Erebor\Mithril\Console\ArgParser;

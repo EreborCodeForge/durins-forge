@@ -1,0 +1,53 @@
+<?php
+
+declare(strict_types=1);
+
+namespace EreborCodeForge\Durin\Forge\Tests\Unit\Package;
+
+use EreborCodeForge\Durin\Presets\Registry\DefaultPresetRegistryFactory;
+use EreborCodeForge\Durin\Core\Contract\ProjectOptions;
+use PHPUnit\Framework\TestCase;
+
+final class GeneratedPresetContractTest extends TestCase
+{
+    public function test_generated_http_presets_require_durins_forge_and_vendor_bin_docs(): void
+    {
+        $engine = (new DefaultPresetRegistryFactory())->engine();
+
+        foreach (['minimal', 'service'] as $preset) {
+            $plan = $engine->plan(new ProjectOptions('demo', $preset, sys_get_temp_dir()));
+            $files = [];
+            foreach ($plan->actions() as $action) {
+                $files[$action->relativePath] = $action->contents ?? '';
+            }
+
+            $this->assertArrayHasKey('composer.json', $files);
+            $composer = json_decode($files['composer.json'], true, 512, JSON_THROW_ON_ERROR);
+            $this->assertSame('^0.1', $composer['require']['ereborcodeforge/durins-forge']);
+            $this->assertArrayNotHasKey('ereborcodeforge/mithrilphp', $composer['require']);
+
+            $this->assertArrayHasKey('README.md', $files);
+            $this->assertStringContainsString('vendor/bin/durin doctor', $files['README.md']);
+            $this->assertStringContainsString('vendor/bin/durin dev', $files['README.md']);
+            $this->assertStringNotContainsString('php bin/durin', $files['README.md']);
+
+            $this->assertArrayHasKey('src/Kernel.php', $files);
+            $this->assertStringContainsString('namespace App;', $files['src/Kernel.php']);
+            $this->assertStringContainsString('HttpApplicationKernel', $files['src/Kernel.php']);
+        }
+    }
+
+    public function test_fixture_composer_files_match_forge_dependency_contract(): void
+    {
+        $root = dirname(__DIR__, 3);
+        foreach (['minimal', 'service', 'worker'] as $preset) {
+            $path = $root . "/tests/Fixtures/generated-{$preset}/composer.json";
+            $composer = json_decode((string) file_get_contents($path), true, 512, JSON_THROW_ON_ERROR);
+            $this->assertSame(
+                '^0.1',
+                $composer['require']['ereborcodeforge/durins-forge'],
+                $preset
+            );
+        }
+    }
+}

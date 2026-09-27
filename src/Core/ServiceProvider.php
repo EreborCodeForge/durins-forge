@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Core;
+namespace EreborCodeForge\Durin\Forge\Core;
 
 use Erebor\Mithril\Container;
 

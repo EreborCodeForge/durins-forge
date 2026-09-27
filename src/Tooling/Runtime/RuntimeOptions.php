@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tooling\Runtime;
+namespace EreborCodeForge\Durin\Forge\Tooling\Runtime;
 
 /**
  * Shared options for serve / dev / status orchestration.

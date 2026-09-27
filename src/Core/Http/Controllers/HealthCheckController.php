@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Core\Http\Controllers;
+namespace EreborCodeForge\Durin\Forge\Core\Http\Controllers;
 
 use Erebor\Mithril\Http\Response;
 

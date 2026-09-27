@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Tooling\Generators;
+namespace EreborCodeForge\Durin\Forge\Tests\Unit\Tooling\Generators;
 
-use App\Tooling\Generators\GeneratorRequest;
-use App\Tooling\Generators\GeneratorRunner;
-use App\Tooling\Generators\NameInflector;
-use App\Tooling\Generators\PlaceholderClassGenerator;
-use App\Tooling\Generators\StubTemplate;
+use EreborCodeForge\Durin\Forge\Tooling\Generators\GeneratorRequest;
+use EreborCodeForge\Durin\Forge\Tooling\Generators\GeneratorRunner;
+use EreborCodeForge\Durin\Forge\Tooling\Generators\NameInflector;
+use EreborCodeForge\Durin\Forge\Tooling\Generators\PlaceholderClassGenerator;
+use EreborCodeForge\Durin\Forge\Tooling\Generators\StubTemplate;
 use EreborCodeForge\Durin\Core\Mutation\ScaffoldWriter;
 use PHPUnit\Framework\TestCase;
 

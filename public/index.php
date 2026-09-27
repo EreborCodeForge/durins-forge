@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 /**
  * Durin worker entry — Eregion connects over UDS; Mithril Worker stays warm.
- * Not an FPM / php -S front controller: use `vendor/bin/forge serve`.
+ * Not an FPM / php -S front controller: use `vendor/bin/durin serve` / forge serve.
  */
 
 require __DIR__ . '/../vendor/autoload.php';
 
 use App\Kernel;
+use EreborCodeForge\Durin\Forge\Support\ApplicationPath;
 use Erebor\Mithril\Runtime\Eregion\EregionBridge;
 use Erebor\Mithril\Runtime\Eregion\Exceptions\ProtocolException;
 use Erebor\Mithril\Runtime\Eregion\WorkerCliOptions;
@@ -21,6 +22,8 @@ use Erebor\Mithril\Runtime\WorkerExitCode;
 use Erebor\Mithril\Runtime\WorkerResult;
 use Erebor\Mithril\Runtime\WorkerStopReason;
 use Erebor\Mithril\Support\PackageVersion;
+
+ApplicationPath::setRoot(dirname(__DIR__));
 
 if (PHP_SAPI !== 'cli') {
     http_response_code(503);

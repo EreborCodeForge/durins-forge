@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tooling\Runtime;
+namespace EreborCodeForge\Durin\Forge\Tooling\Runtime;
 
 /**
  * Shared orchestration point for serve / dev / status (ADR-0002).

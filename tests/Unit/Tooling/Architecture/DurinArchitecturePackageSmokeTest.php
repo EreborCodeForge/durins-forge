@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Tooling\Architecture;
+namespace EreborCodeForge\Durin\Forge\Tests\Unit\Tooling\Architecture;
 
 use EreborCodeForge\Durin\Architecture\Adoption\AdoptionPlanner;
 use EreborCodeForge\Durin\Architecture\Detection\ArchitectureDetector;

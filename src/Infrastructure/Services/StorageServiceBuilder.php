@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Infrastructure\Services;
+namespace EreborCodeForge\Durin\Forge\Infrastructure\Services;
 
-use App\Core\Contracts\StorageServiceInterface;
+use EreborCodeForge\Durin\Forge\Core\Contracts\StorageServiceInterface;
 use Erebor\Mithril\Container;
 use Erebor\Mithril\Environment;
 use Exception;

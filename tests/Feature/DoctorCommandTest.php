@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Feature;
+namespace EreborCodeForge\Durin\Forge\Tests\Feature;
 
-use App\Console\Application;
+use EreborCodeForge\Durin\Forge\Console\Application;
 use PHPUnit\Framework\TestCase;
 
 final class DoctorCommandTest extends TestCase

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tooling\Graph;
+namespace EreborCodeForge\Durin\Forge\Tooling\Graph;
 
 /**
  * Builds graph edges from compiled route descriptors (explicit handler metadata; no AST).

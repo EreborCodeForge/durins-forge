@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Infrastructure\Session;
+namespace EreborCodeForge\Durin\Forge\Infrastructure\Session;
 
 class SessionManager
 {

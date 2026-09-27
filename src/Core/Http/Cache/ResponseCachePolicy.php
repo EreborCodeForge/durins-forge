@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Core\Http\Cache;
+namespace EreborCodeForge\Durin\Forge\Core\Http\Cache;
 
 use ReflectionMethod;
 

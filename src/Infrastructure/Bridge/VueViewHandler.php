@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Infrastructure\Bridge;
+namespace EreborCodeForge\Durin\Forge\Infrastructure\Bridge;
 
 use Erebor\Mithril\Http\Response;
 

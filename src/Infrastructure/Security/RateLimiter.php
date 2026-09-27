@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Infrastructure\Security;
+namespace EreborCodeForge\Durin\Forge\Infrastructure\Security;
 
-use App\Core\Cache\CacheInterface;
+use EreborCodeForge\Durin\Forge\Core\Cache\CacheInterface;
 
 class RateLimiter
 {

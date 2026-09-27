@@ -6,7 +6,7 @@
     <title>Durin's Forge</title>
     
     <!-- Vite Assets -->
-    <?= App\Infrastructure\View\Vite::tags('resources/js/app.js') ?>
+    <?= EreborCodeForge\Durin\Forge\Infrastructure\View\Vite::tags('resources/js/app.js') ?>
 
 </head>
 <body class="bg-gray-100 font-sans antialiased">

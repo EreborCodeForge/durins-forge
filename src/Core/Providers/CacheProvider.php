@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace App\Core\Providers;
+namespace EreborCodeForge\Durin\Forge\Core\Providers;
 
-use App\Core\Attributes\Discoverable;
-use App\Core\Cache\CacheInterface;
-use App\Core\DescriptorProvider;
-use App\Core\Http\Cache\HttpResponseCacheStoreFactory;
-use App\Core\Http\Cache\HttpResponseCacheStoreInterface;
-use App\Core\Http\Cache\ResponseCacheKeyBuilder;
-use App\Core\Http\Cache\ResponseCachePolicy;
-use App\Core\ServiceProvider;
-use App\Infrastructure\Cache\FileCache;
-use App\Infrastructure\Security\RateLimiter;
+use EreborCodeForge\Durin\Forge\Core\Attributes\Discoverable;
+use EreborCodeForge\Durin\Forge\Core\Cache\CacheInterface;
+use EreborCodeForge\Durin\Forge\Core\DescriptorProvider;
+use EreborCodeForge\Durin\Forge\Core\Http\Cache\HttpResponseCacheStoreFactory;
+use EreborCodeForge\Durin\Forge\Core\Http\Cache\HttpResponseCacheStoreInterface;
+use EreborCodeForge\Durin\Forge\Core\Http\Cache\ResponseCacheKeyBuilder;
+use EreborCodeForge\Durin\Forge\Core\Http\Cache\ResponseCachePolicy;
+use EreborCodeForge\Durin\Forge\Core\ServiceProvider;
+use EreborCodeForge\Durin\Forge\Infrastructure\Cache\FileCache;
+use EreborCodeForge\Durin\Forge\Infrastructure\Security\RateLimiter;
 use Erebor\Mithril\Container;
 
 #[Discoverable(tag: 'provider.cache')]

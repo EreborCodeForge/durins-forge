@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Console\Commands;
+namespace EreborCodeForge\Durin\Forge\Console\Commands;
 
 use EreborCodeForge\Durin\Presets\Registry\DefaultPresetRegistryFactory;
 use EreborCodeForge\Durin\Presets\Registry\PresetEngine;
@@ -93,7 +93,7 @@ final class NewCommand extends Command
         $this->line("  cd {$name}");
         $this->line('  composer install');
         $this->line('  cp .env.example .env');
-        $this->line('  php bin/durin doctor');
+        $this->line('  vendor/bin/durin doctor');
 
         return 0;
     }

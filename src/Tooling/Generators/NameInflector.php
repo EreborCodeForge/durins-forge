@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tooling\Generators;
+namespace EreborCodeForge\Durin\Forge\Tooling\Generators;
 
 /**
  * Name and path helpers for make:* generators.

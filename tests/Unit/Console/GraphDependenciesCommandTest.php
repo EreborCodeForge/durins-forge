@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Console;
+namespace EreborCodeForge\Durin\Forge\Tests\Unit\Console;
 
-use App\Console\Commands\GraphDependenciesCommand;
-use App\Tooling\Graph\DependencyGraphAssembler;
-use App\Tooling\Graph\GraphRendererRegistry;
+use EreborCodeForge\Durin\Forge\Console\Commands\GraphDependenciesCommand;
+use EreborCodeForge\Durin\Forge\Tooling\Graph\DependencyGraphAssembler;
+use EreborCodeForge\Durin\Forge\Tooling\Graph\GraphRendererRegistry;
 use EreborCodeForge\Durin\Core\Project\ProjectDiscovery;
 use PHPUnit\Framework\TestCase;
 

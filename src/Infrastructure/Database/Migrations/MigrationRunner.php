@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Infrastructure\Database\Migrations;
+namespace EreborCodeForge\Durin\Forge\Infrastructure\Database\Migrations;
 
-use App\Infrastructure\Database\Migrations\Interface\Migration;
+use EreborCodeForge\Durin\Forge\Infrastructure\Database\Migrations\Interface\Migration;
 use PDO;
 use PDOException;
 use Exception;

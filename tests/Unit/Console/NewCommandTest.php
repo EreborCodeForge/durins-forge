@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Console;
+namespace EreborCodeForge\Durin\Forge\Tests\Unit\Console;
 
-use App\Console\Commands\NewCommand;
+use EreborCodeForge\Durin\Forge\Console\Commands\NewCommand;
 use EreborCodeForge\Durin\Presets\Registry\DefaultPresetRegistryFactory;
 use EreborCodeForge\Durin\Core\Mutation\ScaffoldWriter;
 use PHPUnit\Framework\TestCase;

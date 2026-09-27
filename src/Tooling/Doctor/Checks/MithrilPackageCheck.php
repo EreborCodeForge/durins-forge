@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Tooling\Doctor\Checks;
+namespace EreborCodeForge\Durin\Forge\Tooling\Doctor\Checks;
 
-use App\Tooling\Doctor\Check;
-use App\Tooling\Doctor\CheckResult;
-use App\Tooling\Doctor\DoctorContext;
-use App\Tooling\Doctor\DoctorExitCode;
+use EreborCodeForge\Durin\Forge\Tooling\Doctor\Check;
+use EreborCodeForge\Durin\Forge\Tooling\Doctor\CheckResult;
+use EreborCodeForge\Durin\Forge\Tooling\Doctor\DoctorContext;
+use EreborCodeForge\Durin\Forge\Tooling\Doctor\DoctorExitCode;
 use Composer\InstalledVersions;
 
 final class MithrilPackageCheck implements Check

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Core\Http\Middleware;
+namespace EreborCodeForge\Durin\Forge\Core\Http\Middleware;
 
-use App\Core\Http\Cache\CachedResponse;
-use App\Core\Http\Cache\HttpResponseCacheStoreFactory;
-use App\Core\Http\Cache\HttpResponseCacheStoreInterface;
-use App\Core\Http\Cache\ResponseCacheKeyBuilder;
-use App\Core\Http\Cache\ResponseCachePolicy;
+use EreborCodeForge\Durin\Forge\Core\Http\Cache\CachedResponse;
+use EreborCodeForge\Durin\Forge\Core\Http\Cache\HttpResponseCacheStoreFactory;
+use EreborCodeForge\Durin\Forge\Core\Http\Cache\HttpResponseCacheStoreInterface;
+use EreborCodeForge\Durin\Forge\Core\Http\Cache\ResponseCacheKeyBuilder;
+use EreborCodeForge\Durin\Forge\Core\Http\Cache\ResponseCachePolicy;
 use Erebor\Mithril\Container;
 use Erebor\Mithril\Contracts\RouterMiddlewareContract;
 use Erebor\Mithril\Http\HttpContext;

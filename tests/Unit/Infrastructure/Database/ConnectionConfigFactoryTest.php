@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Infrastructure\Database;
+namespace EreborCodeForge\Durin\Forge\Tests\Unit\Infrastructure\Database;
 
-use App\Infrastructure\Database\ConnectionConfigFactory;
-use App\Infrastructure\Database\DB;
+use EreborCodeForge\Durin\Forge\Infrastructure\Database\ConnectionConfigFactory;
+use EreborCodeForge\Durin\Forge\Infrastructure\Database\DB;
 use PHPUnit\Framework\TestCase;
 
 final class ConnectionConfigFactoryTest extends TestCase

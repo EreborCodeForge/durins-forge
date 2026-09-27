@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tooling\Graph;
+namespace EreborCodeForge\Durin\Forge\Tooling\Graph;
 
 use EreborCodeForge\Durin\Core\Project\Project;
 

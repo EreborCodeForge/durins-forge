@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Console\Commands;
+namespace EreborCodeForge\Durin\Forge\Console\Commands;
 
-use App\Console\Commands\BaseMigrateCommand;
+use EreborCodeForge\Durin\Forge\Console\Commands\BaseMigrateCommand;
 
 class MigrateFreshCommand extends BaseMigrateCommand
 {

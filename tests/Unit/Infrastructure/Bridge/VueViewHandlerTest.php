@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Tests\Unit\Infrastructure\Bridge;
+namespace EreborCodeForge\Durin\Forge\Tests\Unit\Infrastructure\Bridge;
 
-use App\Infrastructure\Bridge\VueViewHandler;
-use App\Tests\DurinsForgeBaseTest;
+use EreborCodeForge\Durin\Forge\Infrastructure\Bridge\VueViewHandler;
+use EreborCodeForge\Durin\Forge\Tests\DurinsForgeBaseTest;
 use Erebor\Mithril\Http\Response;
 
 class VueViewHandlerTest extends DurinsForgeBaseTest

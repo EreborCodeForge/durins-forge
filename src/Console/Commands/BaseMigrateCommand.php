@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Console\Commands;
+namespace EreborCodeForge\Durin\Forge\Console\Commands;
 
-use App\Infrastructure\Database\Migrations\MigrationRunner;
-use App\Infrastructure\Database\DB;
+use EreborCodeForge\Durin\Forge\Infrastructure\Database\Migrations\MigrationRunner;
+use EreborCodeForge\Durin\Forge\Infrastructure\Database\DB;
 use Erebor\Mithril\Console\Command;
 use Erebor\Mithril\Environment;
 use PDOException;

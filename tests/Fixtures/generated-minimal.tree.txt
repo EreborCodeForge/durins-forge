@@ -5,6 +5,8 @@
 ./public/index.php
 ./README.md
 ./routes/api.php
+./routes/web.php
 ./src/Application/.gitkeep
 ./src/Http/.gitkeep
+./src/Kernel.php
 ./tests/ExampleTest.php

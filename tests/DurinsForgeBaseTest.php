@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests;
+namespace EreborCodeForge\Durin\Forge\Tests;
 
 use App\Kernel;
 use Erebor\Mithril\Container;

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Console;
+namespace EreborCodeForge\Durin\Forge\Tests\Unit\Console;
 
-use App\Console\Commands\MakeUseCaseCommand;
-use App\Tooling\Generators\GeneratorRunner;
-use App\Tooling\Generators\NameInflector;
-use App\Tooling\Generators\UseCaseGenerator;
+use EreborCodeForge\Durin\Forge\Console\Commands\MakeUseCaseCommand;
+use EreborCodeForge\Durin\Forge\Tooling\Generators\GeneratorRunner;
+use EreborCodeForge\Durin\Forge\Tooling\Generators\NameInflector;
+use EreborCodeForge\Durin\Forge\Tooling\Generators\UseCaseGenerator;
 use EreborCodeForge\Durin\Core\Mutation\ScaffoldWriter;
 use PHPUnit\Framework\TestCase;
 

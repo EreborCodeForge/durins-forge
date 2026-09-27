@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Tooling\Runtime;
+namespace EreborCodeForge\Durin\Forge\Tests\Unit\Tooling\Runtime;
 
-use App\Tooling\Runtime\EregionBinaryLocator;
-use App\Tooling\Runtime\JsonRuntimeStatusRenderer;
-use App\Tooling\Runtime\MithrilRuntimeStatusProvider;
-use App\Tooling\Runtime\RuntimeOptions;
-use App\Tooling\Runtime\TextRuntimeStatusRenderer;
+use EreborCodeForge\Durin\Forge\Tooling\Runtime\EregionBinaryLocator;
+use EreborCodeForge\Durin\Forge\Tooling\Runtime\JsonRuntimeStatusRenderer;
+use EreborCodeForge\Durin\Forge\Tooling\Runtime\MithrilRuntimeStatusProvider;
+use EreborCodeForge\Durin\Forge\Tooling\Runtime\RuntimeOptions;
+use EreborCodeForge\Durin\Forge\Tooling\Runtime\TextRuntimeStatusRenderer;
 use PHPUnit\Framework\TestCase;
 
 final class FixedBinaryLocator implements EregionBinaryLocator

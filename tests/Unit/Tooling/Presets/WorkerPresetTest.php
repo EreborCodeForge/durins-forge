@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Tooling\Presets;
+namespace EreborCodeForge\Durin\Forge\Tests\Unit\Tooling\Presets;
 
 use EreborCodeForge\Durin\Presets\Registry\DefaultPresetRegistryFactory;
 use EreborCodeForge\Durin\Core\Contract\ProjectOptions;
@@ -65,7 +65,8 @@ final class WorkerPresetTest extends TestCase
 
         $composer = json_decode((string) file_get_contents($target . '/composer.json'), true);
         $this->assertSame('App\\JobKernel', $composer['extra']['mithril']['job_kernel']);
-        $this->assertSame('^2.2', $composer['require']['ereborcodeforge/mithrilphp']);
+        $this->assertSame('^0.1', $composer['require']['ereborcodeforge/durins-forge']);
+        $this->assertArrayNotHasKey('ereborcodeforge/mithrilphp', $composer['require']);
 
         $kernel = (string) file_get_contents($target . '/src/JobKernel.php');
         $this->assertStringContainsString('implements JobApplication', $kernel);

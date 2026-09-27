@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Console\Commands;
+namespace EreborCodeForge\Durin\Forge\Console\Commands;
 
-use App\Tooling\Graph\DependencyGraphAssembler;
-use App\Tooling\Graph\GraphRendererRegistry;
+use EreborCodeForge\Durin\Forge\Tooling\Graph\DependencyGraphAssembler;
+use EreborCodeForge\Durin\Forge\Tooling\Graph\GraphRendererRegistry;
 use EreborCodeForge\Durin\Core\Manifest\DurinManifestException;
 use EreborCodeForge\Durin\Core\Project\ProjectDiscovery;
 use Erebor\Mithril\Console\ArgParser;

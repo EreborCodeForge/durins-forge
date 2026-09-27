@@ -2,29 +2,29 @@
 
 declare(strict_types=1);
 
-namespace App\Console;
+namespace EreborCodeForge\Durin\Forge\Console;
 
-use App\Console\Commands\ConfigCacheCommand;
-use App\Console\Commands\ConfigClearCommand;
-use App\Console\Commands\ContainerClearCommand;
-use App\Console\Commands\ContainerCompileCommand;
-use App\Console\Commands\DevCommand;
-use App\Console\Commands\DoctorCommand;
-use App\Console\Commands\GraphDependenciesCommand;
-use App\Console\Commands\MigrateCommand;
-use App\Console\Commands\MigrateFreshCommand;
-use App\Console\Commands\MigrateRollbackCommand;
-use App\Console\Commands\MakeFeatureCommand;
-use App\Console\Commands\MakeModuleCommand;
-use App\Console\Commands\MakeUseCaseCommand;
-use App\Console\Commands\NewCommand;
-use App\Console\Commands\OptimizeCommand;
-use App\Console\Commands\RoutesClearCommand;
-use App\Console\Commands\RoutesCompileCommand;
-use App\Console\Commands\RoutesPostmanCommand;
-use App\Console\Commands\SeedCommand;
-use App\Console\Commands\ServeCommand;
-use App\Console\Commands\StatusCommand;
+use EreborCodeForge\Durin\Forge\Console\Commands\ConfigCacheCommand;
+use EreborCodeForge\Durin\Forge\Console\Commands\ConfigClearCommand;
+use EreborCodeForge\Durin\Forge\Console\Commands\ContainerClearCommand;
+use EreborCodeForge\Durin\Forge\Console\Commands\ContainerCompileCommand;
+use EreborCodeForge\Durin\Forge\Console\Commands\DevCommand;
+use EreborCodeForge\Durin\Forge\Console\Commands\DoctorCommand;
+use EreborCodeForge\Durin\Forge\Console\Commands\GraphDependenciesCommand;
+use EreborCodeForge\Durin\Forge\Console\Commands\MigrateCommand;
+use EreborCodeForge\Durin\Forge\Console\Commands\MigrateFreshCommand;
+use EreborCodeForge\Durin\Forge\Console\Commands\MigrateRollbackCommand;
+use EreborCodeForge\Durin\Forge\Console\Commands\MakeFeatureCommand;
+use EreborCodeForge\Durin\Forge\Console\Commands\MakeModuleCommand;
+use EreborCodeForge\Durin\Forge\Console\Commands\MakeUseCaseCommand;
+use EreborCodeForge\Durin\Forge\Console\Commands\NewCommand;
+use EreborCodeForge\Durin\Forge\Console\Commands\OptimizeCommand;
+use EreborCodeForge\Durin\Forge\Console\Commands\RoutesClearCommand;
+use EreborCodeForge\Durin\Forge\Console\Commands\RoutesCompileCommand;
+use EreborCodeForge\Durin\Forge\Console\Commands\RoutesPostmanCommand;
+use EreborCodeForge\Durin\Forge\Console\Commands\SeedCommand;
+use EreborCodeForge\Durin\Forge\Console\Commands\ServeCommand;
+use EreborCodeForge\Durin\Forge\Console\Commands\StatusCommand;
 use Erebor\Mithril\Console\Kernel as MithrilKernel;
 
 class Application

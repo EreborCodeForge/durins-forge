@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Infrastructure\Services;
+namespace EreborCodeForge\Durin\Forge\Infrastructure\Services;
 
-use App\Core\Contracts\StorageServiceInterface;
-use App\Infrastructure\Exceptions\InfrastructureException;
+use EreborCodeForge\Durin\Forge\Core\Contracts\StorageServiceInterface;
+use EreborCodeForge\Durin\Forge\Infrastructure\Exceptions\InfrastructureException;
 use Erebor\Mithril\Http\UploadedFile;
 
 class LocalStorageService implements StorageServiceInterface

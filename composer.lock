@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9e6ef8aecae6947ae2c9cb248f34b13d",
+    "content-hash": "fd9d47cf2196fcd9767c7bfad7ce665d",
     "packages": [
         {
             "name": "ereborcodeforge/durin-architecture",
@@ -114,16 +114,16 @@
         },
         {
             "name": "ereborcodeforge/durin-presets",
-            "version": "0.1.0",
+            "version": "0.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/EreborCodeForge/durin-presets.git",
-                "reference": "a12ad2634b1f0bed5ec63f6b8174e6e9840e159d"
+                "reference": "d2431f54057b38edecd87f1dee24db2a01c8c88c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/EreborCodeForge/durin-presets/zipball/a12ad2634b1f0bed5ec63f6b8174e6e9840e159d",
-                "reference": "a12ad2634b1f0bed5ec63f6b8174e6e9840e159d",
+                "url": "https://api.github.com/repos/EreborCodeForge/durin-presets/zipball/d2431f54057b38edecd87f1dee24db2a01c8c88c",
+                "reference": "d2431f54057b38edecd87f1dee24db2a01c8c88c",
                 "shasum": ""
             },
             "require": {
@@ -160,10 +160,10 @@
             ],
             "description": "Architecture presets and project-shape policies for Durin.",
             "support": {
-                "source": "https://github.com/EreborCodeForge/durin-presets/tree/v0.1.0",
+                "source": "https://github.com/EreborCodeForge/durin-presets/tree/v0.1.1",
                 "issues": "https://github.com/EreborCodeForge/durin-presets/issues"
             },
-            "time": "2026-09-27T00:37:16+00:00"
+            "time": "2026-09-27T14:31:01+00:00"
         },
         {
             "name": "ereborcodeforge/mazarbul",

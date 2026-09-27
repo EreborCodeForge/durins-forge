@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Core\Container;
+namespace EreborCodeForge\Durin\Forge\Core\Container;
 
 /**
  * Converte o descriptor (DescriptorProvider) em PHP executável para loadCompiled().
@@ -60,10 +60,10 @@ PHP;
             \Erebor\Mithril\Container::class => ['new' => null, 'deps' => [], 'self' => true],
             \Erebor\Mithril\Router::class => ['new' => \Erebor\Mithril\Router::class, 'deps' => []],
             \Erebor\Mithril\Routing\Contracts\HandlerResolver::class => [
-                'new' => \App\Core\Routing\ControllerHandlerResolver::class,
+                'new' => \EreborCodeForge\Durin\Forge\Core\Routing\ControllerHandlerResolver::class,
                 'deps' => [\Erebor\Mithril\Container::class],
             ],
-            \App\Core\Exceptions\Handler::class => ['new' => \App\Core\Exceptions\Handler::class, 'deps' => []],
+            \EreborCodeForge\Durin\Forge\Core\Exceptions\Handler::class => ['new' => \EreborCodeForge\Durin\Forge\Core\Exceptions\Handler::class, 'deps' => []],
         ];
     }
 

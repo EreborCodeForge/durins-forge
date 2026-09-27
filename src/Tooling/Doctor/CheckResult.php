@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tooling\Doctor;
+namespace EreborCodeForge\Durin\Forge\Tooling\Doctor;
 
 final readonly class CheckResult
 {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tooling\Generators;
+namespace EreborCodeForge\Durin\Forge\Tooling\Generators;
 
 /**
  * Minimal stub renderer: replaces {{key}} placeholders.

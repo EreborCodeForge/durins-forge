@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Core\Http\Cache;
+namespace EreborCodeForge\Durin\Forge\Core\Http\Cache;
 
-use App\Core\Cache\CacheInterface;
+use EreborCodeForge\Durin\Forge\Core\Cache\CacheInterface;
 
 /**
  * L2 store backed by CacheInterface (FileCache by default).

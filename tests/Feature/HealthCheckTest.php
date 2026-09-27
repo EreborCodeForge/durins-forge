@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Tests\Feature;
+namespace EreborCodeForge\Durin\Forge\Tests\Feature;
 
-use App\Tests\DurinsForgeBaseTest;
+use EreborCodeForge\Durin\Forge\Tests\DurinsForgeBaseTest;
 use Erebor\Mithril\Http\Request;
 
 class HealthCheckTest extends DurinsForgeBaseTest
