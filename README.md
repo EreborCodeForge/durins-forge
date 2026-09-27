@@ -90,9 +90,13 @@ vendor/bin/durin dev
 | **`durins-forge` Tooling** | Doctor, Generators, Graph, Runtime + CLI |
 | **App consumidora** | `App\Kernel`, `config/`, `routes/`, `public/`, `.env` |
 
-Ver [ADR-0004](docs/adr/ADR-0004-tooling-package-boundaries.md) e [ADR-0005](docs/adr/ADR-0005-forge-consumer-mode.md).
+Ver [ADR-0004](docs/adr/ADR-0004-tooling-package-boundaries.md), [ADR-0005](docs/adr/ADR-0005-forge-consumer-mode.md) e [ADR-0006](docs/adr/ADR-0006-durins-forge-package-contract.md).
+
+Contrato público: [`docs/public-api.md`](docs/public-api.md) · arquitetura do pacote: [`docs/package-architecture.md`](docs/package-architecture.md).
 
 Skeleton de aplicação (não autoloadado como framework): [`resources/skeleton/application/`](resources/skeleton/application/).
+
+> **Nota de distribuição:** `durin-core`, `durin-presets` e `durin-architecture` já estão no Packagist. A publicação de `ereborcodeforge/durins-forge` e a tag `v0.1.0` são ações explícitas do maintainer (ver [current-state](docs/refactoring/package-contract/current-state.md)). Até lá, o fluxo EMPTY DIR via Packagist permanece bloqueado. Pacotes futuros `durin-app` / `durin-installer` não existem ainda — não use `create-project` nesses nomes.
 
 ---
 
