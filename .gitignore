@@ -6,6 +6,7 @@ yarn-error.log
 .env
 .env.backup
 .env.production
+auth.json
 
 .idea/
 .vscode/
