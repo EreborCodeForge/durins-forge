@@ -1,0 +1,65 @@
+name: Distribution smoke
+
+# Gate: Packagist must publish ereborcodeforge/durins-forge before this job is a real DoD.
+# Until then the job stays disabled so local-only path/VCS workarounds are not mistaken for green.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  distribution-smoke:
+    name: Packagist consumer smoke
+    # Re-enable when https://packagist.org/packages/ereborcodeforge/durins-forge returns 200
+    # and a stable 0.1.x tag exists. See docs/refactoring/package-contract/current-state.md.
+    if: ${{ false }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: json, pdo, pdo_sqlite, sockets, msgpack
+          coverage: none
+          tools: composer:v2
+
+      - name: Fresh require from Packagist
+        working-directory: ${{ runner.temp }}
+        run: |
+          set -euo pipefail
+          mkdir smoke && cd smoke
+          composer require ereborcodeforge/durins-forge:^0.1 --no-interaction --prefer-dist
+          test -x vendor/bin/durin
+          vendor/bin/durin --help || vendor/bin/durin
+          vendor/bin/durin doctor || true
+          vendor/bin/durin status || true
+          vendor/bin/durin new sample --preset=minimal
+          cd sample
+          composer install --no-interaction --prefer-dist
+          vendor/bin/durin doctor || true
+
+  distribution-smoke-gate:
+    name: Document Packagist gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Assert Forge publication gate is documented
+        run: |
+          set -euo pipefail
+          code=$(curl -s -o /dev/null -w "%{http_code}" https://packagist.org/packages/ereborcodeforge/durins-forge.json || echo 000)
+          echo "Packagist HTTP status for ereborcodeforge/durins-forge: ${code}"
+          test -f docs/refactoring/package-contract/current-state.md
+          test -f docs/public-api.md
+          if [ "${code}" = "200" ]; then
+            echo "::notice::Forge is on Packagist — remove if: false from distribution-smoke job to run the real DoD."
+          else
+            echo "Gate still open: package not on Packagist (expected until maintainer publish)."
+          fi

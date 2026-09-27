@@ -1,18 +1,17 @@
 {
     "name": "ereborcodeforge/durins-forge",
-    "description": "Durin’s Forge is the official framework and project forger built atop MithrilPHP — crafting applications using Clean Architecture",
+    "description": "Durin Forge — Composer framework package for Durin applications (composition, CLI, and DX over MithrilPHP)",
     "type": "library",
     "license": "MIT",
     "keywords": [
         "php",
         "framework",
-        "installer",
-        "scaffolding",
-        "clean-architecture",
-        "api",
+        "durin",
         "mithrilphp",
-        "erebor",
-        "durin"
+        "clean-architecture",
+        "scaffolding",
+        "cli",
+        "erebor"
     ],
     "homepage": "https://github.com/EreborCodeForge/durins-forge",
     "support": {
@@ -23,20 +22,6 @@
         {
             "name": "Thales Ruppenthal",
             "email": "thales.rup@gmail.com"
-        }
-    ],
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/EreborCodeForge/durin-core"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/EreborCodeForge/durin-presets"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/EreborCodeForge/durin-architecture"
         }
     ],
     "require": {

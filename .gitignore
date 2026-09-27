@@ -28,8 +28,9 @@ Thumbs.db
 /.mithril/
 .phpunit.cache/
 
+/storage/framework/cache/*
+!storage/framework/cache/.gitkeep
+
 # Versus / local comparison sandboxes (not part of Durin)
 /versus/
 /versus-*/
-
-!storage/framework/cache/.gitkeep
