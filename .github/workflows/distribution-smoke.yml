@@ -1,7 +1,6 @@
 name: Distribution smoke
 
-# Gate: Packagist must publish ereborcodeforge/durins-forge before this job is a real DoD.
-# Until then the job stays disabled so local-only path/VCS workarounds are not mistaken for green.
+# Real EMPTY DIR DoD against Packagist (ereborcodeforge/durins-forge v0.1.0+).
 
 on:
   workflow_dispatch:
@@ -15,8 +14,6 @@ permissions:
 jobs:
   distribution-smoke:
     name: Packagist consumer smoke
-    # Stable v0.1.0 is on Packagist — run real EMPTY DIR DoD.
-    if: ${{ true }}
     runs-on: ubuntu-latest
 
     steps:
@@ -36,29 +33,36 @@ jobs:
           composer require ereborcodeforge/durins-forge:^0.1 --no-interaction --prefer-dist
           test -x vendor/bin/durin
           vendor/bin/durin --help || vendor/bin/durin
-          vendor/bin/durin doctor || true
-          vendor/bin/durin status || true
           vendor/bin/durin new sample --preset=minimal
           cd sample
+          php -r '
+            $c = json_decode(file_get_contents("composer.json"), true, 512, JSON_THROW_ON_ERROR);
+            if (array_key_exists("repositories", $c)) {
+              fwrite(STDERR, "generated composer.json must not declare repositories\n");
+              exit(1);
+            }
+            if (($c["require"]["ereborcodeforge/durins-forge"] ?? null) !== "^0.1") {
+              fwrite(STDERR, "generated app must require ereborcodeforge/durins-forge:^0.1\n");
+              exit(1);
+            }
+            echo "generated composer contract OK\n";
+          '
           composer install --no-interaction --prefer-dist
-          vendor/bin/durin doctor || true
+          test -x vendor/bin/durin
+          vendor/bin/durin doctor
 
   distribution-smoke-gate:
-    name: Document Packagist gate
+    name: Confirm Packagist package exists
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Assert Forge publication gate is documented
+      - name: Assert Forge is on Packagist
         run: |
           set -euo pipefail
           code=$(curl -s -o /dev/null -w "%{http_code}" https://packagist.org/packages/ereborcodeforge/durins-forge.json || echo 000)
           echo "Packagist HTTP status for ereborcodeforge/durins-forge: ${code}"
+          test "${code}" = "200"
           test -f docs/refactoring/package-contract/current-state.md
           test -f docs/public-api.md
-          if [ "${code}" = "200" ]; then
-            echo "::notice::Forge is on Packagist — remove if: false from distribution-smoke job to run the real DoD."
-          else
-            echo "Gate still open: package not on Packagist (expected until maintainer publish)."
-          fi

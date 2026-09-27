@@ -1,12 +1,6 @@
 {
     "name": "app/fixture-minimal",
     "type": "project",
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/EreborCodeForge/durins-forge"
-        }
-    ],
     "require": {
         "php": "^8.5",
         "ext-msgpack": "*",

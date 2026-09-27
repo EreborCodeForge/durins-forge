@@ -25,8 +25,8 @@ final class GeneratedPresetContractTest extends TestCase
             $composer = json_decode($files['composer.json'], true, 512, JSON_THROW_ON_ERROR);
             $this->assertSame('^0.1', $composer['require']['ereborcodeforge/durins-forge']);
             $this->assertArrayNotHasKey('ereborcodeforge/mithrilphp', $composer['require']);
-            if ($this->presetsPackageAtLeast('0.1.2')) {
-                $this->assertNoNestedDurinVcsRepositories($composer, 'live engine:' . $preset);
+            if ($this->presetsPackageAtLeast('0.1.3')) {
+                $this->assertNoRepositories($composer, 'live engine:' . $preset);
             }
 
             $this->assertArrayHasKey('README.md', $files);
@@ -51,7 +51,7 @@ final class GeneratedPresetContractTest extends TestCase
                 $composer['require']['ereborcodeforge/durins-forge'],
                 $preset
             );
-            $this->assertNoNestedDurinVcsRepositories($composer, 'fixture:' . $preset);
+            $this->assertNoRepositories($composer, 'fixture:' . $preset);
         }
     }
 
@@ -66,49 +66,18 @@ final class GeneratedPresetContractTest extends TestCase
             return false;
         }
 
-        // Strip leading "v" if present.
-        $normalized = ltrim($version, 'v');
-
-        return version_compare($normalized, $minimum, '>=');
+        return version_compare(ltrim($version, 'v'), $minimum, '>=');
     }
 
     /**
-     * Nested Durin package VCS entries are unnecessary once those packages are on Packagist.
-     * A single transitional Forge VCS entry is allowed until Forge itself is published.
-     *
      * @param array<string, mixed> $composer
      */
-    private function assertNoNestedDurinVcsRepositories(array $composer, string $context): void
+    private function assertNoRepositories(array $composer, string $context): void
     {
-        $repos = $composer['repositories'] ?? [];
-        $urls = [];
-        foreach ($repos as $repo) {
-            if (!is_array($repo)) {
-                continue;
-            }
-            $urls[] = (string) ($repo['url'] ?? '');
-        }
-
-        $forbidden = [
-            'https://github.com/EreborCodeForge/durin-core',
-            'https://github.com/EreborCodeForge/durin-presets',
-            'https://github.com/EreborCodeForge/durin-architecture',
-        ];
-
-        foreach ($forbidden as $url) {
-            $this->assertNotContains(
-                $url,
-                $urls,
-                "{$context}: generated composer must not list nested Durin VCS {$url}"
-            );
-        }
-
-        // Until Forge is on Packagist, exactly one Forge VCS entry (or none) is acceptable.
-        $forgeUrl = 'https://github.com/EreborCodeForge/durins-forge';
-        $other = array_values(array_filter(
-            $urls,
-            static fn (string $u): bool => $u !== '' && $u !== $forgeUrl
-        ));
-        $this->assertSame([], $other, "{$context}: unexpected Composer repositories: " . implode(', ', $other));
+        $this->assertArrayNotHasKey(
+            'repositories',
+            $composer,
+            "{$context}: generated composer.json must not declare repositories (Packagist-only DX)"
+        );
     }
 }
