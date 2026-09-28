@@ -13,6 +13,8 @@ use Erebor\Mithril\Contracts\JobApplication;
 
 final class ProjectKernelCheck implements Check
 {
+    private const string UNINITIALIZED = 'uninitialized';
+
     public function id(): string
     {
         return 'project.kernel';
@@ -20,6 +22,17 @@ final class ProjectKernelCheck implements Check
 
     public function run(DoctorContext $context): array
     {
+        $preset = $context->project->manifest?->preset;
+        if ($preset === self::UNINITIALIZED) {
+            return [
+                CheckResult::warning(
+                    $this->id(),
+                    'Kernel',
+                    'application not initialized (run vendor/bin/durin init)',
+                ),
+            ];
+        }
+
         $composerPath = $context->project->paths->composerJson();
         $jobMode = $context->project->manifest?->isJobMode() ?? false;
         $httpKernel = 'App\\Kernel';
