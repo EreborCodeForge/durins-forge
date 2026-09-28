@@ -1,6 +1,6 @@
 # Durin’s Forge — Public API
 
-**Source of truth for compatibility in `0.1.x`.**  
+**Source of truth for compatibility in `0.2.x`.**  
 Anything not listed here is **unstable / internal** and may change without a major version bump, provided the public CLI and bootstrap contracts below remain intact.
 
 Related: [package-architecture.md](package-architecture.md), [ADR-0006](adr/ADR-0006-durins-forge-package-contract.md).
@@ -56,7 +56,7 @@ No user-facing command may write into `vendor/ereborcodeforge/durins-forge/`. Co
 
 ---
 
-## Public CLI API (`0.1.x`)
+## Public CLI API (`0.2.x`)
 
 Preserve command names, important args/options, and meaningful exit-code semantics.
 
@@ -67,6 +67,13 @@ durin dev
 durin serve
 durin optimize
 durin graph:dependencies
+
+durin presets:list
+durin presets:list --format=json
+durin init
+durin init --preset=<id>
+durin init --preset=<id> --progress=jsonl
+durin init --skip-runtime-install
 
 durin make:module
 durin make:usecase
@@ -86,13 +93,18 @@ durin container:compile
 durin container:clear
 
 durin new
+durin new --preset=<id>
 ```
 
 Notes:
 
-- `durin new` is supported in Forge; creation UX may later be wrapped by `durin-installer`.
-- Database `migrate*` is **Mazarbul DDL**, not architecture migration (future architecture commands will use distinct names).
-- `bin/durins-forge` remains a compatibility entry in `0.1.x`; `vendor/bin/durin` is canonical.
+- Preset catalog and default come from `ereborcodeforge/durin-presets` — Forge does not hardcode preset ID lists.
+- `durin init` initializes a neutral application root (created by `durin-app` / installer). It is not architecture migration.
+- Default runtime runner is Eregion; `init` installs/configures it unless `--skip-runtime-install`.
+- `--progress=jsonl` emits stable stage IDs for installer UX.
+- `durin new` remains supported; creation UX is primarily owned by `durin-installer`.
+- Database `migrate*` is **Mazarbul DDL**, not architecture migration.
+- `bin/durins-forge` remains a compatibility entry; `vendor/bin/durin` is canonical.
 
 Human-readable wording may improve if it is not part of a tested/documented machine contract (e.g. JSON schemas where exposed).
 

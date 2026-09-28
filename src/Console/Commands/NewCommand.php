@@ -29,17 +29,17 @@ final class NewCommand extends Command
 
     public static function getDescription(): string
     {
-        return 'Cria um projeto a partir de um preset (ex.: --preset=minimal|service|worker)';
+        return 'Cria um projeto a partir de um preset (--preset; default do registry se omitido)';
     }
 
     public function execute(): int
     {
         $parsed = ArgParser::parse($this->args);
         $name = $parsed['positionals'][0] ?? null;
-        $preset = ArgParser::string($parsed['options'], 'preset', 'minimal') ?? 'minimal';
+        $presetOption = ArgParser::string($parsed['options'], 'preset');
 
         if (!is_string($name) || $name === '') {
-            $this->error('Usage: durin new <name> [--preset=minimal|service|worker]');
+            $this->error('Usage: durin new <name> [--preset=<id>]');
 
             return 2;
         }
@@ -62,6 +62,10 @@ final class NewCommand extends Command
         $writer = $this->writer ?? new ScaffoldWriter();
 
         try {
+            $preset = $presetOption !== null && $presetOption !== ''
+                ? $engine->registry()->definition($presetOption)->id()
+                : $engine->registry()->default()->id();
+
             $plan = $engine->plan(new ProjectOptions(
                 name: $name,
                 preset: $preset,
@@ -89,7 +93,7 @@ final class NewCommand extends Command
         }
 
         $this->info("Created {$name} with preset {$preset}");
-        $this->line("Next:");
+        $this->line('Next:');
         $this->line("  cd {$name}");
         $this->line('  composer install');
         $this->line('  cp .env.example .env');

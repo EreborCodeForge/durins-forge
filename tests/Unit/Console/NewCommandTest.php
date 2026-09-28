@@ -79,6 +79,33 @@ final class NewCommandTest extends TestCase
         }
     }
 
+    public function test_new_command_omitted_preset_uses_registry_default(): void
+    {
+        $cwd = getcwd();
+        chdir($this->tempRoot);
+
+        try {
+            $command = new NewCommand(
+                (new DefaultPresetRegistryFactory())->engine(),
+                new ScaffoldWriter(),
+            );
+            $command->setArgs(['demo-default']);
+
+            ob_start();
+            $code = $command->execute();
+            $output = (string) ob_get_clean();
+
+            $this->assertSame(0, $code);
+            $this->assertStringContainsString('preset minimal', $output);
+            $yaml = (string) file_get_contents($this->tempRoot . '/demo-default/durin.yaml');
+            $this->assertStringContainsString('preset: minimal', $yaml);
+        } finally {
+            if (is_string($cwd)) {
+                chdir($cwd);
+            }
+        }
+    }
+
     private function removeTree(string $path): void
     {
         if (!is_dir($path)) {
