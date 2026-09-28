@@ -6,6 +6,7 @@ namespace EreborCodeForge\Durin\Forge\Tooling\Doctor;
 
 use EreborCodeForge\Durin\Forge\Tooling\Doctor\Checks\CompiledArtifactsCheck;
 use EreborCodeForge\Durin\Forge\Tooling\Doctor\Checks\EregionRuntimeCheck;
+use EreborCodeForge\Durin\Forge\Tooling\Doctor\Checks\JobRuntimeCheck;
 use EreborCodeForge\Durin\Forge\Tooling\Doctor\Checks\MithrilPackageCheck;
 use EreborCodeForge\Durin\Forge\Tooling\Doctor\Checks\PhpExtensionsCheck;
 use EreborCodeForge\Durin\Forge\Tooling\Doctor\Checks\PhpVersionCheck;
@@ -47,6 +48,7 @@ final class DoctorRunner
             new ProjectManifestCheck(),
             new CompiledArtifactsCheck(),
             new MithrilPackageCheck(),
+            new JobRuntimeCheck(),
             new EregionRuntimeCheck(),
         ];
     }

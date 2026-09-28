@@ -99,19 +99,65 @@ final class InitCommandTest extends TestCase
         $this->assertSame(0, $code);
         $lines = array_values(array_filter(array_map('trim', explode("\n", trim($output)))));
         $stages = [];
+        $complete = null;
         foreach ($lines as $line) {
             $row = json_decode($line, true);
             $this->assertIsArray($row);
             if (($row['type'] ?? '') === 'progress') {
                 $stages[] = $row['stage'];
             }
+            if (($row['type'] ?? '') === 'complete') {
+                $complete = $row;
+            }
         }
 
         $this->assertSame('preset.resolve', $stages[0]);
         $this->assertContains('scaffold.plan', $stages);
         $this->assertContains('scaffold.apply', $stages);
+        $this->assertContains('runtime.resolve', $stages);
+        $this->assertContains('manifest.finalize', $stages);
         $this->assertContains('validate', $stages);
-        $this->assertStringContainsString('"type":"complete"', $output);
+        $this->assertIsArray($complete);
+        $this->assertSame('minimal', $complete['preset']);
+        $this->assertSame([
+            'mode' => 'http',
+            'execution' => 'mithril-http',
+            'supervisor' => 'eregion',
+        ], $complete['runtime']);
+    }
+
+    public function test_worker_jsonl_complete_has_job_runtime_without_supervisor(): void
+    {
+        $this->seedNeutralApp('jobs');
+        ApplicationPath::setRoot($this->tempRoot);
+
+        $command = new InitCommand($this->initializer());
+        $command->setArgs(['--preset=worker', '--progress=jsonl', '--skip-runtime-install']);
+
+        ob_start();
+        $code = $command->execute();
+        $output = (string) ob_get_clean();
+
+        $this->assertSame(0, $code);
+        $complete = null;
+        foreach (explode("\n", trim($output)) as $line) {
+            $row = json_decode(trim($line), true);
+            if (is_array($row) && ($row['type'] ?? '') === 'complete') {
+                $complete = $row;
+            }
+        }
+
+        $this->assertIsArray($complete);
+        $this->assertSame([
+            'mode' => 'job',
+            'execution' => 'mithril-job',
+            'supervisor' => null,
+        ], $complete['runtime']);
+
+        $yaml = (string) file_get_contents($this->tempRoot . '/durin.yaml');
+        $this->assertStringContainsString('server: none', $yaml);
+        $this->assertStringContainsString('mode: job', $yaml);
+        $this->assertFileDoesNotExist($this->tempRoot . '/eregion.yaml');
     }
 
     public function test_same_preset_init_is_idempotent(): void
@@ -154,7 +200,7 @@ final class InitCommandTest extends TestCase
         $this->assertStringContainsString('already initialized', $output);
     }
 
-    public function test_eregion_default_when_preset_runner_null(): void
+    public function test_http_profile_resolves_eregion_supervisor_when_runner_null(): void
     {
         $registry = (new DefaultPresetRegistryFactory())->create();
         $definition = $registry->definition('service');
@@ -173,14 +219,19 @@ final class InitCommandTest extends TestCase
                 }
             },
             configurator: new class extends \EreborCodeForge\Durin\Forge\Tooling\Runtime\EregionConfigurator {
-                public function configure(string $applicationRoot, bool $force = false): array
-                {
+                public function configure(
+                    string $applicationRoot,
+                    bool $force = false,
+                    ?\EreborCodeForge\Durin\Forge\Tooling\Runtime\RuntimePlan $plan = null,
+                ): array {
                     return [];
                 }
             },
         );
-        $this->assertSame('eregion', $provisioner->resolveRunner($definition->runtime()));
-        $this->assertTrue($provisioner->shouldInstall($definition->runtime()));
+        $plan = $provisioner->resolve($definition->runtime());
+        $this->assertSame('mithril-http', $plan->executionRuntime);
+        $this->assertSame('eregion', $plan->supervisor);
+        $this->assertTrue($provisioner->shouldInstall($definition->runtime(), $plan));
     }
 
     private function initializer(): ApplicationInitializer
@@ -197,8 +248,11 @@ final class InitCommandTest extends TestCase
             }
         };
         $configurator = new class extends \EreborCodeForge\Durin\Forge\Tooling\Runtime\EregionConfigurator {
-            public function configure(string $applicationRoot, bool $force = false): array
-            {
+            public function configure(
+                string $applicationRoot,
+                bool $force = false,
+                ?\EreborCodeForge\Durin\Forge\Tooling\Runtime\RuntimePlan $plan = null,
+            ): array {
                 return [['path' => $applicationRoot . '/eregion.yaml', 'action' => 'exists']];
             }
         };

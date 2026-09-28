@@ -1,0 +1,76 @@
+<?php
+
+declare(strict_types=1);
+
+namespace EreborCodeForge\Durin\Forge\Tooling\Runtime;
+
+use EreborCodeForge\Durin\Core\Manifest\DurinManifest;
+
+/**
+ * Concrete runtime decision: execution + optional supervisor.
+ *
+ * @param list<string> $capabilities
+ */
+final readonly class RuntimePlan
+{
+    /**
+     * @param list<string> $capabilities
+     */
+    public function __construct(
+        public string $mode,
+        public string $executionRuntime,
+        public ?string $supervisor,
+        public array $capabilities,
+    ) {}
+
+    /**
+     * Reconstruct a plan from a finalized manifest (Doctor / serve gates).
+     */
+    public static function fromManifest(DurinManifest $manifest): self
+    {
+        $mode = $manifest->isJobMode() ? 'job' : 'http';
+        $execution = $mode === 'job' ? 'mithril-job' : 'mithril-http';
+        $supervisor = match ($manifest->runtimeServer) {
+            'eregion' => 'eregion',
+            'none', '' => null,
+            default => $manifest->runtimeServer,
+        };
+
+        $capabilities = $mode === 'job'
+            ? ['job-loop', 'messaging']
+            : ['persistent-http'];
+        if ($supervisor === 'eregion') {
+            $capabilities[] = 'process-supervision';
+            $capabilities[] = $mode === 'job' ? 'consumer-supervision' : 'http-supervision';
+        }
+
+        return new self(
+            mode: $mode,
+            executionRuntime: $execution,
+            supervisor: $supervisor,
+            capabilities: array_values(array_unique($capabilities)),
+        );
+    }
+
+    /**
+     * @return array{mode: string, execution: string, supervisor: ?string}
+     */
+    public function toCompletePayload(): array
+    {
+        return [
+            'mode' => $this->mode,
+            'execution' => $this->executionRuntime,
+            'supervisor' => $this->supervisor,
+        ];
+    }
+
+    public function usesEregion(): bool
+    {
+        return $this->supervisor === 'eregion';
+    }
+
+    public function isJobExecution(): bool
+    {
+        return $this->executionRuntime === 'mithril-job' || $this->mode === 'job';
+    }
+}

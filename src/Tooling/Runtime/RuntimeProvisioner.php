@@ -7,57 +7,83 @@ namespace EreborCodeForge\Durin\Forge\Tooling\Runtime;
 use EreborCodeForge\Durin\Presets\Metadata\RuntimeProfile;
 
 /**
- * Resolves Forge default runner and provisions Eregion when required.
+ * Orchestrates install/configure side effects from a resolved RuntimePlan.
  */
 final class RuntimeProvisioner
 {
-    public const string DEFAULT_RUNNER = 'eregion';
+    public const string EREGION = 'eregion';
+
+    /** @deprecated Use capability resolution; kept for transitional string compares */
+    public const string DEFAULT_RUNNER = self::EREGION;
 
     public function __construct(
         private readonly EregionInstaller $installer = new EregionInstaller(),
         private readonly EregionConfigurator $configurator = new EregionConfigurator(),
         private readonly bool $defaultInstallRunner = true,
+        private readonly RuntimeResolver $resolver = new RuntimeResolver(),
     ) {}
 
-    public function resolveRunner(RuntimeProfile $profile): string
+    public function resolve(RuntimeProfile $profile): RuntimePlan
     {
-        return $profile->runner ?? self::DEFAULT_RUNNER;
+        return $this->resolver->resolve($profile);
     }
 
-    public function shouldInstall(RuntimeProfile $profile): bool
+    /**
+     * @deprecated Prefer resolve() → RuntimePlan
+     */
+    public function resolveRunner(RuntimeProfile $profile): string
     {
+        $plan = $this->resolve($profile);
+
+        return $plan->supervisor ?? $plan->executionRuntime;
+    }
+
+    public function shouldInstall(RuntimeProfile $profile, ?RuntimePlan $plan = null): bool
+    {
+        $plan ??= $this->resolve($profile);
+
+        if (!$plan->usesEregion()) {
+            return false;
+        }
+
         if ($profile->installRunner !== null) {
             return $profile->installRunner;
         }
 
-        $runner = $this->resolveRunner($profile);
-
-        return $this->defaultInstallRunner && $runner === self::DEFAULT_RUNNER;
+        return $this->defaultInstallRunner;
     }
 
     /**
-     * @return array{runner: string, installed: bool, configured: bool, install_action: ?string}
+     * @return array{
+     *     plan: RuntimePlan,
+     *     runner: string,
+     *     installed: bool,
+     *     configured: bool,
+     *     install_action: ?string
+     * }
      */
     public function provision(
         string $applicationRoot,
         RuntimeProfile $profile,
         bool $skipInstall = false,
+        ?RuntimePlan $plan = null,
     ): array {
-        $runner = $this->resolveRunner($profile);
-        $installAction = null;
-        $installed = false;
-        $configured = false;
+        $plan ??= $this->resolve($profile);
 
-        if ($runner !== self::DEFAULT_RUNNER) {
+        if (!$plan->usesEregion()) {
             return [
-                'runner' => $runner,
+                'plan' => $plan,
+                'runner' => $plan->executionRuntime,
                 'installed' => false,
                 'configured' => false,
                 'install_action' => null,
             ];
         }
 
-        if (!$skipInstall && $this->shouldInstall($profile)) {
+        $installAction = null;
+        $installed = false;
+
+        if (!$skipInstall && $this->shouldInstall($profile, $plan)) {
             $result = $this->installer->install($applicationRoot);
             $installAction = $result['action'];
             $installed = true;
@@ -65,13 +91,13 @@ final class RuntimeProvisioner
             $installed = $this->installer->isInstalled($applicationRoot);
         }
 
-        $this->configurator->configure($applicationRoot);
-        $configured = true;
+        $this->configurator->configure($applicationRoot, plan: $plan);
 
         return [
-            'runner' => $runner,
+            'plan' => $plan,
+            'runner' => self::EREGION,
             'installed' => $installed,
-            'configured' => $configured,
+            'configured' => true,
             'install_action' => $installAction,
         ];
     }

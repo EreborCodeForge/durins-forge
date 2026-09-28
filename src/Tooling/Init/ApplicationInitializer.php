@@ -9,8 +9,9 @@ use EreborCodeForge\Durin\Core\Manifest\DurinManifestParser;
 use EreborCodeForge\Durin\Core\Mutation\ScaffoldWriter;
 use EreborCodeForge\Durin\Core\Contract\ProjectOptions;
 use EreborCodeForge\Durin\Core\Project\ProjectDiscovery;
-use EreborCodeForge\Durin\Forge\Support\ApplicationPath;
 use EreborCodeForge\Durin\Forge\Tooling\Progress\InitProgressReporter;
+use EreborCodeForge\Durin\Forge\Tooling\Runtime\ManifestRuntimeFinalizer;
+use EreborCodeForge\Durin\Forge\Tooling\Runtime\RuntimePlan;
 use EreborCodeForge\Durin\Forge\Tooling\Runtime\RuntimeProvisioner;
 use EreborCodeForge\Durin\Presets\Contract\PresetDefinition;
 use EreborCodeForge\Durin\Presets\Preset\UnknownPresetException;
@@ -31,10 +32,11 @@ final class ApplicationInitializer
         private readonly RuntimeProvisioner $runtime = new RuntimeProvisioner(),
         private readonly DurinManifestParser $manifestParser = new DurinManifestParser(),
         private readonly ProjectDiscovery $discovery = new ProjectDiscovery(),
+        private readonly ManifestRuntimeFinalizer $manifestFinalizer = new ManifestRuntimeFinalizer(),
     ) {}
 
     /**
-     * @return array{preset: string, runner: string, idempotent: bool}
+     * @return array{preset: string, runtime: RuntimePlan, idempotent: bool}
      */
     public function initialize(
         string $applicationRoot,
@@ -52,19 +54,24 @@ final class ApplicationInitializer
         $existing = $this->readExistingPreset($root);
         if ($existing !== null && $existing !== self::UNINITIALIZED) {
             if ($existing === $definition->id()) {
-                $progress->stage('validate', 'Validating application');
-                $runner = $this->runtime->resolveRunner($definition->runtime());
-                if (!$skipRuntimeInstall && $this->runtime->shouldInstall($definition->runtime())) {
-                    $progress->stage('runtime.resolve', 'Resolving runtime');
-                    $progress->stage('runtime.install', 'Installing Eregion');
-                    $progress->stage('runtime.configure', 'Configuring Eregion');
-                    $this->runtime->provision($root, $definition->runtime(), $skipRuntimeInstall);
+                $progress->stage('runtime.resolve', 'Resolving runtime');
+                $plan = $this->runtime->resolve($definition->runtime());
+
+                if (!$skipRuntimeInstall && $this->runtime->shouldInstall($definition->runtime(), $plan)) {
+                    $progress->stage('runtime.provision', 'Provisioning runtime');
+                    $progress->stage('runtime.configure', 'Configuring runtime');
+                    $this->runtime->provision($root, $definition->runtime(), false, $plan);
                 }
-                $progress->complete($definition->id(), $runner);
+
+                $progress->stage('manifest.finalize', 'Finalizing manifest');
+                $this->manifestFinalizer->finalize($root, $plan);
+
+                $progress->stage('validate', 'Validating application');
+                $progress->complete($definition->id(), $plan);
 
                 return [
                     'preset' => $definition->id(),
-                    'runner' => $runner,
+                    'runtime' => $plan,
                     'idempotent' => true,
                 ];
             }
@@ -96,24 +103,27 @@ final class ApplicationInitializer
         }
 
         $progress->stage('runtime.resolve', 'Resolving runtime');
-        $runner = $this->runtime->resolveRunner($definition->runtime());
+        $runtimePlan = $this->runtime->resolve($definition->runtime());
 
-        if (!$skipRuntimeInstall && $this->runtime->shouldInstall($definition->runtime())) {
-            $progress->stage('runtime.install', 'Installing Eregion');
-            $progress->stage('runtime.configure', 'Configuring Eregion');
-            $this->runtime->provision($root, $definition->runtime(), false);
-        } elseif ($runner === RuntimeProvisioner::DEFAULT_RUNNER) {
-            $progress->stage('runtime.configure', 'Configuring Eregion');
-            $this->runtime->provision($root, $definition->runtime(), true);
+        if (!$skipRuntimeInstall && $this->runtime->shouldInstall($definition->runtime(), $runtimePlan)) {
+            $progress->stage('runtime.provision', 'Provisioning runtime');
+            $progress->stage('runtime.configure', 'Configuring runtime');
+            $this->runtime->provision($root, $definition->runtime(), false, $runtimePlan);
+        } elseif ($runtimePlan->usesEregion()) {
+            $progress->stage('runtime.configure', 'Configuring runtime');
+            $this->runtime->provision($root, $definition->runtime(), true, $runtimePlan);
         }
+
+        $progress->stage('manifest.finalize', 'Finalizing manifest');
+        $this->manifestFinalizer->finalize($root, $runtimePlan);
 
         $progress->stage('validate', 'Validating application');
         $this->assertNoVendorMutation($root);
-        $progress->complete($definition->id(), $runner);
+        $progress->complete($definition->id(), $runtimePlan);
 
         return [
             'preset' => $definition->id(),
-            'runner' => $runner,
+            'runtime' => $runtimePlan,
             'idempotent' => false,
         ];
     }

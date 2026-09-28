@@ -8,11 +8,13 @@ use EreborCodeForge\Durin\Forge\Tooling\Doctor\Check;
 use EreborCodeForge\Durin\Forge\Tooling\Doctor\CheckResult;
 use EreborCodeForge\Durin\Forge\Tooling\Doctor\DoctorContext;
 use EreborCodeForge\Durin\Forge\Tooling\Doctor\DoctorExitCode;
+use EreborCodeForge\Durin\Forge\Tooling\Runtime\RuntimePlan;
 use Erebor\Mithril\Runtime\Eregion\ApplicationResolver;
 use Erebor\Mithril\Runtime\Eregion\EregionBinaryResolver;
 
 /**
  * Thin runtime signals via Mithril resolvers — does not reimplement EREGION protocol.
+ * Runs when RuntimePlan includes Eregion as supervisor.
  */
 final class EregionRuntimeCheck implements Check
 {
@@ -23,14 +25,18 @@ final class EregionRuntimeCheck implements Check
 
     public function run(DoctorContext $context): array
     {
-        if ($context->project->manifest?->isJobMode() === true) {
-            return [
-                CheckResult::ok(
-                    $this->id(),
-                    'Eregion',
-                    'skipped (job mode — see SPEC-DX-017 / bin/job-worker)',
-                ),
-            ];
+        $manifest = $context->project->manifest;
+        if ($manifest !== null) {
+            $plan = RuntimePlan::fromManifest($manifest);
+            if (!$plan->usesEregion()) {
+                return [
+                    CheckResult::ok(
+                        $this->id(),
+                        'Eregion',
+                        'skipped (runtime plan has no Eregion supervisor)',
+                    ),
+                ];
+            }
         }
 
         $results = [];

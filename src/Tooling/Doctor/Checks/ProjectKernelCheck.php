@@ -8,6 +8,7 @@ use EreborCodeForge\Durin\Forge\Tooling\Doctor\Check;
 use EreborCodeForge\Durin\Forge\Tooling\Doctor\CheckResult;
 use EreborCodeForge\Durin\Forge\Tooling\Doctor\DoctorContext;
 use EreborCodeForge\Durin\Forge\Tooling\Doctor\DoctorExitCode;
+use EreborCodeForge\Durin\Forge\Tooling\Runtime\RuntimePlan;
 use Erebor\Mithril\Contracts\HttpApplication;
 use Erebor\Mithril\Contracts\JobApplication;
 
@@ -34,7 +35,11 @@ final class ProjectKernelCheck implements Check
         }
 
         $composerPath = $context->project->paths->composerJson();
-        $jobMode = $context->project->manifest?->isJobMode() ?? false;
+        $jobExecution = false;
+        if ($context->project->manifest !== null) {
+            $jobExecution = RuntimePlan::fromManifest($context->project->manifest)->isJobExecution();
+        }
+
         $httpKernel = 'App\\Kernel';
         $jobKernel = 'App\\JobKernel';
 
@@ -48,12 +53,12 @@ final class ProjectKernelCheck implements Check
                 $configuredJob = $json['extra']['mithril']['job_kernel'] ?? null;
                 if (is_string($configuredJob) && $configuredJob !== '') {
                     $jobKernel = $configuredJob;
-                    $jobMode = true;
+                    $jobExecution = true;
                 }
             }
         }
 
-        if ($jobMode) {
+        if ($jobExecution) {
             return $this->assertImplements($jobKernel, JobApplication::class, 'JobKernel');
         }
 

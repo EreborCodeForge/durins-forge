@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace EreborCodeForge\Durin\Forge\Tooling\Progress;
 
+use EreborCodeForge\Durin\Forge\Tooling\Runtime\RuntimePlan;
+
 /**
  * Emits machine-readable init progress (JSONL) or human lines.
  */
@@ -32,19 +34,22 @@ final class InitProgressReporter
     /**
      * @param array<string, mixed> $extra
      */
-    public function complete(string $preset, string $runner, array $extra = []): void
+    public function complete(string $preset, RuntimePlan $plan, array $extra = []): void
     {
         if ($this->jsonl) {
             $this->writeJson(array_merge([
                 'type' => 'complete',
                 'preset' => $preset,
-                'runner' => $runner,
+                'runtime' => $plan->toCompletePayload(),
             ], $extra));
 
             return;
         }
 
-        $this->writeLine("Initialized preset {$preset} (runner: {$runner}).");
+        $supervisor = $plan->supervisor ?? 'none';
+        $this->writeLine(
+            "Initialized preset {$preset} (execution: {$plan->executionRuntime}, supervisor: {$supervisor})."
+        );
     }
 
     /**

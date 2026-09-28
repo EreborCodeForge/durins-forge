@@ -110,6 +110,45 @@ final class RuntimeFacadeTest extends TestCase
         $this->assertSame('/tmp/fake-forge', $runner->calls[1]['binary']);
     }
 
+    public function test_facade_refuses_job_execution_for_serve(): void
+    {
+        $root = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'durin_job_serve_' . uniqid('', true);
+        mkdir($root, 0777, true);
+        file_put_contents($root . '/durin.yaml', <<<'YAML'
+application:
+  name: jobs
+  preset: worker
+runtime:
+  engine: mithril
+  server: none
+  mode: job
+features:
+  http: false
+  messaging: true
+architecture:
+  modules: false
+YAML);
+
+        $runner = new RecordingProcessRunner();
+        $facade = new MithrilRuntimeFacade(
+            processRunner: $runner,
+            statusProvider: new StubStatusProvider(),
+            forgeBinary: '/tmp/fake-forge',
+        );
+
+        $this->expectException(\EreborCodeForge\Durin\Forge\Tooling\Runtime\RuntimeOrchestrationException::class);
+        $this->expectExceptionMessage('job-worker');
+
+        try {
+            $facade->serve(new RuntimeOptions($root));
+        } finally {
+            @unlink($root . '/durin.yaml');
+            @rmdir($root);
+        }
+
+        $this->assertSame([], $runner->calls);
+    }
+
     public function test_facade_status_delegates_to_provider(): void
     {
         $expected = new RuntimeStatus(true, 'ok', binaryPath: '/bin/eregion');
