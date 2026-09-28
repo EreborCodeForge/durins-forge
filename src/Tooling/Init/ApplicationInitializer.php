@@ -186,6 +186,10 @@ final class ApplicationInitializer
             'composer.lock' => true,
             '.env' => true,
             '.env.example' => true,
+            'config/app.php' => true,
+            'README.md' => true,
+            'phpunit.xml' => true,
+            '.gitignore' => true,
         ];
 
         $filtered = new \EreborCodeForge\Durin\Core\Scaffold\ScaffoldPlan();
