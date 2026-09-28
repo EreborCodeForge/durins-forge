@@ -78,12 +78,5 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^12.5"
-    },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/EreborCodeForge/durin-architecture.git",
-            "canonical": true
-        }
-    ]
+    }
 }

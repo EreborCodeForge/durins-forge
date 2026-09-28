@@ -33,14 +33,7 @@ final class PackageContractTest extends TestCase
         $this->assertContains('src/Support/helpers.php', $composer['autoload']['files']);
         $this->assertContains('bin/durin', $composer['bin']);
         $this->assertContains('bin/durins-forge', $composer['bin']);
-
-        if (isset($composer['repositories'])) {
-            foreach ($composer['repositories'] as $repository) {
-                $this->assertSame('vcs', $repository['type'] ?? null);
-                $this->assertIsString($repository['url'] ?? null);
-                $this->assertStringContainsString('github.com/EreborCodeForge/', (string) $repository['url']);
-            }
-        }
+        $this->assertArrayNotHasKey('repositories', $composer);
 
         $this->assertSame('^0.2.1', $composer['require']['ereborcodeforge/durin-presets']);
         $this->assertSame('^0.1.3', $composer['require']['ereborcodeforge/durin-architecture']);
