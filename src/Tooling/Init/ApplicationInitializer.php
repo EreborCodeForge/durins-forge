@@ -83,6 +83,7 @@ final class ApplicationInitializer
             targetDirectory: $root,
         );
         $plan = $this->filterPlanForExistingRoot($root, $engine->plan($options));
+        $this->clearReplaceableConflicts($root, $plan);
 
         $progress->stage('scaffold.apply', 'Applying scaffold');
         $result = $this->writer->write($root, $plan);
@@ -206,6 +207,46 @@ final class ApplicationInitializer
         }
 
         return $filtered;
+    }
+
+    /**
+     * Neutral stubs (empty routes, placeholder index) may differ from preset output.
+     * Init replaces them; preserve-list files are never deleted.
+     */
+    private function clearReplaceableConflicts(
+        string $root,
+        \EreborCodeForge\Durin\Core\Scaffold\ScaffoldPlan $plan,
+    ): void {
+        $preserve = [
+            'composer.json' => true,
+            'composer.lock' => true,
+            '.env' => true,
+            '.env.example' => true,
+            'config/app.php' => true,
+            'README.md' => true,
+            'phpunit.xml' => true,
+            '.gitignore' => true,
+        ];
+
+        foreach ($plan->actions() as $action) {
+            if (isset($preserve[$action->relativePath])) {
+                continue;
+            }
+            if ($action->type !== \EreborCodeForge\Durin\Core\Scaffold\ScaffoldActionType::WriteFile) {
+                continue;
+            }
+            $absolute = $root . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $action->relativePath);
+            if (!is_file($absolute)) {
+                continue;
+            }
+            $existing = file_get_contents($absolute);
+            if ($existing === ($action->contents ?? '')) {
+                continue;
+            }
+            if (!@unlink($absolute)) {
+                throw new \RuntimeException("Unable to replace stub file during init: {$action->relativePath}");
+            }
+        }
     }
 
     private function resolveApplicationName(string $root): string
