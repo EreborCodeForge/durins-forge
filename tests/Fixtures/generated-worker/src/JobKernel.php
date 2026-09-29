@@ -31,8 +31,8 @@ final class JobKernel implements JobApplication
             return;
         }
 
-        // Demo transport — replace with Infrastructure adapter (Redis/SQS/…).
-        $this->container->singleton(JobTransport::class, new InMemoryJobTransport([]));
+        // Demo transport — idleWhenEmpty keeps the consumer persistent until stop/drain.
+        $this->container->singleton(JobTransport::class, new InMemoryJobTransport([], idleWhenEmpty: true));
 
         $this->booted = true;
     }
