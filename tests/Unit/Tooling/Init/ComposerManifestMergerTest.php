@@ -106,4 +106,31 @@ final class ComposerManifestMergerTest extends TestCase
         $this->assertArrayNotHasKey('eregion_repo', $merged['extra']['mithril']);
         $this->assertSame('job-worker', $merged['scripts']['job:work']);
     }
+
+    public function test_supervised_job_keeps_eregion_pin_and_job_kernel(): void
+    {
+        $merged = (new ComposerManifestMerger())->merge(
+            [
+                'name' => 'acme/jobs',
+                'extra' => [
+                    'mithril' => [
+                        'kernel' => 'App\\Kernel',
+                    ],
+                ],
+            ],
+            [
+                'extra' => [
+                    'mithril' => [
+                        'job_kernel' => 'App\\JobKernel',
+                    ],
+                ],
+            ],
+            new RuntimePlan('job', 'mithril-job', 'eregion', ['job-loop', 'process-supervision']),
+        );
+
+        $this->assertSame('App\\JobKernel', $merged['extra']['mithril']['job_kernel']);
+        $this->assertArrayNotHasKey('kernel', $merged['extra']['mithril']);
+        $this->assertSame('v0.4.0', $merged['extra']['mithril']['eregion']);
+        $this->assertSame('EreborCodeForge/eregion', $merged['extra']['mithril']['eregion_repo']);
+    }
 }

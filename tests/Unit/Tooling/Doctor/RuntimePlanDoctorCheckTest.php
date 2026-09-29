@@ -85,7 +85,7 @@ workloads:
       - vendor/bin/job-worker
     workers:
       min: 1
-      max: 4
+      max: 1
 YAML);
         file_put_contents($root . '/composer.json', json_encode([
             'extra' => ['mithril' => ['eregion' => 'v0.4.0']],

@@ -72,6 +72,32 @@ final class RuntimeResolverTest extends TestCase
         ));
     }
 
+    public function test_required_capabilities_remain_mandatory(): void
+    {
+        $this->expectException(RuntimeResolutionException::class);
+        $this->expectExceptionMessage('No compatible execution runtime');
+
+        // preferredCapabilities must never satisfy missing required capabilities.
+        $this->resolver->resolve(new RuntimeProfile(
+            mode: 'http',
+            requiredCapabilities: ['quantum-entanglement'],
+            preferredCapabilities: ['persistent-http', 'http-supervision'],
+        ));
+    }
+
+    public function test_preferred_capabilities_rank_without_becoming_requirement(): void
+    {
+        $plan = $this->resolver->resolve(new RuntimeProfile(
+            mode: 'worker',
+            requiredCapabilities: ['messaging'],
+            preferredCapabilities: ['consumer-supervision'],
+        ));
+
+        $this->assertSame('mithril-job', $plan->executionRuntime);
+        $this->assertSame('eregion', $plan->supervisor);
+        $this->assertContains('consumer-supervision', $plan->capabilities);
+    }
+
     public function test_preferred_compatible_execution(): void
     {
         $plan = $this->resolver->resolve(new RuntimeProfile(
@@ -106,6 +132,18 @@ final class RuntimeResolverTest extends TestCase
         $this->assertSame('mithril-job', $plan->executionRuntime);
         $this->assertSame('eregion', $plan->supervisor);
         $this->assertTrue($plan->usesEregion());
+    }
+
+    public function test_supervised_worker_resolves_via_registry_not_preset_id(): void
+    {
+        $plan = $this->resolver->resolve(new RuntimeProfile(
+            mode: 'job',
+            requiredCapabilities: ['job-loop', 'messaging'],
+            preferredCapabilities: ['process-supervision'],
+        ));
+
+        $this->assertSame('mithril-job', $plan->executionRuntime);
+        $this->assertSame('eregion', $plan->supervisor);
     }
 
     public function test_no_silent_eregion_fallback_when_preferred_runner_null_on_worker(): void

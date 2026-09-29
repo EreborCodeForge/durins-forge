@@ -39,12 +39,57 @@ final class EregionConfiguratorTest extends TestCase
         $this->assertStringContainsString('mode: consumer', $yaml);
         $this->assertStringContainsString('vendor/bin/job-worker', $yaml);
         $this->assertStringContainsString('min: 1', $yaml);
-        $this->assertStringContainsString('max: 4', $yaml);
-        $this->assertStringNotContainsString('count: 4', $yaml);
-        $this->assertStringNotContainsString("server:\n", $yaml);
+        $this->assertStringContainsString('max: 1', $yaml);
+        $this->assertDoesNotMatchRegularExpression('/application-worker:[\s\S]*max:\s*4/', $yaml);
     }
 
-    public function test_job_supervised_replaces_http_starter_with_consumer(): void
+    public function test_job_supervised_preserves_existing_http_and_other_workloads(): void
+    {
+        $root = $this->tempRoot();
+        file_put_contents($root . '/eregion.yaml', <<<'YAML'
+# user-owned
+server:
+  host: 127.0.0.1
+  port: 9090
+
+workload_templates:
+  base:
+    restart_limit: 3
+
+workloads:
+  custom-batch:
+    mode: consumer
+    command:
+      - php
+      - bin/batch.php
+
+operations:
+  prefix: /_eregion
+YAML);
+
+        $plan = new RuntimePlan('job', 'mithril-job', 'eregion', ['job-loop']);
+        $actions = (new EregionConfigurator())->configure($root, plan: $plan);
+        $updated = array_values(array_filter(
+            $actions,
+            static fn (array $a): bool => str_ends_with(str_replace('\\', '/', $a['path']), 'eregion.yaml')
+                && $a['action'] === 'updated',
+        ));
+
+        $this->assertNotEmpty($updated);
+        $yaml = (string) file_get_contents($root . '/eregion.yaml');
+        $this->assertStringContainsString('host: 127.0.0.1', $yaml);
+        $this->assertStringContainsString('port: 9090', $yaml);
+        $this->assertStringContainsString('workload_templates:', $yaml);
+        $this->assertStringContainsString('custom-batch:', $yaml);
+        $this->assertStringContainsString('bin/batch.php', $yaml);
+        $this->assertStringContainsString('operations:', $yaml);
+        $this->assertStringContainsString('application-worker:', $yaml);
+        $this->assertStringContainsString('mode: consumer', $yaml);
+        $this->assertStringContainsString('vendor/bin/job-worker', $yaml);
+        $this->assertStringContainsString('max: 1', $yaml);
+    }
+
+    public function test_job_supervised_upserts_into_http_starter_without_replace(): void
     {
         $root = $this->tempRoot();
         (new EregionCraft(new ApplicationResolver($root)))->craft();
@@ -63,9 +108,13 @@ final class EregionConfiguratorTest extends TestCase
 
         $this->assertNotEmpty($updated);
         $yaml = (string) file_get_contents($root . '/eregion.yaml');
+        $this->assertStringContainsString('server:', $yaml);
         $this->assertStringContainsString('mode: consumer', $yaml);
         $this->assertStringContainsString('vendor/bin/job-worker', $yaml);
-        $this->assertStringNotContainsString('count: 4', $yaml);
+        $this->assertStringContainsString('application-worker:', $yaml);
+        $this->assertStringContainsString('max: 1', $yaml);
+        $this->assertDoesNotMatchRegularExpression('/application-worker:[\s\S]*max:\s*4/', $yaml);
+        $this->assertStringNotContainsString("\nworker:\n", "\n" . $yaml);
     }
 
     public function test_job_supervised_is_idempotent(): void

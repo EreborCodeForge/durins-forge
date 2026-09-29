@@ -9,17 +9,22 @@ use EreborCodeForge\Durin\Presets\Metadata\RuntimeProfile;
 /**
  * Normalizes preset RuntimeProfile into capability requirements (Forge-owned).
  *
+ * requiredCapabilities are hard filters; preferredCapabilities are ranking hints only.
+ *
  * @param list<string> $capabilities
+ * @param list<string> $preferredCapabilities
  */
 final readonly class RuntimeRequirements
 {
     /**
      * @param list<string> $capabilities
+     * @param list<string> $preferredCapabilities
      */
     public function __construct(
         public array $capabilities,
         public string $mode,
         public ?string $preferredRunner,
+        public array $preferredCapabilities = [],
     ) {}
 
     public static function fromProfile(RuntimeProfile $profile): self
@@ -43,11 +48,15 @@ final readonly class RuntimeRequirements
             $caps = self::expandAliases($caps, $mode);
         }
 
-        return new self($caps, $mode, $profile->preferredRunner);
+        return new self(
+            $caps,
+            $mode,
+            $profile->preferredRunner,
+            array_values(array_unique($profile->preferredCapabilities)),
+        );
     }
 
     /**
-     * @param list<string> $required
      * @param list<string> $provided
      */
     public function isCoveredBy(array $provided): bool
@@ -59,6 +68,28 @@ final readonly class RuntimeRequirements
         }
 
         return true;
+    }
+
+    /**
+     * Ranking score: how many preferredCapabilities the candidate provides.
+     * Never used as a hard filter.
+     *
+     * @param list<string> $provided
+     */
+    public function preferenceScore(array $provided): int
+    {
+        if ($this->preferredCapabilities === []) {
+            return 0;
+        }
+
+        $score = 0;
+        foreach ($this->preferredCapabilities as $cap) {
+            if (in_array($cap, $provided, true)) {
+                $score++;
+            }
+        }
+
+        return $score;
     }
 
     /**

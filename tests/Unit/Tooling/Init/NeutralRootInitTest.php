@@ -153,6 +153,7 @@ final class NeutralRootInitTest extends TestCase
         $root = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'durin_neutral_init_' . uniqid('', true);
         $this->roots[] = $root;
         mkdir($root . '/src', 0777, true);
+        mkdir($root . '/config', 0777, true);
         mkdir($root . '/var/cache', 0777, true);
         mkdir($root . '/var/runtime', 0777, true);
 

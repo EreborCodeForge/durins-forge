@@ -64,4 +64,15 @@ final class RuntimeRegistry
             static fn (RuntimeDefinition $d): bool => $d->role() === 'execution',
         ));
     }
+
+    /**
+     * @return list<RuntimeDefinition>
+     */
+    public function supervisors(): array
+    {
+        return array_values(array_filter(
+            $this->byId,
+            static fn (RuntimeDefinition $d): bool => $d->role() === 'supervisor',
+        ));
+    }
 }

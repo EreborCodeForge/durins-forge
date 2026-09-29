@@ -39,6 +39,14 @@ final class ResidualRuntimeCleaner
         if (!$runtime->isJobExecution()) {
             $this->removePaths($applicationRoot, self::JOB_PATHS, $planned);
         }
+
+        // Standalone runtimes must not keep Eregion residuals from a prior supervised plan.
+        if (!$runtime->usesEregion()) {
+            $this->removePaths($applicationRoot, [
+                'eregion.yaml',
+                'var/runtime/eregion.json',
+            ], $planned);
+        }
     }
 
     private function isHttp(RuntimePlan $runtime): bool
