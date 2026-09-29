@@ -13,7 +13,8 @@ use EreborCodeForge\Durin\Forge\Tooling\Runtime\RuntimeOrchestrationException;
 use Erebor\Mithril\Console\Command;
 
 /**
- * Development entry: local defaults + RuntimeFacade::dev (distinct from production serve).
+ * Development entry: local defaults + RuntimeFacade::dev (HTTP experience).
+ * Job apps must use `durin run`. Future: watch/reload/logs.
  */
 final class DevCommand extends Command
 {
@@ -29,7 +30,7 @@ final class DevCommand extends Command
 
     public static function getDescription(): string
     {
-        return 'Sobe o app em modo desenvolvimento (Eregion local; use --php para serve:php)';
+        return 'Sobe o app HTTP em desenvolvimento (Eregion local; use --php para serve:php)';
     }
 
     public function execute(): int

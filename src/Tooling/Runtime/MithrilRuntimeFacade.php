@@ -80,12 +80,12 @@ final class MithrilRuntimeFacade implements RuntimeFacade
         if ($plan->usesEregion()) {
             throw new RuntimeOrchestrationException(
                 'Job applications with Eregion supervision are not started via serve/dev. '
-                . 'Use the Eregion consumer workload (php vendor/bin/job-worker under eregion).'
+                . 'Use: durin run'
             );
         }
 
         throw new RuntimeOrchestrationException(
-            'Job applications are not started via serve/dev. Run: php vendor/bin/job-worker'
+            'Job applications are not started via serve/dev. Use: durin run'
         );
     }
 

@@ -24,6 +24,7 @@ use EreborCodeForge\Durin\Forge\Console\Commands\PresetsListCommand;
 use EreborCodeForge\Durin\Forge\Console\Commands\RoutesClearCommand;
 use EreborCodeForge\Durin\Forge\Console\Commands\RoutesCompileCommand;
 use EreborCodeForge\Durin\Forge\Console\Commands\RoutesPostmanCommand;
+use EreborCodeForge\Durin\Forge\Console\Commands\RunCommand;
 use EreborCodeForge\Durin\Forge\Console\Commands\SeedCommand;
 use EreborCodeForge\Durin\Forge\Console\Commands\ServeCommand;
 use EreborCodeForge\Durin\Forge\Console\Commands\StatusCommand;
@@ -52,6 +53,7 @@ class Application
         $kernel->register(ContainerCompileCommand::class);
         $kernel->register(ContainerClearCommand::class);
         $kernel->register(OptimizeCommand::class);
+        $kernel->register(RunCommand::class);
         $kernel->register(ServeCommand::class);
         $kernel->register(DevCommand::class);
         $kernel->register(StatusCommand::class);

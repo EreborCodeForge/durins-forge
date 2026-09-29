@@ -137,7 +137,7 @@ YAML);
         );
 
         $this->expectException(\EreborCodeForge\Durin\Forge\Tooling\Runtime\RuntimeOrchestrationException::class);
-        $this->expectExceptionMessage('job-worker');
+        $this->expectExceptionMessage('durin run');
 
         try {
             $facade->serve(new RuntimeOptions($root));
