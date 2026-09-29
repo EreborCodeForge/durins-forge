@@ -36,13 +36,40 @@ class EregionConfigurator
     }
 
     /**
+     * Consumer-first eregion.yaml for supervised mithril-job (Eregion v0.4+ workloads).
+     *
      * @return array{path: string, action: string}
      */
     private function ensureJobWorkload(string $applicationRoot): array
     {
         $path = $applicationRoot . DIRECTORY_SEPARATOR . 'eregion.yaml';
-        $workload = <<<'YAML'
+        $workload = $this->consumerWorkloadYaml();
 
+        if (!is_file($path)) {
+            if (file_put_contents($path, $workload) === false) {
+                throw new \RuntimeException("Unable to write {$path}");
+            }
+
+            return ['path' => $path, 'action' => 'created'];
+        }
+
+        $existing = (string) file_get_contents($path);
+        if ($this->hasConsumerJobWorkload($existing)) {
+            return ['path' => $path, 'action' => 'exists'];
+        }
+
+        // Replace HTTP-only starter from Mithril craft with consumer-first config.
+        if (file_put_contents($path, $workload) === false) {
+            throw new \RuntimeException("Unable to update {$path}");
+        }
+
+        return ['path' => $path, 'action' => 'updated'];
+    }
+
+    private function consumerWorkloadYaml(): string
+    {
+        return <<<'YAML'
+# Eregion — job supervision (consumer workload)
 workloads:
   application-worker:
     mode: consumer
@@ -52,25 +79,14 @@ workloads:
     workers:
       min: 1
       max: 4
+
 YAML;
+    }
 
-        if (!is_file($path)) {
-            if (file_put_contents($path, "# Eregion — job supervision\n" . ltrim($workload) . "\n") === false) {
-                throw new \RuntimeException("Unable to write {$path}");
-            }
-
-            return ['path' => $path, 'action' => 'created'];
-        }
-
-        $existing = (string) file_get_contents($path);
-        if (str_contains($existing, 'application-worker:') || str_contains($existing, 'vendor/bin/job-worker')) {
-            return ['path' => $path, 'action' => 'exists'];
-        }
-
-        if (file_put_contents($path, rtrim($existing) . "\n" . $workload . "\n") === false) {
-            throw new \RuntimeException("Unable to update {$path}");
-        }
-
-        return ['path' => $path, 'action' => 'updated'];
+    private function hasConsumerJobWorkload(string $yaml): bool
+    {
+        return str_contains($yaml, 'application-worker:')
+            && str_contains($yaml, 'vendor/bin/job-worker')
+            && str_contains($yaml, 'mode: consumer');
     }
 }

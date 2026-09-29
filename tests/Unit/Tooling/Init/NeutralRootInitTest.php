@@ -57,7 +57,7 @@ final class NeutralRootInitTest extends TestCase
         $this->assertIsArray($composer);
         $this->assertSame('acme/billing', $composer['name']);
         $this->assertSame('App\\Kernel', $composer['extra']['mithril']['kernel']);
-        $this->assertSame('v0.3.0', $composer['extra']['mithril']['eregion']);
+        $this->assertSame('v0.4.0', $composer['extra']['mithril']['eregion']);
         $this->assertArrayNotHasKey('job_kernel', $composer['extra']['mithril']);
 
         $env = (string) file_get_contents($root . '/.env.example');

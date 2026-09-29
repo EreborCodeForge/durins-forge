@@ -47,7 +47,7 @@ Do **not** attribute these to package migration:
 ```text
 php ^8.5
 ereborcodeforge/mazarbul ^1.0
-ereborcodeforge/mithrilphp ^2.2
+ereborcodeforge/mithrilphp ^3.0
 ```
 
 No `durin-core` / `durin-presets` / `durin-architecture` yet.

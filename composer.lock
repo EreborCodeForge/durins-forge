@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d620b0e0550e6f62770d804b462ca802",
+    "content-hash": "2f535e61d3bbd14ca08fbd858e8ab1dd",
     "packages": [
         {
             "name": "ereborcodeforge/durin-architecture",
@@ -227,16 +227,16 @@
         },
         {
             "name": "ereborcodeforge/mithrilphp",
-            "version": "v2.2.0",
+            "version": "v3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/EreborCodeForge/mithrilphp.git",
-                "reference": "6c3a5b087fb8812b6d21e826b33f564714866de1"
+                "reference": "c66d0e22a1ccc25268a54e4c8cd28dcf92daa9c3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/EreborCodeForge/mithrilphp/zipball/6c3a5b087fb8812b6d21e826b33f564714866de1",
-                "reference": "6c3a5b087fb8812b6d21e826b33f564714866de1",
+                "url": "https://api.github.com/repos/EreborCodeForge/mithrilphp/zipball/c66d0e22a1ccc25268a54e4c8cd28dcf92daa9c3",
+                "reference": "c66d0e22a1ccc25268a54e4c8cd28dcf92daa9c3",
                 "shasum": ""
             },
             "require": {
@@ -291,7 +291,7 @@
                 "issues": "https://github.com/EreborCodeForge/mithrilphp/issues",
                 "source": "https://github.com/EreborCodeForge/mithrilphp"
             },
-            "time": "2026-09-26T20:13:45+00:00"
+            "time": "2026-09-29T01:54:10+00:00"
         }
     ],
     "packages-dev": [

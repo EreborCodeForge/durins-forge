@@ -29,7 +29,7 @@
         "ereborcodeforge/durin-core": "^0.2",
         "ereborcodeforge/durin-presets": "^0.3",
         "ereborcodeforge/mazarbul": "^1.0",
-        "ereborcodeforge/mithrilphp": "^2.2",
+        "ereborcodeforge/mithrilphp": "^3.0",
         "ext-msgpack": "*",
         "ext-pdo": "*",
         "ext-sockets": "*",

@@ -49,7 +49,7 @@ final class JobRuntimeCheck implements Check
             $results[] = CheckResult::warning(
                 'runtime.job.worker',
                 'job-worker',
-                'vendor/bin/job-worker not found (composer install / mithrilphp ^2.2)',
+                'vendor/bin/job-worker not found (composer install / mithrilphp ^3.0)',
             );
         }
 
@@ -76,6 +76,23 @@ final class JobRuntimeCheck implements Check
                 'Job supervision',
                 'eregion supervisor + mithril-job execution',
             );
+            $config = $root . DIRECTORY_SEPARATOR . 'eregion.yaml';
+            if (is_file($config)) {
+                $yaml = (string) file_get_contents($config);
+                $results[] = (str_contains($yaml, 'mode: consumer') && str_contains($yaml, 'vendor/bin/job-worker'))
+                    ? CheckResult::ok('runtime.job.consumer_workload', 'consumer workload', 'present in eregion.yaml')
+                    : CheckResult::warning(
+                        'runtime.job.consumer_workload',
+                        'consumer workload',
+                        'eregion.yaml missing consumer job-worker workload',
+                    );
+            } else {
+                $results[] = CheckResult::warning(
+                    'runtime.job.consumer_workload',
+                    'consumer workload',
+                    'eregion.yaml missing',
+                );
+            }
         } else {
             $results[] = CheckResult::ok(
                 'runtime.job.supervision',

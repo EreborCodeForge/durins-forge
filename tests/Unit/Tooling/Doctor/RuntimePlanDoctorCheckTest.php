@@ -70,4 +70,60 @@ final class RuntimePlanDoctorCheckTest extends TestCase
             @rmdir($root);
         }
     }
+
+    public function test_eregion_check_job_supervised_does_not_require_http_worker(): void
+    {
+        $root = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'durin_job_eregion_doctor_' . uniqid('', true);
+        mkdir($root . '/vendor/bin', 0777, true);
+        file_put_contents($root . '/vendor/bin/job-worker', "#!/usr/bin/env php\n");
+        file_put_contents($root . '/eregion.yaml', <<<'YAML'
+workloads:
+  application-worker:
+    mode: consumer
+    command:
+      - php
+      - vendor/bin/job-worker
+    workers:
+      min: 1
+      max: 4
+YAML);
+        file_put_contents($root . '/composer.json', json_encode([
+            'extra' => ['mithril' => ['eregion' => 'v0.4.0']],
+        ], JSON_THROW_ON_ERROR));
+
+        try {
+            $manifest = new DurinManifest(
+                applicationName: 'jobs',
+                preset: 'worker',
+                features: ['http' => false, 'messaging' => true],
+                architecture: ['modules' => false],
+                runtime: new ResolvedRuntime(
+                    mode: 'job',
+                    engine: 'mithril',
+                    execution: 'mithril-job',
+                    supervisor: 'eregion',
+                ),
+            );
+            $project = new Project(new ProjectPaths($root), $manifest);
+            $results = (new EregionRuntimeCheck())->run(new DoctorContext($project));
+            $ids = array_map(static fn (CheckResult $r): string => $r->id, $results);
+
+            $this->assertNotContains('runtime.eregion.worker', $ids);
+            $this->assertContains('runtime.eregion.consumer_worker', $ids);
+            $this->assertContains('runtime.eregion.consumer_workload', $ids);
+
+            foreach ($results as $result) {
+                if (in_array($result->id, ['runtime.eregion.consumer_worker', 'runtime.eregion.consumer_workload'], true)) {
+                    $this->assertSame(CheckStatus::Ok, $result->status);
+                }
+            }
+        } finally {
+            @unlink($root . '/vendor/bin/job-worker');
+            @rmdir($root . '/vendor/bin');
+            @rmdir($root . '/vendor');
+            @unlink($root . '/eregion.yaml');
+            @unlink($root . '/composer.json');
+            @rmdir($root);
+        }
+    }
 }

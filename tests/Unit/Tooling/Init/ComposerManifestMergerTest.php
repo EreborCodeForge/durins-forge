@@ -30,7 +30,7 @@ final class ComposerManifestMergerTest extends TestCase
             'extra' => [
                 'mithril' => [
                     'kernel' => 'App\\Kernel',
-                    'eregion' => 'v0.3.0',
+                    'eregion' => 'v0.4.0',
                     'eregion_repo' => 'EreborCodeForge/eregion',
                 ],
             ],
@@ -48,9 +48,28 @@ final class ComposerManifestMergerTest extends TestCase
         $this->assertSame(['psr-4' => ['App\\' => 'src/']], $merged['autoload']);
         $this->assertSame('^0.1', $merged['require']['ereborcodeforge/durins-forge']);
         $this->assertSame('App\\Kernel', $merged['extra']['mithril']['kernel']);
-        $this->assertSame('v0.3.0', $merged['extra']['mithril']['eregion']);
+        $this->assertSame('v0.4.0', $merged['extra']['mithril']['eregion']);
         $this->assertArrayNotHasKey('job_kernel', $merged['extra']['mithril']);
         $this->assertSame('phpunit', $merged['scripts']['test']);
+    }
+
+    public function test_upgrades_eregion_pin_below_baseline(): void
+    {
+        $merged = (new ComposerManifestMerger())->merge(
+            ['name' => 'acme/app'],
+            [
+                'extra' => [
+                    'mithril' => [
+                        'kernel' => 'App\\Kernel',
+                        'eregion' => 'v0.3.0',
+                        'eregion_repo' => 'EreborCodeForge/eregion',
+                    ],
+                ],
+            ],
+            new RuntimePlan('http', 'mithril-http', 'eregion', ['persistent-http']),
+        );
+
+        $this->assertSame('v0.4.0', $merged['extra']['mithril']['eregion']);
     }
 
     public function test_job_runtime_strips_eregion_and_http_kernel(): void
@@ -60,7 +79,7 @@ final class ComposerManifestMergerTest extends TestCase
             'extra' => [
                 'mithril' => [
                     'kernel' => 'App\\Kernel',
-                    'eregion' => 'v0.3.0',
+                    'eregion' => 'v0.4.0',
                     'eregion_repo' => 'EreborCodeForge/eregion',
                 ],
             ],

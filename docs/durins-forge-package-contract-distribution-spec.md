@@ -70,7 +70,7 @@ internal packages:
   ereborcodeforge/durin-architecture ^0.1
 
 runtime:
-  ereborcodeforge/mithrilphp ^2.2
+  ereborcodeforge/mithrilphp ^3.0
 
 database:
   ereborcodeforge/mazarbul ^1.0

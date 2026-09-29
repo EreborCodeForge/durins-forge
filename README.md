@@ -44,7 +44,7 @@ php bin/durin migrate
 
 `composer.json` pinna (entre outros):
 
-- `ereborcodeforge/mithrilphp:^2.2`
+- `ereborcodeforge/mithrilphp:^3.0`
 - `ereborcodeforge/mazarbul:^1.0`
 - `ereborcodeforge/durin-core:^0.1`
 - `ereborcodeforge/durin-presets:^0.1.3`

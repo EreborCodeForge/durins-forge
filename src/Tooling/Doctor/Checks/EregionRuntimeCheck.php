@@ -26,6 +26,7 @@ final class EregionRuntimeCheck implements Check
     public function run(DoctorContext $context): array
     {
         $manifest = $context->project->manifest;
+        $plan = null;
         if ($manifest !== null) {
             $plan = RuntimePlan::fromManifest($manifest);
             if (!$plan->usesEregion()) {
@@ -43,6 +44,7 @@ final class EregionRuntimeCheck implements Check
         $root = $context->root();
         $resolver = new ApplicationResolver($root);
         $binaryResolver = new EregionBinaryResolver();
+        $jobSupervised = $plan !== null && $plan->isJobExecution();
 
         $pin = null;
         $composer = $context->project->paths->composerJson();
@@ -77,9 +79,9 @@ final class EregionRuntimeCheck implements Check
             ? CheckResult::ok('runtime.eregion.config', 'eregion.yaml', $config)
             : CheckResult::warning('runtime.eregion.config', 'eregion.yaml', 'not found (forge eregion:craft)');
 
-        $manifest = $root . DIRECTORY_SEPARATOR . 'var' . DIRECTORY_SEPARATOR . 'runtime' . DIRECTORY_SEPARATOR . 'eregion.json';
-        if (is_file($manifest)) {
-            $decoded = json_decode((string) file_get_contents($manifest), true);
+        $runtimeManifest = $root . DIRECTORY_SEPARATOR . 'var' . DIRECTORY_SEPARATOR . 'runtime' . DIRECTORY_SEPARATOR . 'eregion.json';
+        if (is_file($runtimeManifest)) {
+            $decoded = json_decode((string) file_get_contents($runtimeManifest), true);
             $results[] = is_array($decoded)
                 ? CheckResult::ok('runtime.eregion.manifest', 'Runtime manifest', 'valid JSON')
                 : CheckResult::fail(
@@ -96,14 +98,66 @@ final class EregionRuntimeCheck implements Check
             );
         }
 
-        $worker = $resolver->eregionWorkerPath();
-        $results[] = is_file($worker)
-            ? CheckResult::ok('runtime.eregion.worker', 'eregion-worker', $worker)
-            : CheckResult::fail(
-                'runtime.eregion.worker',
-                'eregion-worker',
-                'missing',
+        if ($jobSupervised) {
+            $results = [...$results, ...$this->consumerWorkloadChecks($root, $config)];
+        } else {
+            $worker = $resolver->eregionWorkerPath();
+            $results[] = is_file($worker)
+                ? CheckResult::ok('runtime.eregion.worker', 'eregion-worker', $worker)
+                : CheckResult::fail(
+                    'runtime.eregion.worker',
+                    'eregion-worker',
+                    'missing',
+                    DoctorExitCode::MissingDependency,
+                );
+        }
+
+        return $results;
+    }
+
+    /**
+     * @return list<CheckResult>
+     */
+    private function consumerWorkloadChecks(string $root, string $configPath): array
+    {
+        $results = [];
+        $jobWorker = $root . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'job-worker';
+        $jobWorkerBat = $jobWorker . '.bat';
+        if (is_file($jobWorker) || is_file($jobWorkerBat)) {
+            $results[] = CheckResult::ok(
+                'runtime.eregion.consumer_worker',
+                'job-worker',
+                is_file($jobWorker) ? $jobWorker : $jobWorkerBat,
+            );
+        } else {
+            $results[] = CheckResult::fail(
+                'runtime.eregion.consumer_worker',
+                'job-worker',
+                'missing (composer install / mithrilphp ^3.0)',
                 DoctorExitCode::MissingDependency,
+            );
+        }
+
+        if (!is_file($configPath)) {
+            $results[] = CheckResult::warning(
+                'runtime.eregion.consumer_workload',
+                'consumer workload',
+                'eregion.yaml missing',
+            );
+
+            return $results;
+        }
+
+        $yaml = (string) file_get_contents($configPath);
+        $hasConsumer = str_contains($yaml, 'mode: consumer')
+            && str_contains($yaml, 'vendor/bin/job-worker');
+        $results[] = $hasConsumer
+            ? CheckResult::ok('runtime.eregion.consumer_workload', 'consumer workload', 'application-worker present')
+            : CheckResult::fail(
+                'runtime.eregion.consumer_workload',
+                'consumer workload',
+                'eregion.yaml missing consumer job-worker workload',
+                DoctorExitCode::RuntimeIncompatibility,
             );
 
         return $results;

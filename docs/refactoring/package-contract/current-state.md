@@ -42,7 +42,7 @@ Next initiative: **`durin-app`**.
 | `ereborcodeforge/durin-core` | `^0.1` | `0.1.0` |
 | `ereborcodeforge/durin-presets` | `^0.1.3` | `0.1.3` |
 | `ereborcodeforge/durin-architecture` | `^0.1` | `0.1.0` |
-| `ereborcodeforge/mithrilphp` | `^2.2` | yes |
+| `ereborcodeforge/mithrilphp` | `^3.0` | yes |
 | `ereborcodeforge/mazarbul` | `^1.0` | yes |
 
 `durin-architecture` retained (ADR-0006 decision A).

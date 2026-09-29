@@ -29,7 +29,7 @@ final class RuntimeBinaryLocator
 
         return $this->firstExisting($workingDirectory, ['job-worker', 'job-worker.bat'])
             ?? throw new RuntimeLaunchException(
-                'vendor/bin/job-worker not found. Require mithrilphp ^2.2 and run composer install.'
+                'vendor/bin/job-worker not found. Require mithrilphp ^3.0 and run composer install.'
             );
     }
 

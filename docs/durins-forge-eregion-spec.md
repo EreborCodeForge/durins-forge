@@ -8,7 +8,7 @@
 | Camada | Pacote / binário | Papel |
 |--------|------------------|-------|
 | Engine | `ereborcodeforge/mithrilphp` ^2.1 | Worker, DI, HTTP, Forge CLI, bridge Eregion |
-| Server | Eregion Go `v0.3.0+` (protocol `eregion/1`) | HTTP público, pool, UDS, recycle |
+| Server | Eregion Go `v0.4.0+` (protocol `eregion/1`) | HTTP público, pool, UDS, recycle |
 | Framework | **Durin’s Forge** (este documento) | App skeleton, Kernel, rotas, compile, DX |
 
 Contratos irmãos:
@@ -129,7 +129,7 @@ Regras:
   "extra": {
     "mithril": {
       "kernel": "App\\Kernel",
-      "eregion": "v0.3.0"
+      "eregion": "v0.4.0"
     }
   }
 }
@@ -257,7 +257,7 @@ vendor/bin/forge serve:php --port=8000
   "extra": {
     "mithril": {
       "kernel": "App\\Kernel",
-      "eregion": "v0.3.0",
+      "eregion": "v0.4.0",
       "eregion_repo": "EreborCodeForge/eregion"
     }
   }
@@ -268,7 +268,7 @@ vendor/bin/forge serve:php --port=8000
 
 ```bash
 vendor/bin/forge server:install
-# overrides: EREGION_VERSION, EREGION_BINARY, --version=v0.3.0
+# overrides: EREGION_VERSION, EREGION_BINARY, --version=v0.4.0
 vendor/bin/forge server:version
 # esperado:
 #   eregion 0.3.0

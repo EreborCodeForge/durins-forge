@@ -110,8 +110,9 @@ final class ComposerManifestMerger
         }
 
         if ($runtime->usesEregion()) {
-            if (!isset($mithril['eregion']) || !is_string($mithril['eregion']) || $mithril['eregion'] === '') {
-                $mithril['eregion'] = 'v0.3.0';
+            $currentPin = $mithril['eregion'] ?? null;
+            if (!is_string($currentPin) || $currentPin === '' || self::isBelowEregionBaseline($currentPin)) {
+                $mithril['eregion'] = 'v0.4.0';
             }
             if (!isset($mithril['eregion_repo']) || !is_string($mithril['eregion_repo']) || $mithril['eregion_repo'] === '') {
                 $mithril['eregion_repo'] = 'EreborCodeForge/eregion';
@@ -148,5 +149,10 @@ final class ComposerManifestMerger
         }
 
         return $base;
+    }
+
+    private static function isBelowEregionBaseline(string $pin): bool
+    {
+        return version_compare(ltrim($pin, "vV"), '0.4.0', '<');
     }
 }
