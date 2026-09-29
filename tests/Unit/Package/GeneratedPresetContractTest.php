@@ -23,7 +23,7 @@ final class GeneratedPresetContractTest extends TestCase
 
             $this->assertArrayHasKey('composer.json', $files);
             $composer = json_decode($files['composer.json'], true, 512, JSON_THROW_ON_ERROR);
-            $this->assertSame('^0.1', $composer['require']['ereborcodeforge/durins-forge']);
+            $this->assertSame('^0.4', $composer['require']['ereborcodeforge/durins-forge']);
             $this->assertArrayNotHasKey('ereborcodeforge/mithrilphp', $composer['require']);
             if ($this->presetsPackageAtLeast('0.1.3')) {
                 $this->assertNoRepositories($composer, 'live engine:' . $preset);
@@ -47,7 +47,7 @@ final class GeneratedPresetContractTest extends TestCase
             $path = $root . "/tests/Fixtures/generated-{$preset}/composer.json";
             $composer = json_decode((string) file_get_contents($path), true, 512, JSON_THROW_ON_ERROR);
             $this->assertSame(
-                '^0.1',
+                '^0.4',
                 $composer['require']['ereborcodeforge/durins-forge'],
                 $preset
             );
