@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e1f6191da65b5341ddfe1d3faebaf700",
+    "content-hash": "d620b0e0550e6f62770d804b462ca802",
     "packages": [
         {
             "name": "ereborcodeforge/durin-architecture",

@@ -3,7 +3,6 @@
     "description": "Durin Forge \u2014 Composer framework package for Durin applications (composition, CLI, and DX over MithrilPHP)",
     "type": "library",
     "license": "MIT",
-    "version": "0.3.0",
     "keywords": [
         "php",
         "framework",
