@@ -7,6 +7,7 @@ namespace EreborCodeForge\Durin\Forge\Tooling\Runtime;
 use EreborCodeForge\Durin\Core\Manifest\DurinManifest;
 use EreborCodeForge\Durin\Core\Manifest\DurinManifestException;
 use EreborCodeForge\Durin\Core\Manifest\DurinManifestParser;
+use EreborCodeForge\Durin\Core\Runtime\ResolvedRuntime;
 
 /**
  * Rewrites durin.yaml runtime fields from a resolved RuntimePlan.
@@ -25,15 +26,17 @@ final class ManifestRuntimeFinalizer
         }
 
         $current = $this->parser->parseFile($path);
-        $server = $plan->supervisor ?? 'none';
         $updated = new DurinManifest(
             applicationName: $current->applicationName,
             preset: $current->preset,
-            runtimeEngine: $current->runtimeEngine,
-            runtimeServer: $server,
             features: $current->features,
             architecture: $current->architecture,
-            runtimeMode: $plan->mode,
+            runtime: new ResolvedRuntime(
+                mode: $plan->mode,
+                engine: 'mithril',
+                execution: $plan->executionRuntime,
+                supervisor: $plan->supervisor,
+            ),
         );
 
         $yaml = $updated->toYaml();

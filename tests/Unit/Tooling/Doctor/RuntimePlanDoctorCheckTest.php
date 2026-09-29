@@ -7,6 +7,7 @@ namespace EreborCodeForge\Durin\Forge\Tests\Unit\Tooling\Doctor;
 use EreborCodeForge\Durin\Core\Manifest\DurinManifest;
 use EreborCodeForge\Durin\Core\Project\Project;
 use EreborCodeForge\Durin\Core\Project\ProjectPaths;
+use EreborCodeForge\Durin\Core\Runtime\ResolvedRuntime;
 use EreborCodeForge\Durin\Forge\Tooling\Doctor\CheckResult;
 use EreborCodeForge\Durin\Forge\Tooling\Doctor\CheckStatus;
 use EreborCodeForge\Durin\Forge\Tooling\Doctor\DoctorContext;
@@ -21,11 +22,14 @@ final class RuntimePlanDoctorCheckTest extends TestCase
         $manifest = new DurinManifest(
             applicationName: 'jobs',
             preset: 'worker',
-            runtimeEngine: 'mithril',
-            runtimeServer: 'none',
             features: ['http' => false, 'messaging' => true],
             architecture: ['modules' => false],
-            runtimeMode: 'job',
+            runtime: new ResolvedRuntime(
+                mode: 'job',
+                engine: 'mithril',
+                execution: 'mithril-job',
+                supervisor: null,
+            ),
         );
         $project = new Project(new ProjectPaths(sys_get_temp_dir()), $manifest);
         $results = (new EregionRuntimeCheck())->run(new DoctorContext($project));
@@ -43,11 +47,14 @@ final class RuntimePlanDoctorCheckTest extends TestCase
             $manifest = new DurinManifest(
                 applicationName: 'jobs',
                 preset: 'worker',
-                runtimeEngine: 'mithril',
-                runtimeServer: 'none',
                 features: ['http' => false, 'messaging' => true],
                 architecture: ['modules' => false],
-                runtimeMode: 'job',
+                runtime: new ResolvedRuntime(
+                    mode: 'job',
+                    engine: 'mithril',
+                    execution: 'mithril-job',
+                    supervisor: null,
+                ),
             );
             $project = new Project(new ProjectPaths($root), $manifest);
             $results = (new JobRuntimeCheck())->run(new DoctorContext($project));

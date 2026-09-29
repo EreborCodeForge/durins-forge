@@ -7,7 +7,6 @@ namespace EreborCodeForge\Durin\Forge\Tests\Unit\Tooling\Doctor;
 use EreborCodeForge\Durin\Core\Manifest\DurinManifest;
 use EreborCodeForge\Durin\Core\Project\Project;
 use EreborCodeForge\Durin\Core\Project\ProjectPaths;
-use EreborCodeForge\Durin\Forge\Tooling\Doctor\CheckResult;
 use EreborCodeForge\Durin\Forge\Tooling\Doctor\CheckStatus;
 use EreborCodeForge\Durin\Forge\Tooling\Doctor\DoctorContext;
 use EreborCodeForge\Durin\Forge\Tooling\Doctor\Checks\ProjectKernelCheck;
@@ -20,10 +19,9 @@ final class ProjectKernelCheckTest extends TestCase
         $manifest = new DurinManifest(
             applicationName: 'demo',
             preset: 'uninitialized',
-            runtimeEngine: 'mithril',
-            runtimeServer: 'eregion',
             features: ['http' => false, 'messaging' => false],
             architecture: ['modules' => false],
+            runtime: null,
         );
         $project = new Project(new ProjectPaths(sys_get_temp_dir()), $manifest);
         $results = (new ProjectKernelCheck())->run(new DoctorContext($project));

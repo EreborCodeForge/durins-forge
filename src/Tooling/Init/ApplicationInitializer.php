@@ -9,6 +9,8 @@ use EreborCodeForge\Durin\Core\Manifest\DurinManifestParser;
 use EreborCodeForge\Durin\Core\Mutation\ScaffoldWriter;
 use EreborCodeForge\Durin\Core\Contract\ProjectOptions;
 use EreborCodeForge\Durin\Core\Project\ProjectDiscovery;
+use EreborCodeForge\Durin\Core\Scaffold\ScaffoldActionType;
+use EreborCodeForge\Durin\Core\Scaffold\ScaffoldPlan;
 use EreborCodeForge\Durin\Forge\Tooling\Progress\InitProgressReporter;
 use EreborCodeForge\Durin\Forge\Tooling\Runtime\ManifestRuntimeFinalizer;
 use EreborCodeForge\Durin\Forge\Tooling\Runtime\RuntimePlan;
@@ -33,6 +35,9 @@ final class ApplicationInitializer
         private readonly DurinManifestParser $manifestParser = new DurinManifestParser(),
         private readonly ProjectDiscovery $discovery = new ProjectDiscovery(),
         private readonly ManifestRuntimeFinalizer $manifestFinalizer = new ManifestRuntimeFinalizer(),
+        private readonly ComposerManifestMerger $composerMerger = new ComposerManifestMerger(),
+        private readonly EnvExampleMerger $envMerger = new EnvExampleMerger(),
+        private readonly ResidualRuntimeCleaner $residualCleaner = new ResidualRuntimeCleaner(),
     ) {}
 
     /**
@@ -89,8 +94,14 @@ final class ApplicationInitializer
             preset: $definition->id(),
             targetDirectory: $root,
         );
-        $plan = $this->filterPlanForExistingRoot($root, $engine->plan($options));
+        $fullPlan = $engine->plan($options);
+        $plannedComposer = $this->extractPlannedContents($fullPlan, 'composer.json');
+        $plannedEnv = $this->extractPlannedContents($fullPlan, '.env.example');
+        $plan = $this->filterPlanForExistingRoot($root, $fullPlan);
         $this->clearReplaceableConflicts($root, $plan);
+
+        $progress->stage('runtime.resolve', 'Resolving runtime');
+        $runtimePlan = $this->runtime->resolve($definition->runtime());
 
         $progress->stage('scaffold.apply', 'Applying scaffold');
         $result = $this->writer->write($root, $plan);
@@ -102,8 +113,9 @@ final class ApplicationInitializer
             throw new \RuntimeException('Scaffold conflicts: ' . implode(', ', $conflicts));
         }
 
-        $progress->stage('runtime.resolve', 'Resolving runtime');
-        $runtimePlan = $this->runtime->resolve($definition->runtime());
+        $this->applyMergedComposer($root, $plannedComposer, $runtimePlan);
+        $this->applyMergedEnvExample($root, $plannedEnv);
+        $this->residualCleaner->clean($root, $runtimePlan, $plan);
 
         if (!$skipRuntimeInstall && $this->runtime->shouldInstall($definition->runtime(), $runtimePlan)) {
             $progress->stage('runtime.provision', 'Provisioning runtime');
@@ -188,9 +200,9 @@ final class ApplicationInitializer
     /**
      * Neutral app roots already own Composer identity and env templates.
      * Preset plans still describe those files for greenfield `durin new`;
-     * init must not conflict with consumer-owned files.
+     * init merges composer.json / .env.example instead of blind overwrite.
      */
-    private function filterPlanForExistingRoot(string $root, \EreborCodeForge\Durin\Core\Scaffold\ScaffoldPlan $plan): \EreborCodeForge\Durin\Core\Scaffold\ScaffoldPlan
+    private function filterPlanForExistingRoot(string $root, ScaffoldPlan $plan): ScaffoldPlan
     {
         $preserve = [
             'composer.json' => true,
@@ -203,13 +215,13 @@ final class ApplicationInitializer
             '.gitignore' => true,
         ];
 
-        $filtered = new \EreborCodeForge\Durin\Core\Scaffold\ScaffoldPlan();
+        $filtered = new ScaffoldPlan();
         foreach ($plan->actions() as $action) {
             $absolute = $root . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $action->relativePath);
             if (isset($preserve[$action->relativePath]) && is_file($absolute)) {
                 continue;
             }
-            if ($action->type === \EreborCodeForge\Durin\Core\Scaffold\ScaffoldActionType::CreateDirectory) {
+            if ($action->type === ScaffoldActionType::CreateDirectory) {
                 $filtered->directory($action->relativePath);
                 continue;
             }
@@ -223,10 +235,8 @@ final class ApplicationInitializer
      * Neutral stubs (empty routes, placeholder index) may differ from preset output.
      * Init replaces them; preserve-list files are never deleted.
      */
-    private function clearReplaceableConflicts(
-        string $root,
-        \EreborCodeForge\Durin\Core\Scaffold\ScaffoldPlan $plan,
-    ): void {
+    private function clearReplaceableConflicts(string $root, ScaffoldPlan $plan): void
+    {
         $preserve = [
             'composer.json' => true,
             'composer.lock' => true,
@@ -242,7 +252,7 @@ final class ApplicationInitializer
             if (isset($preserve[$action->relativePath])) {
                 continue;
             }
-            if ($action->type !== \EreborCodeForge\Durin\Core\Scaffold\ScaffoldActionType::WriteFile) {
+            if ($action->type !== ScaffoldActionType::WriteFile) {
                 continue;
             }
             $absolute = $root . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $action->relativePath);
@@ -257,6 +267,54 @@ final class ApplicationInitializer
                 throw new \RuntimeException("Unable to replace stub file during init: {$action->relativePath}");
             }
         }
+    }
+
+    private function extractPlannedContents(ScaffoldPlan $plan, string $relativePath): ?string
+    {
+        foreach ($plan->actions() as $action) {
+            if (
+                $action->type === ScaffoldActionType::WriteFile
+                && $action->relativePath === $relativePath
+            ) {
+                return (string) ($action->contents ?? '');
+            }
+        }
+
+        return null;
+    }
+
+    private function applyMergedComposer(string $root, ?string $plannedJson, RuntimePlan $runtime): void
+    {
+        $path = $root . DIRECTORY_SEPARATOR . 'composer.json';
+        $existingRaw = is_file($path) ? (string) file_get_contents($path) : '{}';
+        $existing = json_decode($existingRaw, true);
+        if (!is_array($existing)) {
+            throw new \RuntimeException("Invalid composer.json at {$path}");
+        }
+
+        $planned = [];
+        if ($plannedJson !== null && $plannedJson !== '') {
+            $decoded = json_decode($plannedJson, true);
+            if (!is_array($decoded)) {
+                throw new \RuntimeException('Preset planned composer.json is invalid JSON.');
+            }
+            $planned = $decoded;
+        }
+
+        $merged = $this->composerMerger->merge($existing, $planned, $runtime);
+        file_put_contents($path, $this->composerMerger->encode($merged));
+    }
+
+    private function applyMergedEnvExample(string $root, ?string $plannedEnv): void
+    {
+        if ($plannedEnv === null) {
+            return;
+        }
+
+        $path = $root . DIRECTORY_SEPARATOR . '.env.example';
+        $existing = is_file($path) ? (string) file_get_contents($path) : '';
+        $merged = $this->envMerger->merge($existing, $plannedEnv);
+        file_put_contents($path, $merged);
     }
 
     private function resolveApplicationName(string $root): string

@@ -30,7 +30,7 @@ final readonly class RuntimeRequirements
             default => $profile->mode,
         };
 
-        $caps = array_values($profile->capabilities);
+        $caps = array_values($profile->requiredCapabilities);
         if ($caps === []) {
             $caps = match ($mode) {
                 'http' => ['persistent-http'],
@@ -43,7 +43,7 @@ final readonly class RuntimeRequirements
             $caps = self::expandAliases($caps, $mode);
         }
 
-        return new self($caps, $mode, $profile->runner);
+        return new self($caps, $mode, $profile->preferredRunner);
     }
 
     /**

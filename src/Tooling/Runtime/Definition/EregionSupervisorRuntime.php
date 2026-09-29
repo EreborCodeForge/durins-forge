@@ -26,7 +26,7 @@ final class EregionSupervisorRuntime implements RuntimeDefinition
     public function supports(RuntimeProfile $profile): bool
     {
         // Supervisor is never a sole execution match; preferredRunner=eregion selects it as supervisor.
-        return $profile->runner === 'eregion';
+        return $profile->preferredRunner === 'eregion';
     }
 
     public function role(): string

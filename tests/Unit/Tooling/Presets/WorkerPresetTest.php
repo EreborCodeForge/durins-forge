@@ -57,8 +57,8 @@ final class WorkerPresetTest extends TestCase
 
         $manifest = (new DurinManifestParser())->parseFile($target . '/durin.yaml');
         $this->assertSame('worker', $manifest->preset);
-        $this->assertSame('none', $manifest->runtimeServer);
-        $this->assertSame('job', $manifest->runtimeMode);
+        $this->assertNull($manifest->runtime);
+        $this->assertFalse($manifest->isResolved());
         $this->assertFalse($manifest->features['http']);
         $this->assertTrue($manifest->features['messaging']);
         $this->assertTrue($manifest->isJobMode());

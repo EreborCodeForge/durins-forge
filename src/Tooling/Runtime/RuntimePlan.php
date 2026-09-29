@@ -28,27 +28,38 @@ final readonly class RuntimePlan
      */
     public static function fromManifest(DurinManifest $manifest): self
     {
+        if ($manifest->runtime !== null) {
+            $resolved = $manifest->runtime;
+            $mode = $resolved->mode;
+            $execution = $resolved->execution;
+            $supervisor = $resolved->supervisor;
+
+            $capabilities = $mode === 'job'
+                ? ['job-loop', 'messaging']
+                : ['persistent-http'];
+            if ($supervisor === 'eregion') {
+                $capabilities[] = 'process-supervision';
+                $capabilities[] = $mode === 'job' ? 'consumer-supervision' : 'http-supervision';
+            }
+
+            return new self(
+                mode: $mode,
+                executionRuntime: $execution,
+                supervisor: $supervisor,
+                capabilities: array_values(array_unique($capabilities)),
+            );
+        }
+
         $mode = $manifest->isJobMode() ? 'job' : 'http';
         $execution = $mode === 'job' ? 'mithril-job' : 'mithril-http';
-        $supervisor = match ($manifest->runtimeServer) {
-            'eregion' => 'eregion',
-            'none', '' => null,
-            default => $manifest->runtimeServer,
-        };
-
-        $capabilities = $mode === 'job'
-            ? ['job-loop', 'messaging']
-            : ['persistent-http'];
-        if ($supervisor === 'eregion') {
-            $capabilities[] = 'process-supervision';
-            $capabilities[] = $mode === 'job' ? 'consumer-supervision' : 'http-supervision';
-        }
 
         return new self(
             mode: $mode,
             executionRuntime: $execution,
-            supervisor: $supervisor,
-            capabilities: array_values(array_unique($capabilities)),
+            supervisor: null,
+            capabilities: $mode === 'job'
+                ? ['job-loop', 'messaging']
+                : ['persistent-http'],
         );
     }
 

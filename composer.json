@@ -1,6 +1,6 @@
 {
     "name": "ereborcodeforge/durins-forge",
-    "description": "Durin Forge — Composer framework package for Durin applications (composition, CLI, and DX over MithrilPHP)",
+    "description": "Durin Forge \u2014 Composer framework package for Durin applications (composition, CLI, and DX over MithrilPHP)",
     "type": "library",
     "license": "MIT",
     "keywords": [
@@ -25,9 +25,9 @@
         }
     ],
     "require": {
-        "ereborcodeforge/durin-architecture": "^0.1.3",
-        "ereborcodeforge/durin-core": "^0.1",
-        "ereborcodeforge/durin-presets": "^0.2.1",
+        "ereborcodeforge/durin-architecture": "^0.1.4",
+        "ereborcodeforge/durin-core": "^0.2",
+        "ereborcodeforge/durin-presets": "^0.3",
         "ereborcodeforge/mazarbul": "^1.0",
         "ereborcodeforge/mithrilphp": "^2.2",
         "ext-msgpack": "*",

@@ -7,6 +7,7 @@ namespace EreborCodeForge\Durin\Forge\Tests\Unit\Tooling\Project;
 use EreborCodeForge\Durin\Core\Manifest\DurinManifest;
 use EreborCodeForge\Durin\Core\Manifest\DurinManifestException;
 use EreborCodeForge\Durin\Core\Manifest\DurinManifestParser;
+use EreborCodeForge\Durin\Core\Runtime\ResolvedRuntime;
 use PHPUnit\Framework\TestCase;
 
 final class DurinManifestParserTest extends TestCase
@@ -35,9 +36,10 @@ YAML;
 
         $this->assertSame('billing', $manifest->applicationName);
         $this->assertSame('service', $manifest->preset);
-        $this->assertSame('mithril', $manifest->runtimeEngine);
-        $this->assertSame('eregion', $manifest->runtimeServer);
-        $this->assertSame('http', $manifest->runtimeMode);
+        $this->assertNotNull($manifest->runtime);
+        $this->assertSame('mithril', $manifest->runtime->engine);
+        $this->assertSame('eregion', $manifest->runtime->supervisor);
+        $this->assertSame('http', $manifest->runtime->mode);
         $this->assertFalse($manifest->isJobMode());
     }
 
@@ -48,9 +50,9 @@ application:
   name: notifications
   preset: worker
 runtime:
-  engine: mithril
-  server: none
   mode: job
+  engine: mithril
+  execution: mithril-job
 features:
   http: false
   messaging: true
@@ -59,8 +61,29 @@ architecture:
 YAML);
 
         $this->assertTrue($manifest->isJobMode());
-        $this->assertSame('job', $manifest->runtimeMode);
-        $this->assertSame('none', $manifest->runtimeServer);
+        $this->assertNotNull($manifest->runtime);
+        $this->assertSame('job', $manifest->runtime->mode);
+        $this->assertSame('mithril-job', $manifest->runtime->execution);
+        $this->assertNull($manifest->runtime->supervisor);
+    }
+
+    public function test_parses_unresolved_runtime(): void
+    {
+        $manifest = (new DurinManifestParser())->parse(<<<'YAML'
+application:
+  name: bare
+  preset: uninitialized
+runtime:
+  state: unresolved
+features:
+  http: false
+  messaging: false
+architecture:
+  modules: false
+YAML);
+
+        $this->assertNull($manifest->runtime);
+        $this->assertFalse($manifest->isResolved());
     }
 
     public function test_round_trip_yaml(): void
@@ -68,10 +91,14 @@ YAML);
         $original = new DurinManifest(
             applicationName: 'catalog',
             preset: 'minimal',
-            runtimeEngine: 'mithril',
-            runtimeServer: 'eregion',
             features: ['http' => true, 'messaging' => false],
             architecture: ['modules' => false],
+            runtime: new ResolvedRuntime(
+                mode: 'http',
+                engine: 'mithril',
+                execution: 'mithril-http',
+                supervisor: 'eregion',
+            ),
         );
 
         $parsed = (new DurinManifestParser())->parse($original->toYaml());
@@ -79,26 +106,26 @@ YAML);
         $this->assertSame($original->toArray(), $parsed->toArray());
     }
 
-    public function test_rejects_missing_application_name(): void
+    public function test_rejects_invalid_application_section(): void
     {
         $this->expectException(DurinManifestException::class);
-
         (new DurinManifestParser())->parse(<<<'YAML'
-application:
-  preset: minimal
+runtime:
+  engine: mithril
 YAML);
     }
 
-    public function test_applies_runtime_defaults(): void
+    public function test_defaults_features_when_absent(): void
     {
         $manifest = (new DurinManifestParser())->parse(<<<'YAML'
 application:
-  name: api
+  name: bare
   preset: minimal
+runtime:
+  state: unresolved
 YAML);
 
-        $this->assertSame('mithril', $manifest->runtimeEngine);
-        $this->assertSame('eregion', $manifest->runtimeServer);
-        $this->assertSame('http', $manifest->runtimeMode);
+        $this->assertFalse($manifest->features['http']);
+        $this->assertFalse($manifest->features['messaging']);
     }
 }

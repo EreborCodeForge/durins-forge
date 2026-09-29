@@ -68,7 +68,7 @@ final class RuntimeResolverTest extends TestCase
 
         $this->resolver->resolve(new RuntimeProfile(
             mode: 'http',
-            capabilities: ['quantum-entanglement'],
+            requiredCapabilities: ['quantum-entanglement'],
         ));
     }
 
@@ -76,8 +76,8 @@ final class RuntimeResolverTest extends TestCase
     {
         $plan = $this->resolver->resolve(new RuntimeProfile(
             mode: 'worker',
-            runner: 'mithril-job',
-            capabilities: ['messaging'],
+            requiredCapabilities: ['messaging'],
+            preferredRunner: 'mithril-job',
         ));
 
         $this->assertSame('mithril-job', $plan->executionRuntime);
@@ -91,7 +91,7 @@ final class RuntimeResolverTest extends TestCase
 
         $this->resolver->resolve(new RuntimeProfile(
             mode: 'http',
-            runner: 'mithril-job',
+            preferredRunner: 'mithril-job',
         ));
     }
 
@@ -99,8 +99,8 @@ final class RuntimeResolverTest extends TestCase
     {
         $plan = $this->resolver->resolve(new RuntimeProfile(
             mode: 'worker',
-            runner: 'eregion',
-            capabilities: ['messaging'],
+            requiredCapabilities: ['messaging'],
+            preferredRunner: 'eregion',
         ));
 
         $this->assertSame('mithril-job', $plan->executionRuntime);
@@ -108,9 +108,12 @@ final class RuntimeResolverTest extends TestCase
         $this->assertTrue($plan->usesEregion());
     }
 
-    public function test_no_silent_eregion_fallback_when_runner_null_on_worker(): void
+    public function test_no_silent_eregion_fallback_when_preferred_runner_null_on_worker(): void
     {
-        $profile = new RuntimeProfile(mode: 'worker', runner: null, capabilities: ['messaging']);
+        $profile = new RuntimeProfile(
+            mode: 'worker',
+            requiredCapabilities: ['messaging'],
+        );
         $plan = $this->resolver->resolve($profile);
 
         $this->assertNull($plan->supervisor);

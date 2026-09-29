@@ -155,8 +155,9 @@ final class InitCommandTest extends TestCase
         ], $complete['runtime']);
 
         $yaml = (string) file_get_contents($this->tempRoot . '/durin.yaml');
-        $this->assertStringContainsString('server: none', $yaml);
+        $this->assertStringContainsString('execution: mithril-job', $yaml);
         $this->assertStringContainsString('mode: job', $yaml);
+        $this->assertStringNotContainsString('supervisor:', $yaml);
         $this->assertFileDoesNotExist($this->tempRoot . '/eregion.yaml');
     }
 
@@ -200,11 +201,11 @@ final class InitCommandTest extends TestCase
         $this->assertStringContainsString('already initialized', $output);
     }
 
-    public function test_http_profile_resolves_eregion_supervisor_when_runner_null(): void
+    public function test_http_profile_resolves_eregion_supervisor_when_preferred_runner_null(): void
     {
         $registry = (new DefaultPresetRegistryFactory())->create();
         $definition = $registry->definition('service');
-        $this->assertNull($definition->runtime()->runner);
+        $this->assertNull($definition->runtime()->preferredRunner);
 
         $provisioner = new RuntimeProvisioner(
             installer: new class extends \EreborCodeForge\Durin\Forge\Tooling\Runtime\EregionInstaller {
