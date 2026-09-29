@@ -114,16 +114,16 @@
         },
         {
             "name": "ereborcodeforge/durin-presets",
-            "version": "0.3.1",
+            "version": "0.3.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/EreborCodeForge/durin-presets.git",
-                "reference": "5bd3494e02617addfdabdc8fcc4b2270e17fa16a"
+                "reference": "0ce00265a935c15b7b471fde9eeff2932974874f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/EreborCodeForge/durin-presets/zipball/5bd3494e02617addfdabdc8fcc4b2270e17fa16a",
-                "reference": "5bd3494e02617addfdabdc8fcc4b2270e17fa16a",
+                "url": "https://api.github.com/repos/EreborCodeForge/durin-presets/zipball/0ce00265a935c15b7b471fde9eeff2932974874f",
+                "reference": "0ce00265a935c15b7b471fde9eeff2932974874f",
                 "shasum": ""
             },
             "require": {
@@ -139,16 +139,7 @@
                     "EreborCodeForge\\Durin\\Presets\\": "src/"
                 }
             },
-            "autoload-dev": {
-                "psr-4": {
-                    "EreborCodeForge\\Durin\\Presets\\Tests\\": "tests/"
-                }
-            },
-            "scripts": {
-                "test": [
-                    "phpunit"
-                ]
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -160,10 +151,10 @@
             ],
             "description": "Architecture presets and project-shape policies for Durin.",
             "support": {
-                "source": "https://github.com/EreborCodeForge/durin-presets/tree/v0.3.1",
-                "issues": "https://github.com/EreborCodeForge/durin-presets/issues"
+                "issues": "https://github.com/EreborCodeForge/durin-presets/issues",
+                "source": "https://github.com/EreborCodeForge/durin-presets/tree/v0.3.3"
             },
-            "time": "2026-09-29T01:18:32+00:00"
+            "time": "2026-09-29T02:01:22+00:00"
         },
         {
             "name": "ereborcodeforge/mazarbul",
