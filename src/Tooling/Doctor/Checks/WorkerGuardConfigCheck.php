@@ -6,10 +6,10 @@ namespace EreborCodeForge\Durin\Forge\Tooling\Doctor\Checks;
 
 use Erebor\Mithril\Runtime\Guard\GuardConfig;
 use Erebor\Mithril\Runtime\Guard\GuardConfigException;
+use Erebor\Mithril\Runtime\Guard\GuardMode;
 use EreborCodeForge\Durin\Forge\Tooling\Doctor\Check;
 use EreborCodeForge\Durin\Forge\Tooling\Doctor\CheckResult;
 use EreborCodeForge\Durin\Forge\Tooling\Doctor\DoctorContext;
-use EreborCodeForge\Durin\Forge\Tooling\Doctor\DoctorExitCode;
 
 final class WorkerGuardConfigCheck implements Check
 {
@@ -29,11 +29,20 @@ final class WorkerGuardConfigCheck implements Check
             $config = GuardConfig::loadFile($path, false);
         } catch (GuardConfigException) {
             return [
-                CheckResult::fail(
+                CheckResult::warning(
                     $this->id(),
                     'WorkerGuard',
-                    'config/worker_guard.php is invalid',
-                    DoctorExitCode::InvalidConfiguration,
+                    'WorkerGuard invalid configuration; guard disabled for this worker. Run `durin doctor --strict`',
+                ),
+            ];
+        }
+
+        if ($config->mode === GuardMode::Audit) {
+            return [
+                CheckResult::warning(
+                    $this->id(),
+                    'WorkerGuard',
+                    'mode=audit is not valid for the HTTP worker. Run `durin doctor --strict`',
                 ),
             ];
         }
