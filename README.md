@@ -148,6 +148,22 @@ Inclui fronteira de namespace (`App\` proibido em `src/`), contrato dos presets 
 
 ---
 
+## WorkerGuard
+
+`durin worker:audit` roda dois requests artificiais no mesmo worker, em memória, sem subir o Eregion e sem escrever em `vendor/`. Um watchpoint explícito não é isolamento geral: o Guard só vê o que a app registrou.
+
+Copie [`resources/stubs/config/worker_guard.php`](resources/stubs/config/worker_guard.php) para `config/worker_guard.php` na app. O default é `off`.
+
+```bash
+php bin/durin worker:audit --scenario=tests/WorkerGuard/CleanScenario.php
+php bin/durin worker:audit --scenario=tests/WorkerGuard/CleanScenario.php --format=json
+php bin/durin worker:audit --scenario=tests/WorkerGuard/ContaminatedScenario.php --strict
+```
+
+Exit `0` limpo, `1` finding relevante (`--strict` inclui warning), `2` cenário, config ou bootstrap inválido. O relatório fica em `var/worker-guard/latest.json`.
+
+---
+
 ## Próximo passo
 
 O pacote de aplicação mínima **`durin-app`** (e depois `durin-installer`) ainda não faz parte deste repositório. Este package está pronto para ser consumido via Composer conforme [ADR-0005](docs/adr/ADR-0005-forge-consumer-mode.md).

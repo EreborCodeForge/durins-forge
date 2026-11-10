@@ -13,6 +13,7 @@ use EreborCodeForge\Durin\Forge\Tooling\Doctor\Checks\PhpVersionCheck;
 use EreborCodeForge\Durin\Forge\Tooling\Doctor\Checks\ProjectComposerCheck;
 use EreborCodeForge\Durin\Forge\Tooling\Doctor\Checks\ProjectKernelCheck;
 use EreborCodeForge\Durin\Forge\Tooling\Doctor\Checks\ProjectManifestCheck;
+use EreborCodeForge\Durin\Forge\Tooling\Doctor\Checks\WorkerGuardConfigCheck;
 
 final class DoctorRunner
 {
@@ -50,6 +51,7 @@ final class DoctorRunner
             new MithrilPackageCheck(),
             new JobRuntimeCheck(),
             new EregionRuntimeCheck(),
+            new WorkerGuardConfigCheck(),
         ];
     }
 }

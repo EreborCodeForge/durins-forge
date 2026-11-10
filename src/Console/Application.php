@@ -28,6 +28,7 @@ use EreborCodeForge\Durin\Forge\Console\Commands\RunCommand;
 use EreborCodeForge\Durin\Forge\Console\Commands\SeedCommand;
 use EreborCodeForge\Durin\Forge\Console\Commands\ServeCommand;
 use EreborCodeForge\Durin\Forge\Console\Commands\StatusCommand;
+use EreborCodeForge\Durin\Forge\Console\Commands\WorkerAuditCommand;
 use Erebor\Mithril\Console\Kernel as MithrilKernel;
 
 class Application
@@ -58,6 +59,7 @@ class Application
         $kernel->register(DevCommand::class);
         $kernel->register(StatusCommand::class);
         $kernel->register(DoctorCommand::class);
+        $kernel->register(WorkerAuditCommand::class);
         $kernel->register(GraphDependenciesCommand::class);
         return $kernel->handle($argv);
     }
