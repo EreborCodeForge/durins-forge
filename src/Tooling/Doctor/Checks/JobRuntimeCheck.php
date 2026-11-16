@@ -6,14 +6,24 @@ namespace EreborCodeForge\Durin\Forge\Tooling\Doctor\Checks;
 
 use EreborCodeForge\Durin\Forge\Tooling\Doctor\Check;
 use EreborCodeForge\Durin\Forge\Tooling\Doctor\CheckResult;
+use EreborCodeForge\Durin\Forge\Tooling\Doctor\CliEregionConfigProbe;
 use EreborCodeForge\Durin\Forge\Tooling\Doctor\DoctorContext;
+use EreborCodeForge\Durin\Forge\Tooling\Doctor\DoctorExitCode;
+use EreborCodeForge\Durin\Forge\Tooling\Doctor\EregionConfigProbe;
 use EreborCodeForge\Durin\Forge\Tooling\Runtime\RuntimePlan;
+use Erebor\Mithril\Runtime\Eregion\EregionBinaryResolver;
+use Erebor\Mithril\Runtime\Eregion\Exceptions\EregionBinaryException;
 
 /**
  * Job execution checks driven by RuntimePlan (standalone or supervised).
  */
 final class JobRuntimeCheck implements Check
 {
+    public function __construct(
+        private readonly EregionConfigProbe $probe = new CliEregionConfigProbe(),
+        private readonly EregionBinaryResolver $binaries = new EregionBinaryResolver(),
+    ) {}
+
     public function id(): string
     {
         return 'runtime.job';
@@ -78,14 +88,7 @@ final class JobRuntimeCheck implements Check
             );
             $config = $root . DIRECTORY_SEPARATOR . 'eregion.yaml';
             if (is_file($config)) {
-                $yaml = (string) file_get_contents($config);
-                $results[] = (str_contains($yaml, 'mode: consumer') && str_contains($yaml, 'vendor/bin/job-worker'))
-                    ? CheckResult::ok('runtime.job.consumer_workload', 'consumer workload', 'present in eregion.yaml')
-                    : CheckResult::warning(
-                        'runtime.job.consumer_workload',
-                        'consumer workload',
-                        'eregion.yaml missing consumer job-worker workload',
-                    );
+                $results[] = $this->consumerWorkload($root, $config);
             } else {
                 $results[] = CheckResult::warning(
                     'runtime.job.consumer_workload',
@@ -102,5 +105,39 @@ final class JobRuntimeCheck implements Check
         }
 
         return $results;
+    }
+
+    private function consumerWorkload(string $root, string $configPath): CheckResult
+    {
+        try {
+            $located = $this->binaries->locate($root);
+        } catch (EregionBinaryException) {
+            $located = null;
+        }
+        if ($located === null) {
+            return CheckResult::warning(
+                'runtime.job.consumer_workload',
+                'consumer workload',
+                'not validated; eregion binary unavailable',
+            );
+        }
+
+        $report = $this->probe->probe($located['path'], $configPath);
+        if (!$report->validated || !$report->hasMode('consumer')) {
+            return CheckResult::fail(
+                'runtime.job.consumer_workload',
+                'consumer workload',
+                $report->validated
+                    ? 'eregion check did not report a consumer workload'
+                    : $report->detail,
+                DoctorExitCode::RuntimeIncompatibility,
+            );
+        }
+
+        return CheckResult::ok(
+            'runtime.job.consumer_workload',
+            'consumer workload',
+            'validated by eregion check; process not probed',
+        );
     }
 }

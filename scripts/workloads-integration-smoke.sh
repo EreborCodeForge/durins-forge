@@ -58,7 +58,12 @@ JOB_WORKER_BIN="${JOB_WORKER_BIN:-$FORGE/vendor/ereborcodeforge/mithrilphp/bin/j
 
 pass() { echo "PASS  $1"; }
 fail() { echo "FAIL  $1 — $2" >&2; exit 1; }
-skip() { echo "SKIP  $1 — $2"; }
+skip() {
+  if [[ "${DURIN_SMOKE_REQUIRED:-}" == "1" ]]; then
+    fail "$1" "required matrix cannot skip: $2"
+  fi
+  echo "SKIP  $1 — $2"
+}
 
 require_bin() {
   local label="$1" path="$2"

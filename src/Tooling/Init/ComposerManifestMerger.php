@@ -12,6 +12,8 @@ use EreborCodeForge\Durin\Forge\Tooling\Runtime\RuntimePlan;
  */
 final class ComposerManifestMerger
 {
+    public const string APPROVED_EREGION_PIN = 'v0.4.2';
+
     private const array IDENTITY_KEYS = [
         'name',
         'description',
@@ -112,7 +114,7 @@ final class ComposerManifestMerger
         if ($runtime->usesEregion()) {
             $currentPin = $mithril['eregion'] ?? null;
             if (!is_string($currentPin) || $currentPin === '' || self::isBelowEregionBaseline($currentPin)) {
-                $mithril['eregion'] = 'v0.4.0';
+                $mithril['eregion'] = self::APPROVED_EREGION_PIN;
             }
             if (!isset($mithril['eregion_repo']) || !is_string($mithril['eregion_repo']) || $mithril['eregion_repo'] === '') {
                 $mithril['eregion_repo'] = 'EreborCodeForge/eregion';
@@ -153,6 +155,6 @@ final class ComposerManifestMerger
 
     private static function isBelowEregionBaseline(string $pin): bool
     {
-        return version_compare(ltrim($pin, "vV"), '0.4.0', '<');
+        return version_compare(ltrim($pin, 'vV'), ltrim(self::APPROVED_EREGION_PIN, 'vV'), '<');
     }
 }

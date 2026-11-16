@@ -32,6 +32,10 @@ vendor/bin/durin make:feature ...
 
 Apps geradas por `durin new` já declaram `ereborcodeforge/durins-forge` e documentam `vendor/bin/durin`.
 
+### Matriz de distribuição
+
+Smoke de pull request valida o código da branch (`composer validate --strict`, `check-platform-reqs`, testes de init). Smoke de release usa só artefatos do Packagist (`durins-forge:^0.4` e `durin-app:^0.4` + `durin init`). Pacote ou versão ausente falha o job. `DURIN_SMOKE_REQUIRED=1` faz o script `scripts/workloads-integration-smoke.sh` tratar `SKIP` como `FAIL`. App gerada não declara `repositories` nem `minimum-stability: dev`. Publicação no Packagist não faz parte deste fluxo.
+
 ### Desenvolvimento deste repositório
 
 ```bash

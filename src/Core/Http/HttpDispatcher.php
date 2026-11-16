@@ -19,13 +19,15 @@ final class HttpDispatcher
         private readonly Router $router,
         private readonly HandlerResolver $resolver,
         private readonly PipelineContract $pipeline,
+        private readonly ?HttpStageProfiler $profiler = null,
     ) {}
 
     public function dispatch(Request $request): Response
     {
+        $profiler = $this->profiler ?? HttpStageProfiler::fromEnvironment();
         try {
-            $match = $this->router->match($request);
-            $handler = $this->resolver->resolve($match->handler);
+            $match = $profiler->measure('match', fn () => $this->router->match($request));
+            $handler = $profiler->measure('resolve', fn () => $this->resolver->resolve($match->handler));
 
             $context = new HttpContext($request);
             $context->set('route.handler', $match->handler);
@@ -38,10 +40,10 @@ final class HttpDispatcher
                     : throw new RuntimeException('Route handler must return a Response instance.');
             };
 
-            $result = $this->pipeline
-                ->send($context)
-                ->through($match->middlewares)
-                ->then($destination);
+            $result = $profiler->measure(
+                'pipelines',
+                fn () => $this->pipeline->send($context)->through($match->middlewares)->then($destination),
+            );
 
             if (!$result instanceof Response) {
                 throw new RuntimeException('Pipeline must return a Response instance.');
@@ -49,7 +51,7 @@ final class HttpDispatcher
 
             return $result;
         } finally {
-            DB::onRequestEnd();
+            $profiler->measure('db.onRequestEnd', static fn () => DB::onRequestEnd());
         }
     }
 }

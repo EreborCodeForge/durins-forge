@@ -39,6 +39,7 @@ final class RecordingRunProcessRunner implements RuntimeProcessRunner
 final class RuntimeLauncherRegistryTest extends TestCase
 {
     private string $root;
+    private string $eregionBinary;
     private RecordingRunProcessRunner $runner;
     private RuntimeLauncherRegistry $registry;
 
@@ -49,13 +50,17 @@ final class RuntimeLauncherRegistryTest extends TestCase
         mkdir($this->root . '/vendor/bin', 0777, true);
         file_put_contents($this->root . '/vendor/bin/forge', "#!/usr/bin/env php\n<?php\n");
         file_put_contents($this->root . '/vendor/bin/job-worker', "#!/usr/bin/env php\n<?php\n");
+        $eregionDir = $this->root . '/.mithril/bin';
+        mkdir($eregionDir, 0777, true);
+        $this->eregionBinary = $eregionDir . '/' . (PHP_OS_FAMILY === 'Windows' ? 'eregion.exe' : 'eregion');
+        file_put_contents($this->eregionBinary, 'eregion');
 
         $this->runner = new RecordingRunProcessRunner();
         $locator = new RuntimeBinaryLocator();
         $this->registry = new RuntimeLauncherRegistry([
             new HttpEregionLauncher($this->runner, $locator, $this->root . '/vendor/bin/forge'),
             new MithrilJobLauncher($this->runner, $locator, $this->root . '/vendor/bin/job-worker'),
-            new EregionJobLauncher($this->runner, $locator, $this->root . '/vendor/bin/forge'),
+            new EregionJobLauncher($this->runner, $locator, $this->eregionBinary),
         ]);
     }
 
@@ -100,7 +105,7 @@ final class RuntimeLauncherRegistryTest extends TestCase
         $code = $launcher->launch($plan, new RunOptions($this->root));
         $this->assertSame(0, $code);
         $this->assertCount(1, $this->runner->calls);
-        $this->assertStringContainsString('forge', $this->runner->calls[0]['binary']);
+        $this->assertSame($this->eregionBinary, $this->runner->calls[0]['binary']);
         $this->assertSame('serve', $this->runner->calls[0]['arguments'][0]);
     }
 

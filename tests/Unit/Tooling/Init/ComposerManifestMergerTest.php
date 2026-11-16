@@ -48,7 +48,7 @@ final class ComposerManifestMergerTest extends TestCase
         $this->assertSame(['psr-4' => ['App\\' => 'src/']], $merged['autoload']);
         $this->assertSame('^0.1', $merged['require']['ereborcodeforge/durins-forge']);
         $this->assertSame('App\\Kernel', $merged['extra']['mithril']['kernel']);
-        $this->assertSame('v0.4.0', $merged['extra']['mithril']['eregion']);
+        $this->assertSame('v0.4.2', $merged['extra']['mithril']['eregion']);
         $this->assertArrayNotHasKey('job_kernel', $merged['extra']['mithril']);
         $this->assertSame('phpunit', $merged['scripts']['test']);
     }
@@ -69,7 +69,7 @@ final class ComposerManifestMergerTest extends TestCase
             new RuntimePlan('http', 'mithril-http', 'eregion', ['persistent-http']),
         );
 
-        $this->assertSame('v0.4.0', $merged['extra']['mithril']['eregion']);
+        $this->assertSame('v0.4.2', $merged['extra']['mithril']['eregion']);
     }
 
     public function test_job_runtime_strips_eregion_and_http_kernel(): void
@@ -130,7 +130,7 @@ final class ComposerManifestMergerTest extends TestCase
 
         $this->assertSame('App\\JobKernel', $merged['extra']['mithril']['job_kernel']);
         $this->assertArrayNotHasKey('kernel', $merged['extra']['mithril']);
-        $this->assertSame('v0.4.0', $merged['extra']['mithril']['eregion']);
+        $this->assertSame('v0.4.2', $merged['extra']['mithril']['eregion']);
         $this->assertSame('EreborCodeForge/eregion', $merged['extra']['mithril']['eregion_repo']);
     }
 }

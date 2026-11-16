@@ -11,8 +11,11 @@ use EreborCodeForge\Durin\Core\Runtime\ResolvedRuntime;
 use EreborCodeForge\Durin\Forge\Tooling\Doctor\CheckResult;
 use EreborCodeForge\Durin\Forge\Tooling\Doctor\CheckStatus;
 use EreborCodeForge\Durin\Forge\Tooling\Doctor\DoctorContext;
+use EreborCodeForge\Durin\Forge\Tooling\Doctor\EregionConfigProbe;
+use EreborCodeForge\Durin\Forge\Tooling\Doctor\EregionConfigReport;
 use EreborCodeForge\Durin\Forge\Tooling\Doctor\Checks\EregionRuntimeCheck;
 use EreborCodeForge\Durin\Forge\Tooling\Doctor\Checks\JobRuntimeCheck;
+use EreborCodeForge\Durin\Forge\Tooling\Doctor\JsonDoctorRenderer;
 use PHPUnit\Framework\TestCase;
 
 final class RuntimePlanDoctorCheckTest extends TestCase
@@ -90,6 +93,9 @@ YAML);
         file_put_contents($root . '/composer.json', json_encode([
             'extra' => ['mithril' => ['eregion' => 'v0.4.0']],
         ], JSON_THROW_ON_ERROR));
+        $binDir = $root . '/.mithril/bin';
+        mkdir($binDir, 0777, true);
+        copy($this->fixtureBinary(), $binDir . '/' . (PHP_OS_FAMILY === 'Windows' ? 'eregion.exe' : 'eregion'));
 
         try {
             $manifest = new DurinManifest(
@@ -105,25 +111,177 @@ YAML);
                 ),
             );
             $project = new Project(new ProjectPaths($root), $manifest);
-            $results = (new EregionRuntimeCheck())->run(new DoctorContext($project));
+            $results = (new EregionRuntimeCheck($this->validatedConsumerProbe()))->run(new DoctorContext($project));
             $ids = array_map(static fn (CheckResult $r): string => $r->id, $results);
 
             $this->assertNotContains('runtime.eregion.worker', $ids);
+            $this->assertContains('runtime.eregion.binary_path', $ids);
+            $this->assertContains('runtime.eregion.version', $ids);
+            $this->assertContains('runtime.eregion.protocol', $ids);
             $this->assertContains('runtime.eregion.consumer_worker', $ids);
             $this->assertContains('runtime.eregion.consumer_workload', $ids);
 
             foreach ($results as $result) {
                 if (in_array($result->id, ['runtime.eregion.consumer_worker', 'runtime.eregion.consumer_workload'], true)) {
+                    $this->assertSame(CheckStatus::Ok, $result->status, $result->detail);
+                }
+                if ($result->id === 'runtime.eregion.metrics_access') {
                     $this->assertSame(CheckStatus::Ok, $result->status);
+                    $this->assertSame('loopback', $result->detail);
                 }
             }
         } finally {
-            @unlink($root . '/vendor/bin/job-worker');
-            @rmdir($root . '/vendor/bin');
-            @rmdir($root . '/vendor');
-            @unlink($root . '/eregion.yaml');
-            @unlink($root . '/composer.json');
-            @rmdir($root);
+            $this->removeTree($root);
         }
+    }
+
+    public function test_commented_consumer_text_is_not_a_validated_workload(): void
+    {
+        $root = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'durin_comment_workload_' . uniqid('', true);
+        mkdir($root . '/.mithril/bin', 0777, true);
+        copy($this->fixtureBinary(), $root . '/.mithril/bin/' . (PHP_OS_FAMILY === 'Windows' ? 'eregion.exe' : 'eregion'));
+        file_put_contents($root . '/eregion.yaml', "# mode: consumer\n# vendor/bin/job-worker\nserver:\n  host: 127.0.0.1\n");
+        file_put_contents($root . '/composer.json', '{"extra":{"mithril":{"eregion":"v0.4.2","token":"SECRET_TOKEN"}}}');
+
+        $probe = new class implements EregionConfigProbe {
+            public function probe(string $binary, string $configPath): EregionConfigReport
+            {
+                return EregionConfigReport::fromOutput(0, <<<'OUT'
+OK: configuration is valid
+  workloads=1
+    - http mode=http workers=1..1
+  metrics_access=unset
+OUT, '');
+            }
+        };
+
+        try {
+            $manifest = new DurinManifest(
+                applicationName: 'jobs',
+                preset: 'worker',
+                features: ['http' => false, 'messaging' => true],
+                architecture: ['modules' => false],
+                runtime: new ResolvedRuntime(
+                    mode: 'job',
+                    engine: 'mithril',
+                    execution: 'mithril-job',
+                    supervisor: 'eregion',
+                ),
+            );
+            $results = (new EregionRuntimeCheck($probe))->run(new DoctorContext(new Project(new ProjectPaths($root), $manifest)));
+            $workload = null;
+            foreach ($results as $result) {
+                if ($result->id === 'runtime.eregion.consumer_workload') {
+                    $workload = $result;
+                }
+            }
+            $this->assertNotNull($workload);
+            $this->assertSame(CheckStatus::Fail, $workload->status);
+
+            $json = (new JsonDoctorRenderer())->render(new \EreborCodeForge\Durin\Forge\Tooling\Doctor\DoctorReport($results));
+            $this->assertStringNotContainsString('SECRET_TOKEN', $json);
+            $decoded = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
+            $this->assertArrayHasKey('runtime', $decoded);
+            $this->assertSame('unset; doctor --strict requires loopback or public', $decoded['runtime']['metrics_access']);
+            $this->assertArrayHasKey('summary', $decoded);
+            $this->assertArrayHasKey('checks', $decoded);
+        } finally {
+            $this->removeTree($root);
+        }
+    }
+
+    public function test_eco01_doctor_fails_when_binary_version_mismatches_pin(): void
+    {
+        $fixture = dirname(__DIR__, 6) . DIRECTORY_SEPARATOR . 'mithrilphp' . DIRECTORY_SEPARATOR
+            . 'tests' . DIRECTORY_SEPARATOR . 'Fixtures' . DIRECTORY_SEPARATOR . 'eco01fixture' . DIRECTORY_SEPARATOR
+            . (PHP_OS_FAMILY === 'Windows' ? 'fixture.exe' : 'fixture');
+        if (!is_file($fixture)) {
+            $this->fail('ECO-01 fixture binary is missing: ' . $fixture);
+        }
+
+        $root = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'durin_eco01_doctor_' . uniqid('', true);
+        $binary = $root . DIRECTORY_SEPARATOR . '.mithril' . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR
+            . (PHP_OS_FAMILY === 'Windows' ? 'eregion.exe' : 'eregion');
+        mkdir(dirname($binary), 0777, true);
+        copy($fixture, $binary);
+        file_put_contents($binary . '.mode', 'old');
+        file_put_contents($root . '/composer.json', json_encode([
+            'extra' => ['mithril' => ['eregion' => 'v0.4.2']],
+        ], JSON_THROW_ON_ERROR));
+
+        try {
+            $manifest = new DurinManifest(
+                applicationName: 'jobs',
+                preset: 'worker',
+                features: ['http' => false, 'messaging' => true],
+                architecture: ['modules' => false],
+                runtime: new ResolvedRuntime(
+                    mode: 'job',
+                    engine: 'mithril',
+                    execution: 'mithril-job',
+                    supervisor: 'eregion',
+                ),
+            );
+            $results = (new EregionRuntimeCheck())->run(new DoctorContext(new Project(new ProjectPaths($root), $manifest)));
+            $version = null;
+            foreach ($results as $result) {
+                if ($result->id === 'runtime.eregion.version') {
+                    $version = $result;
+                }
+            }
+            $this->assertNotNull($version);
+            $this->assertSame(CheckStatus::Fail, $version->status);
+            $this->assertStringContainsString('v0.4.2', $version->detail);
+            $this->assertStringContainsString('0.1.0', $version->detail);
+        } finally {
+            $this->removeTree($root);
+        }
+    }
+
+    private function fixtureBinary(): string
+    {
+        $fixture = dirname(__DIR__, 6) . DIRECTORY_SEPARATOR . 'mithrilphp' . DIRECTORY_SEPARATOR
+            . 'tests' . DIRECTORY_SEPARATOR . 'Fixtures' . DIRECTORY_SEPARATOR . 'eco01fixture' . DIRECTORY_SEPARATOR
+            . (PHP_OS_FAMILY === 'Windows' ? 'fixture.exe' : 'fixture');
+        if (!is_file($fixture)) {
+            $this->fail('ECO-01 fixture binary is missing: ' . $fixture);
+        }
+
+        return $fixture;
+    }
+
+    private function validatedConsumerProbe(): EregionConfigProbe
+    {
+        return new class implements EregionConfigProbe {
+            public function probe(string $binary, string $configPath): EregionConfigReport
+            {
+                return EregionConfigReport::fromOutput(0, <<<'OUT'
+OK: configuration is valid
+  workloads=1
+    - application-worker mode=consumer workers=1..1
+  metrics_access=loopback
+OUT, '');
+            }
+        };
+    }
+
+    private function removeTree(string $path): void
+    {
+        if (!is_dir($path)) {
+            return;
+        }
+        $items = scandir($path) ?: [];
+        foreach ($items as $item) {
+            if ($item === '.' || $item === '..') {
+                continue;
+            }
+            $full = $path . DIRECTORY_SEPARATOR . $item;
+            if (is_dir($full)) {
+                $this->removeTree($full);
+            } else {
+                @unlink($full);
+            }
+        }
+        @rmdir($path);
     }
 }

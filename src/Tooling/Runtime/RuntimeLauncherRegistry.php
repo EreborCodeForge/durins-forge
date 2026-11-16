@@ -33,7 +33,7 @@ final class RuntimeLauncherRegistry
         return new self([
             new HttpEregionLauncher($runner, $locator, $forgeBinary),
             new MithrilJobLauncher($runner, $locator, $jobWorkerBinary),
-            new EregionJobLauncher($runner, $locator, $forgeBinary),
+            new EregionJobLauncher(new NativeProcessRunner(), $locator),
         ]);
     }
 
