@@ -114,16 +114,16 @@
         },
         {
             "name": "ereborcodeforge/durin-presets",
-            "version": "0.3.3",
+            "version": "v0.3.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/EreborCodeForge/durin-presets.git",
-                "reference": "0ce00265a935c15b7b471fde9eeff2932974874f"
+                "reference": "4f464dd31974912030856721c71a38cdfe33b6df"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/EreborCodeForge/durin-presets/zipball/0ce00265a935c15b7b471fde9eeff2932974874f",
-                "reference": "0ce00265a935c15b7b471fde9eeff2932974874f",
+                "url": "https://api.github.com/repos/EreborCodeForge/durin-presets/zipball/4f464dd31974912030856721c71a38cdfe33b6df",
+                "reference": "4f464dd31974912030856721c71a38cdfe33b6df",
                 "shasum": ""
             },
             "require": {
@@ -152,9 +152,9 @@
             "description": "Architecture presets and project-shape policies for Durin.",
             "support": {
                 "issues": "https://github.com/EreborCodeForge/durin-presets/issues",
-                "source": "https://github.com/EreborCodeForge/durin-presets/tree/v0.3.3"
+                "source": "https://github.com/EreborCodeForge/durin-presets/tree/v0.3.5"
             },
-            "time": "2026-09-29T02:01:22+00:00"
+            "time": "2026-11-16T17:24:26+00:00"
         },
         {
             "name": "ereborcodeforge/mazarbul",
