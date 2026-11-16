@@ -145,6 +145,8 @@ YAML);
 
         $yaml = (string) file_get_contents($root . '/eregion.yaml');
         $this->assertStringContainsString('server:', $yaml);
+        $this->assertStringContainsString('worker_script: vendor/bin/eregion-worker', $yaml);
+        $this->assertStringNotContainsString("\nworker:\n", "\n" . $yaml);
         $this->assertStringNotContainsString('mode: consumer', $yaml);
         $this->assertStringNotContainsString('vendor/bin/job-worker', $yaml);
     }

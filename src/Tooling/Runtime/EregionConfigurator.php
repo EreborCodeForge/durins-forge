@@ -31,12 +31,43 @@ class EregionConfigurator
     ): array {
         $craft = $this->craft ?? new EregionCraft(new ApplicationResolver($applicationRoot));
         $actions = $craft->craft(force: $force);
+        $normalized = $this->normalizeStarter($applicationRoot);
+        if ($normalized !== null) {
+            $actions[] = $normalized;
+        }
 
         if ($plan !== null && $plan->isJobExecution() && $plan->usesEregion()) {
             $actions[] = $this->ensureJobWorkload($applicationRoot);
         }
 
         return array_values(array_filter($actions));
+    }
+
+    /**
+     * @return array{path: string, action: string}|null
+     */
+    private function normalizeStarter(string $applicationRoot): ?array
+    {
+        $path = $applicationRoot . DIRECTORY_SEPARATOR . 'eregion.yaml';
+        if (!is_file($path)) {
+            return null;
+        }
+
+        $existing = (string) file_get_contents($path);
+        $normalized = $this->stripLegacySingularWorkerKey($existing);
+        if (!str_contains($normalized, 'worker_script:')) {
+            $normalized = rtrim($normalized) . "\n\nphp:\n  worker_script: vendor/bin/eregion-worker\n";
+        }
+
+        if ($normalized === $existing) {
+            return ['path' => $path, 'action' => 'exists'];
+        }
+
+        if (file_put_contents($path, $normalized) === false) {
+            throw new \RuntimeException("Unable to update {$path}");
+        }
+
+        return ['path' => $path, 'action' => 'updated'];
     }
 
     /**
