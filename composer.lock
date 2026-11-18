@@ -62,16 +62,16 @@
         },
         {
             "name": "ereborcodeforge/durin-core",
-            "version": "0.2.0",
+            "version": "v0.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/EreborCodeForge/durin-core.git",
-                "reference": "6d16502cc928b9a4f8f3585411867e782c551e49"
+                "reference": "c5ab148d50138805404eda7c4b8465fce6235c82"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/EreborCodeForge/durin-core/zipball/6d16502cc928b9a4f8f3585411867e782c551e49",
-                "reference": "6d16502cc928b9a4f8f3585411867e782c551e49",
+                "url": "https://api.github.com/repos/EreborCodeForge/durin-core/zipball/c5ab148d50138805404eda7c4b8465fce6235c82",
+                "reference": "c5ab148d50138805404eda7c4b8465fce6235c82",
                 "shasum": ""
             },
             "require": {
@@ -86,16 +86,7 @@
                     "EreborCodeForge\\Durin\\Core\\": "src/"
                 }
             },
-            "autoload-dev": {
-                "psr-4": {
-                    "EreborCodeForge\\Durin\\Core\\Tests\\": "tests/"
-                }
-            },
-            "scripts": {
-                "test": [
-                    "phpunit"
-                ]
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -107,27 +98,27 @@
             ],
             "description": "Project model and deterministic tooling primitives for Durin.",
             "support": {
-                "source": "https://github.com/EreborCodeForge/durin-core/tree/v0.2.0",
-                "issues": "https://github.com/EreborCodeForge/durin-core/issues"
+                "issues": "https://github.com/EreborCodeForge/durin-core/issues",
+                "source": "https://github.com/EreborCodeForge/durin-core/tree/v0.2.1"
             },
-            "time": "2026-09-29T01:18:18+00:00"
+            "time": "2026-11-18T00:25:02+00:00"
         },
         {
             "name": "ereborcodeforge/durin-presets",
-            "version": "v0.3.5",
+            "version": "v0.3.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/EreborCodeForge/durin-presets.git",
-                "reference": "4f464dd31974912030856721c71a38cdfe33b6df"
+                "reference": "36f79ab8f836fd5684566c931643790f50befe53"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/EreborCodeForge/durin-presets/zipball/4f464dd31974912030856721c71a38cdfe33b6df",
-                "reference": "4f464dd31974912030856721c71a38cdfe33b6df",
+                "url": "https://api.github.com/repos/EreborCodeForge/durin-presets/zipball/36f79ab8f836fd5684566c931643790f50befe53",
+                "reference": "36f79ab8f836fd5684566c931643790f50befe53",
                 "shasum": ""
             },
             "require": {
-                "ereborcodeforge/durin-core": "^0.2",
+                "ereborcodeforge/durin-core": "^0.2.1",
                 "php": "^8.5"
             },
             "require-dev": {
@@ -152,9 +143,9 @@
             "description": "Architecture presets and project-shape policies for Durin.",
             "support": {
                 "issues": "https://github.com/EreborCodeForge/durin-presets/issues",
-                "source": "https://github.com/EreborCodeForge/durin-presets/tree/v0.3.5"
+                "source": "https://github.com/EreborCodeForge/durin-presets/tree/v0.3.6"
             },
-            "time": "2026-11-16T17:24:26+00:00"
+            "time": "2026-11-18T00:26:47+00:00"
         },
         {
             "name": "ereborcodeforge/mazarbul",
