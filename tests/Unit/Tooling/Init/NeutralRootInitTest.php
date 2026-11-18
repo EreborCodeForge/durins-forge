@@ -139,6 +139,8 @@ final class NeutralRootInitTest extends TestCase
                         string $applicationRoot,
                         bool $force = false,
                         ?RuntimePlan $plan = null,
+                        ?\EreborCodeForge\Durin\Core\Contract\ProjectSelection $selection = null,
+                        bool $preserveExisting = false,
                     ): array {
                         return [];
                     }

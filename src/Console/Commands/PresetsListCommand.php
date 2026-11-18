@@ -66,6 +66,17 @@ final class PresetsListCommand extends Command
         $default = $catalog['default'] ?? $registry->default()->id();
         $this->line('Default: ' . $default);
 
+        $capabilities = $catalog['capabilities'] ?? [];
+        if ($capabilities !== []) {
+            $this->line('');
+            $this->line('Capabilities:');
+            foreach ($capabilities as $capability) {
+                $id = (string) ($capability['id'] ?? '');
+                $description = (string) ($capability['description'] ?? '');
+                $this->line('  ' . $id . '  ' . $description);
+            }
+        }
+
         return 0;
     }
 }

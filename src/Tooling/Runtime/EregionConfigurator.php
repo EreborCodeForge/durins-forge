@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace EreborCodeForge\Durin\Forge\Tooling\Runtime;
 
+use EreborCodeForge\Durin\Core\Contract\ProjectSelection;
 use Erebor\Mithril\Runtime\Eregion\ApplicationResolver;
 use Erebor\Mithril\Runtime\Eregion\EregionCraft;
 
@@ -28,7 +29,13 @@ class EregionConfigurator
         string $applicationRoot,
         bool $force = false,
         ?RuntimePlan $plan = null,
+        ?ProjectSelection $selection = null,
+        bool $preserveExisting = false,
     ): array {
+        if ($preserveExisting) {
+            return [];
+        }
+
         $craft = $this->craft ?? new EregionCraft(new ApplicationResolver($applicationRoot));
         $actions = $craft->craft(force: $force);
         $normalized = $this->normalizeStarter($applicationRoot);
@@ -37,7 +44,7 @@ class EregionConfigurator
         }
 
         if ($plan !== null && $plan->isJobExecution() && $plan->usesEregion()) {
-            $actions[] = $this->ensureJobWorkload($applicationRoot);
+            $actions[] = $this->ensureJobWorkload($applicationRoot, $selection, $preserveExisting);
         }
 
         return array_values(array_filter($actions));
@@ -75,13 +82,20 @@ class EregionConfigurator
      *
      * @return array{path: string, action: string}
      */
-    private function ensureJobWorkload(string $applicationRoot): array
-    {
+    private function ensureJobWorkload(
+        string $applicationRoot,
+        ?ProjectSelection $selection,
+        bool $preserveExisting,
+    ): array {
         $path = $applicationRoot . DIRECTORY_SEPARATOR . 'eregion.yaml';
-        $managed = $this->managedWorkloadDocument();
+        $desired = ManagedJobWorkload::desired($selection);
+
+        if ($preserveExisting) {
+            return ['path' => $path, 'action' => 'exists'];
+        }
 
         if (!is_file($path)) {
-            if (file_put_contents($path, $managed) === false) {
+            if (file_put_contents($path, $this->managedWorkloadDocument($selection)) === false) {
                 throw new \RuntimeException("Unable to write {$path}");
             }
 
@@ -89,11 +103,17 @@ class EregionConfigurator
         }
 
         $existing = (string) file_get_contents($path);
-        if ($this->hasManagedConsumerWorkload($existing)) {
+        $current = ManagedJobWorkload::parseDocument($existing);
+        if ($current !== null && $current == $desired) {
             return ['path' => $path, 'action' => 'exists'];
         }
+        if ($current !== null) {
+            throw new \RuntimeException(
+                'Managed workload application-worker does not match the requested policy. Use a future configure/evolve command.'
+            );
+        }
 
-        $merged = $this->upsertManagedWorkload($existing);
+        $merged = $this->upsertManagedWorkload($existing, ManagedJobWorkload::fragment($desired));
         $merged = $this->stripLegacySingularWorkerKey($merged);
         if (file_put_contents($path, $merged) === false) {
             throw new \RuntimeException("Unable to update {$path}");
@@ -102,55 +122,18 @@ class EregionConfigurator
         return ['path' => $path, 'action' => 'updated'];
     }
 
-    private function managedWorkloadDocument(): string
+    private function managedWorkloadDocument(?ProjectSelection $selection): string
     {
-        return <<<'YAML'
-# Eregion — job supervision (consumer workload)
-workloads:
-  application-worker:
-    mode: consumer
-    command:
-      - php
-      - vendor/bin/job-worker
-    workers:
-      min: 1
-      max: 1
-
-YAML;
+        return "# Eregion — job supervision (consumer workload)\nworkloads:\n"
+            . ManagedJobWorkload::fragment(ManagedJobWorkload::desired($selection));
     }
 
     /**
-     * YAML fragment indented under a top-level `workloads:` key.
+     * Insert the Forge-managed workload; preserve all other YAML bytes.
      */
-    private function managedWorkloadFragment(): string
-    {
-        return <<<'YAML'
-  application-worker:
-    mode: consumer
-    command:
-      - php
-      - vendor/bin/job-worker
-    workers:
-      min: 1
-      max: 1
-
-YAML;
-    }
-
-    private function hasManagedConsumerWorkload(string $yaml): bool
-    {
-        return str_contains($yaml, self::MANAGED_WORKLOAD . ':')
-            && str_contains($yaml, 'vendor/bin/job-worker')
-            && str_contains($yaml, 'mode: consumer');
-    }
-
-    /**
-     * Insert or replace only the Forge-managed workload; preserve all other YAML.
-     */
-    private function upsertManagedWorkload(string $yaml): string
+    private function upsertManagedWorkload(string $yaml, string $fragment): string
     {
         $withoutManaged = $this->removeWorkloadBlock($yaml, self::MANAGED_WORKLOAD);
-        $fragment = $this->managedWorkloadFragment();
 
         if (preg_match('/^workloads:\s*(?:\r?\n|$)/m', $withoutManaged) === 1) {
             return (string) preg_replace(

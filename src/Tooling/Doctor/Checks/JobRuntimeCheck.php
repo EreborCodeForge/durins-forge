@@ -40,9 +40,14 @@ final class JobRuntimeCheck implements Check
 
         $plan = RuntimePlan::fromManifest($manifest);
         if (!$plan->isJobExecution()) {
-            return [
+            $results = [
                 CheckResult::ok($this->id(), 'Job runtime', 'skipped (execution is not mithril-job)'),
             ];
+            if (($manifest->features['producer'] ?? false) === true) {
+                $results[] = $this->publisherNotConfigured($context->root());
+            }
+
+            return $results;
         }
 
         $results = [];
@@ -80,6 +85,10 @@ final class JobRuntimeCheck implements Check
             }
         }
 
+        if (($manifest->features['consumer'] ?? false) === true || ($manifest->features['producer'] ?? false) === true) {
+            $results[] = $this->transportNotConfigured($root, $manifest->features);
+        }
+
         if ($plan->usesEregion()) {
             $results[] = CheckResult::ok(
                 'runtime.job.supervision',
@@ -105,6 +114,46 @@ final class JobRuntimeCheck implements Check
         }
 
         return $results;
+    }
+
+    /**
+     * @param array{http: bool, messaging: bool, consumer: bool, producer: bool} $features
+     */
+    private function transportNotConfigured(string $root, array $features): CheckResult
+    {
+        $kernel = $root . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'JobKernel.php';
+        $publisher = $root . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Infrastructure' . DIRECTORY_SEPARATOR . 'Messaging' . DIRECTORY_SEPARATOR . 'UnconfiguredPublisher.php';
+        $kernelSource = is_file($kernel) ? (string) file_get_contents($kernel) : '';
+        $demoTransport = str_contains($kernelSource, 'InMemoryJobTransport');
+        $unconfiguredPublisher = is_file($publisher);
+
+        if (($features['consumer'] && $demoTransport) || ($features['producer'] && $unconfiguredPublisher)) {
+            return CheckResult::warning(
+                'runtime.messaging.transport',
+                'messaging transport',
+                'not_configured: bind a real JobTransport or Publisher. YAML does not mean a broker is operational, and this scaffold does not ack or publish successfully by itself.',
+            );
+        }
+
+        return CheckResult::ok(
+            'runtime.messaging.transport',
+            'messaging transport',
+            'no scaffold demo transport detected',
+        );
+    }
+
+    private function publisherNotConfigured(string $root): CheckResult
+    {
+        $publisher = $root . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Infrastructure' . DIRECTORY_SEPARATOR . 'Messaging' . DIRECTORY_SEPARATOR . 'UnconfiguredPublisher.php';
+        if (!is_file($publisher)) {
+            return CheckResult::ok('runtime.messaging.publisher', 'publisher', 'no unconfigured publisher scaffold');
+        }
+
+        return CheckResult::warning(
+            'runtime.messaging.publisher',
+            'publisher',
+            'not_configured: UnconfiguredPublisher fails closed until a real Publisher adapter is bound.',
+        );
     }
 
     private function consumerWorkload(string $root, string $configPath): CheckResult

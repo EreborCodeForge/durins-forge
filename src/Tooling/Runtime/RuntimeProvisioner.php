@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace EreborCodeForge\Durin\Forge\Tooling\Runtime;
 
+use EreborCodeForge\Durin\Core\Contract\ProjectSelection;
 use EreborCodeForge\Durin\Presets\Metadata\RuntimeProfile;
 
 /**
@@ -67,6 +68,8 @@ final class RuntimeProvisioner
         RuntimeProfile $profile,
         bool $skipInstall = false,
         ?RuntimePlan $plan = null,
+        ?ProjectSelection $selection = null,
+        bool $preserveExisting = false,
     ): array {
         $plan ??= $this->resolve($profile);
 
@@ -91,7 +94,12 @@ final class RuntimeProvisioner
             $installed = $this->installer->isInstalled($applicationRoot);
         }
 
-        $this->configurator->configure($applicationRoot, plan: $plan);
+        $this->configurator->configure(
+            $applicationRoot,
+            plan: $plan,
+            selection: $selection,
+            preserveExisting: $preserveExisting,
+        );
 
         return [
             'plan' => $plan,

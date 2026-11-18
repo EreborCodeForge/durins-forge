@@ -4,18 +4,23 @@ declare(strict_types=1);
 
 namespace EreborCodeForge\Durin\Forge\Tooling\Init;
 
+use EreborCodeForge\Durin\Core\Contract\ProjectOptions;
+use EreborCodeForge\Durin\Core\Contract\ProjectSelection;
+use EreborCodeForge\Durin\Core\Manifest\DurinManifest;
 use EreborCodeForge\Durin\Core\Manifest\DurinManifestException;
 use EreborCodeForge\Durin\Core\Manifest\DurinManifestParser;
 use EreborCodeForge\Durin\Core\Mutation\ScaffoldWriter;
-use EreborCodeForge\Durin\Core\Contract\ProjectOptions;
 use EreborCodeForge\Durin\Core\Project\ProjectDiscovery;
 use EreborCodeForge\Durin\Core\Scaffold\ScaffoldActionType;
 use EreborCodeForge\Durin\Core\Scaffold\ScaffoldPlan;
 use EreborCodeForge\Durin\Forge\Tooling\Progress\InitProgressReporter;
+use EreborCodeForge\Durin\Forge\Tooling\Runtime\ManagedJobWorkload;
 use EreborCodeForge\Durin\Forge\Tooling\Runtime\ManifestRuntimeFinalizer;
 use EreborCodeForge\Durin\Forge\Tooling\Runtime\RuntimePlan;
 use EreborCodeForge\Durin\Forge\Tooling\Runtime\RuntimeProvisioner;
+use EreborCodeForge\Durin\Presets\Capability\WorkloadOptionPolicy;
 use EreborCodeForge\Durin\Presets\Contract\PresetDefinition;
+use EreborCodeForge\Durin\Presets\Metadata\RuntimeProfile;
 use EreborCodeForge\Durin\Presets\Preset\UnknownPresetException;
 use EreborCodeForge\Durin\Presets\Registry\DefaultPresetRegistryFactory;
 use EreborCodeForge\Durin\Presets\Registry\PresetEngine;
@@ -48,6 +53,7 @@ final class ApplicationInitializer
         ?string $presetId,
         InitProgressReporter $progress,
         bool $skipRuntimeInstall = false,
+        ?ProjectSelection $selection = null,
     ): array {
         $root = $this->assertApplicationRoot($applicationRoot);
         $engine = $this->engine ?? (new DefaultPresetRegistryFactory())->engine();
@@ -55,24 +61,34 @@ final class ApplicationInitializer
 
         $progress->stage('preset.resolve', 'Resolving preset');
         $definition = $this->resolvePreset($registry, $presetId);
+        $selection ??= new ProjectSelection($definition->id());
 
         $existing = $this->readExistingPreset($root);
         if ($existing !== null && $existing !== self::UNINITIALIZED) {
             if ($existing === $definition->id()) {
+                $manifest = $this->manifestParser->parseFile($root . DIRECTORY_SEPARATOR . 'durin.yaml');
+                $this->assertRerunCompatible($root, $manifest, $selection);
                 $progress->stage('runtime.resolve', 'Resolving runtime');
-                $plan = $this->runtime->resolve($definition->runtime());
+                $plan = RuntimePlan::fromManifest($manifest);
 
-                if (!$skipRuntimeInstall && $this->runtime->shouldInstall($definition->runtime(), $plan)) {
+                if (!$skipRuntimeInstall && $plan->usesEregion() && $this->runtime->shouldInstall($definition->runtime(), $plan)) {
                     $progress->stage('runtime.provision', 'Provisioning runtime');
                     $progress->stage('runtime.configure', 'Configuring runtime');
-                    $this->runtime->provision($root, $definition->runtime(), false, $plan);
+                    $this->runtime->provision(
+                        $root,
+                        $definition->runtime(),
+                        false,
+                        $plan,
+                        $selection,
+                        true,
+                    );
                 }
 
-                $progress->stage('manifest.finalize', 'Finalizing manifest');
-                $this->manifestFinalizer->finalize($root, $plan);
-
                 $progress->stage('validate', 'Validating application');
-                $progress->complete($definition->id(), $plan);
+                $progress->complete($definition->id(), $plan, [
+                    'features' => $manifest->features,
+                    'idempotent' => true,
+                ]);
 
                 return [
                     'preset' => $definition->id(),
@@ -93,6 +109,8 @@ final class ApplicationInitializer
             name: $appName,
             preset: $definition->id(),
             targetDirectory: $root,
+            extra: ['with' => $selection->features],
+            selection: $selection,
         );
         $fullPlan = $engine->plan($options);
         $plannedComposer = $this->extractPlannedContents($fullPlan, 'composer.json');
@@ -101,7 +119,17 @@ final class ApplicationInitializer
         $this->clearReplaceableConflicts($root, $plan);
 
         $progress->stage('runtime.resolve', 'Resolving runtime');
-        $runtimePlan = $this->runtime->resolve($definition->runtime());
+        $profile = $this->effectiveProfile($definition, $selection);
+        $runtimePlan = $this->runtime->resolve($profile);
+        $expectedSupervisor = (new WorkloadOptionPolicy())->effectiveSupervisor(
+            $profile->mode,
+            $selection->supervisorChoice,
+        );
+        if ($runtimePlan->supervisor !== $expectedSupervisor) {
+            throw new \RuntimeException(
+                'Resolved supervisor does not match the requested --supervisor value. No compatible runtime is available.'
+            );
+        }
 
         $progress->stage('scaffold.apply', 'Applying scaffold');
         $result = $this->writer->write($root, $plan);
@@ -117,27 +145,102 @@ final class ApplicationInitializer
         $this->applyMergedEnvExample($root, $plannedEnv);
         $this->residualCleaner->clean($root, $runtimePlan, $plan);
 
-        if (!$skipRuntimeInstall && $this->runtime->shouldInstall($definition->runtime(), $runtimePlan)) {
+        if (!$skipRuntimeInstall && $this->runtime->shouldInstall($profile, $runtimePlan)) {
             $progress->stage('runtime.provision', 'Provisioning runtime');
             $progress->stage('runtime.configure', 'Configuring runtime');
-            $this->runtime->provision($root, $definition->runtime(), false, $runtimePlan);
+            $this->runtime->provision($root, $profile, false, $runtimePlan, $selection);
         } elseif ($runtimePlan->usesEregion()) {
             $progress->stage('runtime.configure', 'Configuring runtime');
-            $this->runtime->provision($root, $definition->runtime(), true, $runtimePlan);
+            $this->runtime->provision($root, $profile, true, $runtimePlan, $selection);
         }
 
         $progress->stage('manifest.finalize', 'Finalizing manifest');
-        $this->manifestFinalizer->finalize($root, $runtimePlan);
+        $manifest = $this->manifestFinalizer->finalize($root, $runtimePlan);
 
         $progress->stage('validate', 'Validating application');
         $this->assertNoVendorMutation($root);
-        $progress->complete($definition->id(), $runtimePlan);
+        $progress->complete($definition->id(), $runtimePlan, [
+            'features' => $manifest->features,
+        ]);
 
         return [
             'preset' => $definition->id(),
             'runtime' => $runtimePlan,
             'idempotent' => false,
         ];
+    }
+
+    private function effectiveProfile(PresetDefinition $definition, ProjectSelection $selection): RuntimeProfile
+    {
+        $base = $definition->runtime();
+        $preferred = $base->preferredRunner;
+        $preferredCapabilities = $base->preferredCapabilities;
+        if ($base->mode === 'job' && $selection->supervisorChoice === 'eregion') {
+            $preferred = 'eregion';
+        }
+        if ($selection->supervisorChoice === 'none') {
+            $preferred = null;
+            $preferredCapabilities = [];
+        }
+
+        return new RuntimeProfile(
+            mode: $base->mode,
+            requiredCapabilities: $base->requiredCapabilities,
+            preferredCapabilities: $preferredCapabilities,
+            preferredRunner: $preferred,
+            installRunner: $base->installRunner,
+        );
+    }
+
+    private function assertRerunCompatible(string $root, DurinManifest $manifest, ProjectSelection $selection): void
+    {
+        $persisted = [];
+        if ($manifest->features['consumer']) {
+            $persisted[] = 'consumer';
+        }
+        if ($manifest->features['producer']) {
+            $persisted[] = 'producer';
+        }
+        if ($selection->features !== [] && $selection->features !== $persisted) {
+            throw new \RuntimeException(
+                'Init cannot change capabilities on an existing application. Use a future configure/evolve command.'
+            );
+        }
+
+        if ($selection->supervisorChoice === 'none' && $manifest->runtime?->supervisor !== null) {
+            throw new \RuntimeException(
+                'Init cannot change supervisor on an existing application. Use a future configure/evolve command.'
+            );
+        }
+        if ($selection->supervisorChoice === 'eregion' && $manifest->runtime?->supervisor !== 'eregion') {
+            throw new \RuntimeException(
+                'Init cannot change supervisor on an existing application. Use a future configure/evolve command.'
+            );
+        }
+
+        $workloadRequested = $selection->scalingStrategy !== null
+            || $selection->workersMin !== null
+            || $selection->workersMax !== null
+            || $selection->resourceClass !== null
+            || $selection->memoryMb !== null;
+        if (!$workloadRequested) {
+            return;
+        }
+
+        $path = $root . DIRECTORY_SEPARATOR . 'eregion.yaml';
+        if (!is_file($path)) {
+            throw new \RuntimeException(
+                'Init cannot apply workload options because eregion.yaml has no managed workload. Use a future configure/evolve command.'
+            );
+        }
+
+        $current = ManagedJobWorkload::parseDocument((string) file_get_contents($path));
+        $desired = ManagedJobWorkload::desired($selection);
+        if ($current != $desired) {
+            throw new \RuntimeException(
+                'Init cannot change workload settings on an existing application. Use a future configure/evolve command.'
+            );
+        }
     }
 
     private function resolvePreset(PresetRegistry $registry, ?string $presetId): PresetDefinition

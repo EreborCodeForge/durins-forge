@@ -224,6 +224,8 @@ final class InitCommandTest extends TestCase
                     string $applicationRoot,
                     bool $force = false,
                     ?\EreborCodeForge\Durin\Forge\Tooling\Runtime\RuntimePlan $plan = null,
+                    ?\EreborCodeForge\Durin\Core\Contract\ProjectSelection $selection = null,
+                    bool $preserveExisting = false,
                 ): array {
                     return [];
                 }
@@ -253,6 +255,8 @@ final class InitCommandTest extends TestCase
                 string $applicationRoot,
                 bool $force = false,
                 ?\EreborCodeForge\Durin\Forge\Tooling\Runtime\RuntimePlan $plan = null,
+                ?\EreborCodeForge\Durin\Core\Contract\ProjectSelection $selection = null,
+                bool $preserveExisting = false,
             ): array {
                 return [['path' => $applicationRoot . '/eregion.yaml', 'action' => 'exists']];
             }

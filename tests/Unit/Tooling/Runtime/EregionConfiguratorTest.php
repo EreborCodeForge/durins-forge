@@ -137,6 +137,47 @@ YAML);
         $this->assertNotEmpty($workloadActions);
     }
 
+    public function test_managed_workload_keeps_unmanaged_bytes(): void
+    {
+        $root = $this->tempRoot();
+        $original = <<<'YAML'
+# user-owned header
+server:
+  host: 127.0.0.1
+  port: 9090
+
+workloads:
+  custom-batch:
+    mode: consumer
+    command:
+      - php
+      - bin/batch.php
+
+operations:
+  prefix: /_eregion
+YAML;
+        file_put_contents($root . '/eregion.yaml', $original);
+
+        $selection = new \EreborCodeForge\Durin\Core\Contract\ProjectSelection(
+            presetId: 'consumer',
+            features: ['consumer'],
+            supervisorChoice: 'eregion',
+            scalingStrategy: 'fixed',
+            workersMin: 1,
+            workersMax: 4,
+        );
+        $plan = new RuntimePlan('job', 'mithril-job', 'eregion', ['job-loop']);
+        (new EregionConfigurator())->configure($root, plan: $plan, selection: $selection);
+
+        $yaml = str_replace("\r\n", "\n", (string) file_get_contents($root . '/eregion.yaml'));
+        $this->assertStringContainsString("# user-owned header\nserver:\n  host: 127.0.0.1\n  port: 9090\n", $yaml);
+        $this->assertStringContainsString("  custom-batch:\n    mode: consumer\n    command:\n      - php\n      - bin/batch.php\n", $yaml);
+        $this->assertStringContainsString("operations:\n  prefix: /_eregion\n", $yaml);
+        $this->assertStringContainsString('strategy: fixed', $yaml);
+        $this->assertStringContainsString('fixed targets workers.max', $yaml);
+        $this->assertStringContainsString('max: 4', $yaml);
+    }
+
     public function test_http_plan_keeps_http_starter_without_consumer_workload(): void
     {
         $root = $this->tempRoot();

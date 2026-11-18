@@ -35,6 +35,17 @@ final class NewCommand extends Command
     public function execute(): int
     {
         $parsed = ArgParser::parse($this->args);
+        foreach ($parsed['options'] as $key => $_value) {
+            if ($key === 'preset') {
+                continue;
+            }
+            $hint = in_array($key, ['with', 'supervisor', 'scaling', 'workers-min', 'workers-max', 'resource-class', 'memory-mb'], true)
+                ? "Option --{$key} is not accepted by vendor/bin/durin new. Use vendor/bin/durin init or the global durin new command."
+                : "Unknown option --{$key}.";
+            $this->error($hint);
+
+            return 2;
+        }
         $name = $parsed['positionals'][0] ?? null;
         $presetOption = ArgParser::string($parsed['options'], 'preset');
 

@@ -40,7 +40,12 @@ final class PresetsListCommandTest extends TestCase
         $data = json_decode($output, true);
         $this->assertIsArray($data);
         $this->assertSame('minimal', $data['default']);
-        $this->assertCount(3, $data['presets']);
+        $this->assertCount(5, $data['presets']);
+        $this->assertSame(
+            ['minimal', 'service', 'worker', 'consumer', 'producer'],
+            array_column($data['presets'], 'id'),
+        );
+        $this->assertSame(['consumer', 'producer'], array_column($data['capabilities'], 'id'));
         $this->assertArrayHasKey('runtime', $data['presets'][0]);
     }
 }
