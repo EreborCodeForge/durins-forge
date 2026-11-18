@@ -95,7 +95,7 @@ YAML);
         ], JSON_THROW_ON_ERROR));
         $binDir = $root . '/.mithril/bin';
         mkdir($binDir, 0777, true);
-        copy($this->fixtureBinary(), $binDir . '/' . (PHP_OS_FAMILY === 'Windows' ? 'eregion.exe' : 'eregion'));
+        $this->installFixture($binDir . '/' . (PHP_OS_FAMILY === 'Windows' ? 'eregion.exe' : 'eregion'));
 
         try {
             $manifest = new DurinManifest(
@@ -139,7 +139,7 @@ YAML);
     {
         $root = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'durin_comment_workload_' . uniqid('', true);
         mkdir($root . '/.mithril/bin', 0777, true);
-        copy($this->fixtureBinary(), $root . '/.mithril/bin/' . (PHP_OS_FAMILY === 'Windows' ? 'eregion.exe' : 'eregion'));
+        $this->installFixture($root . '/.mithril/bin/' . (PHP_OS_FAMILY === 'Windows' ? 'eregion.exe' : 'eregion'));
         file_put_contents($root . '/eregion.yaml', "# mode: consumer\n# vendor/bin/job-worker\nserver:\n  host: 127.0.0.1\n");
         file_put_contents($root . '/composer.json', '{"extra":{"mithril":{"eregion":"v0.4.2","token":"SECRET_TOKEN"}}}');
 
@@ -192,18 +192,11 @@ OUT, '');
 
     public function test_eco01_doctor_fails_when_binary_version_mismatches_pin(): void
     {
-        $fixture = dirname(__DIR__, 6) . DIRECTORY_SEPARATOR . 'mithrilphp' . DIRECTORY_SEPARATOR
-            . 'tests' . DIRECTORY_SEPARATOR . 'Fixtures' . DIRECTORY_SEPARATOR . 'eco01fixture' . DIRECTORY_SEPARATOR
-            . (PHP_OS_FAMILY === 'Windows' ? 'fixture.exe' : 'fixture');
-        if (!is_file($fixture)) {
-            $this->fail('ECO-01 fixture binary is missing: ' . $fixture);
-        }
-
         $root = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'durin_eco01_doctor_' . uniqid('', true);
         $binary = $root . DIRECTORY_SEPARATOR . '.mithril' . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR
             . (PHP_OS_FAMILY === 'Windows' ? 'eregion.exe' : 'eregion');
         mkdir(dirname($binary), 0777, true);
-        copy($fixture, $binary);
+        $this->installFixture($binary);
         file_put_contents($binary . '.mode', 'old');
         file_put_contents($root . '/composer.json', json_encode([
             'extra' => ['mithril' => ['eregion' => 'v0.4.2']],
@@ -238,16 +231,27 @@ OUT, '');
         }
     }
 
+    private function installFixture(string $destination): void
+    {
+        copy($this->fixtureBinary(), $destination);
+        chmod($destination, 0755);
+    }
+
     private function fixtureBinary(): string
     {
-        $fixture = dirname(__DIR__, 6) . DIRECTORY_SEPARATOR . 'mithrilphp' . DIRECTORY_SEPARATOR
-            . 'tests' . DIRECTORY_SEPARATOR . 'Fixtures' . DIRECTORY_SEPARATOR . 'eco01fixture' . DIRECTORY_SEPARATOR
-            . (PHP_OS_FAMILY === 'Windows' ? 'fixture.exe' : 'fixture');
-        if (!is_file($fixture)) {
-            $this->fail('ECO-01 fixture binary is missing: ' . $fixture);
+        $name = PHP_OS_FAMILY === 'Windows' ? 'fixture.exe' : 'fixture';
+        $candidates = [
+            dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'Fixtures' . DIRECTORY_SEPARATOR . 'eco01fixture' . DIRECTORY_SEPARATOR . $name,
+            dirname(__DIR__, 6) . DIRECTORY_SEPARATOR . 'mithrilphp' . DIRECTORY_SEPARATOR
+                . 'tests' . DIRECTORY_SEPARATOR . 'Fixtures' . DIRECTORY_SEPARATOR . 'eco01fixture' . DIRECTORY_SEPARATOR . $name,
+        ];
+        foreach ($candidates as $fixture) {
+            if (is_file($fixture)) {
+                return $fixture;
+            }
         }
 
-        return $fixture;
+        $this->fail('ECO-01 fixture binary is missing: ' . implode(' or ', $candidates));
     }
 
     private function validatedConsumerProbe(): EregionConfigProbe

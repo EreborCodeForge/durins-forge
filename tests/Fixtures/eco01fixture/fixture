@@ -1,0 +1,39 @@
+#!/bin/sh
+if [ "$1" != "version" ]; then
+  exit 2
+fi
+
+mode=ok
+if [ -f "$0.mode" ]; then
+  mode=$(tr -d '[:space:]' < "$0.mode")
+fi
+
+case "$mode" in
+  hang)
+    while true; do
+      sleep 3600
+    done
+    ;;
+  badexit)
+    printf '%s\n' "eregion 0.4.2" "protocol eregion/1"
+    exit 3
+    ;;
+  badproto)
+    printf '%s\n' "eregion 0.4.2" "protocol eregion/9"
+    ;;
+  malformed)
+    printf '%s\n' "not-a-version"
+    ;;
+  withgo)
+    printf '%s\n' "eregion 0.4.2" "protocol eregion/1" "go go1.23.12 linux/amd64"
+    ;;
+  extra)
+    printf '%s\n' "eregion 0.4.2" "protocol eregion/1" "build dirty"
+    ;;
+  old)
+    printf '%s\n' "eregion 0.1.0" "protocol eregion/1"
+    ;;
+  *)
+    printf '%s\n' "eregion 0.4.2" "protocol eregion/1"
+    ;;
+esac
