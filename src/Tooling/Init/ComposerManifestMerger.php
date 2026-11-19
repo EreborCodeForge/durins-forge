@@ -12,7 +12,7 @@ use EreborCodeForge\Durin\Forge\Tooling\Runtime\RuntimePlan;
  */
 final class ComposerManifestMerger
 {
-    public const string APPROVED_EREGION_PIN = 'v0.4.3';
+    public const string APPROVED_EREGION_PIN = 'v0.4.4';
 
     private const array IDENTITY_KEYS = [
         'name',
