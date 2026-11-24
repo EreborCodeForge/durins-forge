@@ -26,8 +26,8 @@
     ],
     "require": {
         "ereborcodeforge/durin-architecture": "^0.1.4",
-        "ereborcodeforge/durin-core": "^0.2",
-        "ereborcodeforge/durin-presets": "^0.3",
+        "ereborcodeforge/durin-core": "^0.2.2",
+        "ereborcodeforge/durin-presets": "^0.3.7",
         "ereborcodeforge/mazarbul": "^1.0",
         "ereborcodeforge/mithrilphp": "^3.2",
         "ext-msgpack": "*",
