@@ -17,25 +17,32 @@ final readonly class EregionConfigReport
         public string $detail,
         public array $workloads,
         public string $metricsAccess,
+        public string $workerCPU = 'unknown',
     ) {}
 
     public static function fromOutput(int $exitCode, string $stdout, string $stderr): self
     {
         $workloads = [];
         $access = 'unknown';
+        $workerCPU = 'unknown';
         foreach (preg_split('/\R/', $stdout) ?: [] as $line) {
             $line = trim($line);
-            if (preg_match('/^- (\S+) mode=(\S+) workers=(\d+)\.\.(\d+)$/', $line, $match) === 1) {
+            if (preg_match('/^- (\S+) mode=(\S+)(?: strategy=(\S+))? workers=(\d+)\.\.(\d+)$/', $line, $match) === 1) {
                 $workloads[] = [
                     'name' => $match[1],
                     'mode' => $match[2],
-                    'min' => (int) $match[3],
-                    'max' => (int) $match[4],
+                    'strategy' => ($match[3] ?? '') !== '' ? $match[3] : '',
+                    'min' => (int) $match[4],
+                    'max' => (int) $match[5],
                 ];
             }
             if (str_starts_with($line, 'metrics_access=')) {
                 $value = substr($line, strlen('metrics_access='));
                 $access = in_array($value, ['loopback', 'public', 'unset'], true) ? $value : 'unknown';
+            }
+            if (str_starts_with($line, 'worker_cpu=')) {
+                $cpu = substr($line, strlen('worker_cpu='));
+                $workerCPU = in_array($cpu, ['supported', 'unsupported'], true) ? $cpu : 'unknown';
             }
         }
 
@@ -52,7 +59,7 @@ final readonly class EregionConfigReport
             $detail = substr($detail, 0, 240);
         }
 
-        return new self($validated, $detail, $workloads, $access);
+        return new self($validated, $detail, $workloads, $access, $workerCPU);
     }
 
     public function hasMode(string $mode): bool

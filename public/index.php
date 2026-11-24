@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * Durin worker entry — Eregion connects over UDS; Mithril Worker stays warm.
- * Not an FPM / php -S front controller: use `vendor/bin/durin serve` / forge serve.
+ * Not an FPM / php -S front controller: use `durins-forge serve` / `vendor/bin/durins-forge serve`.
  */
 
 require __DIR__ . '/../vendor/autoload.php';
@@ -30,7 +30,7 @@ if (PHP_SAPI !== 'cli') {
     header('Content-Type: application/json');
     echo json_encode([
         'error' => true,
-        'message' => 'HTTP entry is Eregion. Run: vendor/bin/forge serve',
+        'message' => 'HTTP entry is Eregion. Run: durins-forge serve (or vendor/bin/durins-forge serve)',
     ]);
     exit(1);
 }

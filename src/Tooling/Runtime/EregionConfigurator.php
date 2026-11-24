@@ -47,6 +47,14 @@ class EregionConfigurator
             $actions[] = $this->ensureJobWorkload($applicationRoot, $selection, $preserveExisting);
         }
 
+        if ($plan !== null && !$plan->isJobExecution() && $plan->usesEregion() && self::advanced($selection)) {
+            $actions[] = $this->ensureHttpWorkload($applicationRoot, $selection, $preserveExisting);
+        }
+
+        if ($selection?->resourceGuardMode !== null) {
+            $actions[] = $this->ensureGuardMode($applicationRoot, $selection->resourceGuardMode);
+        }
+
         return array_values(array_filter($actions));
     }
 
@@ -94,8 +102,35 @@ class EregionConfigurator
             return ['path' => $path, 'action' => 'exists'];
         }
 
+        return $this->writeWorkload($path, $desired, self::MANAGED_WORKLOAD, "# Eregion — job supervision (consumer workload)\n");
+    }
+
+    /**
+     * @return array{path: string, action: string}
+     */
+    private function ensureHttpWorkload(
+        string $applicationRoot,
+        ?ProjectSelection $selection,
+        bool $preserveExisting,
+    ): array {
+        $path = $applicationRoot . DIRECTORY_SEPARATOR . 'eregion.yaml';
+        $desired = ManagedJobWorkload::desired($selection, 'http');
+        if ($preserveExisting) {
+            return ['path' => $path, 'action' => 'exists'];
+        }
+
+        return $this->writeWorkload($path, $desired, 'http', "# Eregion — http supervision\n");
+    }
+
+    /**
+     * @param array<string, mixed> $desired
+     * @return array{path: string, action: string}
+     */
+    private function writeWorkload(string $path, array $desired, string $name, string $header): array
+    {
         if (!is_file($path)) {
-            if (file_put_contents($path, $this->managedWorkloadDocument($selection)) === false) {
+            $document = $header . "workloads:\n" . ManagedJobWorkload::fragment($desired);
+            if (file_put_contents($path, $document) === false) {
                 throw new \RuntimeException("Unable to write {$path}");
             }
 
@@ -103,17 +138,17 @@ class EregionConfigurator
         }
 
         $existing = (string) file_get_contents($path);
-        $current = ManagedJobWorkload::parseDocument($existing);
+        $current = ManagedJobWorkload::parseDocument($existing, $name);
         if ($current !== null && $current == $desired) {
             return ['path' => $path, 'action' => 'exists'];
         }
         if ($current !== null) {
             throw new \RuntimeException(
-                'Managed workload application-worker does not match the requested policy. Use a future configure/evolve command.'
+                'Managed workload ' . $name . ' does not match the requested policy. Use a future configure/evolve command.'
             );
         }
 
-        $merged = $this->upsertManagedWorkload($existing, ManagedJobWorkload::fragment($desired));
+        $merged = $this->upsertManagedWorkload($existing, ManagedJobWorkload::fragment($desired), $name);
         $merged = $this->stripLegacySingularWorkerKey($merged);
         if (file_put_contents($path, $merged) === false) {
             throw new \RuntimeException("Unable to update {$path}");
@@ -122,18 +157,49 @@ class EregionConfigurator
         return ['path' => $path, 'action' => 'updated'];
     }
 
-    private function managedWorkloadDocument(?ProjectSelection $selection): string
+    /**
+     * @return array{path: string, action: string}
+     */
+    private function ensureGuardMode(string $applicationRoot, string $mode): array
     {
-        return "# Eregion — job supervision (consumer workload)\nworkloads:\n"
-            . ManagedJobWorkload::fragment(ManagedJobWorkload::desired($selection));
+        $path = $applicationRoot . DIRECTORY_SEPARATOR . 'eregion.yaml';
+        if (!is_file($path)) {
+            throw new \RuntimeException('resource_guard.mode requires eregion.yaml.');
+        }
+        $existing = (string) file_get_contents($path);
+        if (preg_match('/^resource_guard:\s*(\S+)/m', $existing) === 1) {
+            throw new \RuntimeException('resource_guard uses syntax this editor cannot merge.');
+        }
+        if (preg_match('/^resource_guard:\s*$/m', $existing) === 1) {
+            if (preg_match('/^  mode:\s*(\S+)\s*$/m', $existing, $found) === 1) {
+                if ($found[1] !== $mode) {
+                    throw new \RuntimeException('Init cannot change resource_guard.mode on an existing application.');
+                }
+
+                return ['path' => $path, 'action' => 'exists'];
+            }
+            $updated = preg_replace('/^resource_guard:\s*$/m', "resource_guard:\n  mode: {$mode}", $existing, 1);
+        } else {
+            $updated = "resource_guard:\n  mode: {$mode}\n\n" . ltrim($existing);
+        }
+        if (!is_string($updated) || file_put_contents($path, $updated) === false) {
+            throw new \RuntimeException("Unable to update {$path}");
+        }
+
+        return ['path' => $path, 'action' => 'updated'];
+    }
+
+    private static function advanced(?ProjectSelection $selection): bool
+    {
+        return $selection !== null && in_array($selection->scalingStrategy, ['cpu_utilization', 'latency', 'throughput', 'hybrid', 'scheduled', 'adaptive'], true);
     }
 
     /**
      * Insert the Forge-managed workload; preserve all other YAML bytes.
      */
-    private function upsertManagedWorkload(string $yaml, string $fragment): string
+    private function upsertManagedWorkload(string $yaml, string $fragment, string $name): string
     {
-        $withoutManaged = $this->removeWorkloadBlock($yaml, self::MANAGED_WORKLOAD);
+        $withoutManaged = $this->removeWorkloadBlock($yaml, $name);
 
         if (preg_match('/^workloads:\s*(?:\r?\n|$)/m', $withoutManaged) === 1) {
             return (string) preg_replace(

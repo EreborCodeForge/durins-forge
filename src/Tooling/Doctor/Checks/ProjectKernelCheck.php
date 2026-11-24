@@ -29,7 +29,7 @@ final class ProjectKernelCheck implements Check
                 CheckResult::warning(
                     $this->id(),
                     'Kernel',
-                    'application not initialized (run vendor/bin/durin init)',
+                    'application not initialized (run durins-forge init)',
                 ),
             ];
         }

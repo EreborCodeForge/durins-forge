@@ -14,11 +14,12 @@ final class ManagedJobWorkload
     /**
      * @return array<string, mixed>
      */
-    public static function desired(?ProjectSelection $selection): array
+    public static function desired(?ProjectSelection $selection, string $kind = 'consumer'): array
     {
+        $http = $kind === 'http';
         $spec = [
-            'mode' => 'consumer',
-            'command' => ['php', 'vendor/bin/job-worker'],
+            'mode' => $http ? 'http' : 'consumer',
+            'command' => $http ? ['php', 'vendor/bin/eregion-worker'] : ['php', 'vendor/bin/job-worker'],
             'workers' => [
                 'min' => $selection?->workersMin ?? 1,
                 'max' => $selection?->workersMax ?? 1,
@@ -37,11 +38,27 @@ final class ManagedJobWorkload
         }
 
         if ($selection?->scalingStrategy !== null) {
-            $spec['scaling'] = [
-                'strategy' => $selection->scalingStrategy,
-                'scale_up_cooldown' => '1s',
-                'scale_down_idle_for' => '30s',
-            ];
+            $advanced = in_array($selection->scalingStrategy, ['cpu_utilization', 'latency', 'throughput', 'hybrid', 'scheduled', 'adaptive'], true);
+            $scaling = ['strategy' => $selection->scalingStrategy];
+            if (!$advanced) {
+                $scaling['scale_up_cooldown'] = '1s';
+                $scaling['scale_down_idle_for'] = '30s';
+            }
+            $raw = $selection->scalingFragment['raw'] ?? null;
+            if (is_string($raw) && $raw !== '') {
+                $kept = [];
+                foreach (preg_split("/\r\n|\n|\r/", $raw) ?: [] as $rawLine) {
+                    $trimmed = trim($rawLine);
+                    if ($trimmed === '' || str_starts_with($trimmed, '#')) {
+                        continue;
+                    }
+                    $kept[] = rtrim($rawLine);
+                }
+                if ($kept !== []) {
+                    $scaling['raw'] = implode("\n", $kept) . "\n";
+                }
+            }
+            $spec['scaling'] = $scaling;
         }
 
         return $spec;
@@ -53,16 +70,18 @@ final class ManagedJobWorkload
     public static function fragment(array $spec): string
     {
         $workers = $spec['workers'];
+        $name = ($spec['mode'] ?? '') === 'http' ? 'http' : 'application-worker';
         $lines = [
-            '  application-worker:',
-            '    mode: consumer',
+            '  ' . $name . ':',
+            '    mode: ' . $spec['mode'],
             '    command:',
-            '      - php',
-            '      - vendor/bin/job-worker',
-            '    workers:',
-            '      min: ' . $workers['min'],
-            '      max: ' . $workers['max'],
         ];
+        foreach ($spec['command'] as $part) {
+            $lines[] = '      - ' . $part;
+        }
+        $lines[] = '    workers:';
+        $lines[] = '      min: ' . $workers['min'];
+        $lines[] = '      max: ' . $workers['max'];
 
         if (isset($spec['resources']) && is_array($spec['resources'])) {
             $lines[] = '    resources:';
@@ -80,8 +99,17 @@ final class ManagedJobWorkload
             }
             $lines[] = '    scaling:';
             $lines[] = '      strategy: ' . $spec['scaling']['strategy'];
-            $lines[] = '      scale_up_cooldown: ' . $spec['scaling']['scale_up_cooldown'];
-            $lines[] = '      scale_down_idle_for: ' . $spec['scaling']['scale_down_idle_for'];
+            if (isset($spec['scaling']['scale_up_cooldown'])) {
+                $lines[] = '      scale_up_cooldown: ' . $spec['scaling']['scale_up_cooldown'];
+            }
+            if (isset($spec['scaling']['scale_down_idle_for'])) {
+                $lines[] = '      scale_down_idle_for: ' . $spec['scaling']['scale_down_idle_for'];
+            }
+            if (isset($spec['scaling']['raw']) && is_string($spec['scaling']['raw'])) {
+                foreach (preg_split("/\r\n|\n|\r/", rtrim($spec['scaling']['raw'])) ?: [] as $rawLine) {
+                    $lines[] = '      ' . $rawLine;
+                }
+            }
         }
 
         return implode("\n", $lines) . "\n";
@@ -90,7 +118,7 @@ final class ManagedJobWorkload
     /**
      * @return array<string, mixed>|null
      */
-    public static function parseDocument(string $yaml): ?array
+    public static function parseDocument(string $yaml, string $name = 'application-worker'): ?array
     {
         $lines = preg_split("/\r\n|\n|\r/", $yaml);
         if ($lines === false) {
@@ -99,7 +127,7 @@ final class ManagedJobWorkload
 
         $starts = [];
         foreach ($lines as $index => $line) {
-            if ($line === '  application-worker:' || str_starts_with($line, '  application-worker: ')) {
+            if ($line === '  ' . $name . ':' || str_starts_with($line, '  ' . $name . ': ')) {
                 $starts[] = $index;
             }
         }
@@ -110,7 +138,7 @@ final class ManagedJobWorkload
 
         if (count($starts) > 1) {
             throw new \RuntimeException(
-                'eregion.yaml has an ambiguous application-worker block. Refusing to edit it.'
+                'eregion.yaml has an ambiguous ' . $name . ' block. Refusing to edit it.'
             );
         }
 
@@ -127,44 +155,61 @@ final class ManagedJobWorkload
             }
         }
 
-        return self::parseBlock(array_slice($lines, $start, $end - $start));
+        return self::parseBlock(array_slice($lines, $start, $end - $start), $name);
     }
 
     /**
      * @param list<string> $lines
      * @return array<string, mixed>
      */
-    private static function parseBlock(array $lines): array
+    private static function parseBlock(array $lines, string $name): array
     {
         $mode = null;
         $command = [];
         $workers = [];
         $resources = [];
         $scaling = [];
+        $raw = [];
         $section = null;
+        $scalingIndent = null;
 
         foreach ($lines as $line) {
+            $indent = strspn($line, ' ');
             $trimmed = trim($line);
-            if ($trimmed === '' || str_starts_with($trimmed, '#') || $trimmed === 'application-worker:') {
+            if ($trimmed === '' || str_starts_with($trimmed, '#') || $trimmed === $name . ':') {
+                continue;
+            }
+
+            if ($section === 'scaling' && $scalingIndent !== null && $indent > $scalingIndent) {
+                $direct = $indent === $scalingIndent + 2
+                    && preg_match('/^(strategy|scale_up_cooldown|scale_down_idle_for):\s*(\S.*)$/', $trimmed, $scalar) === 1;
+                if ($direct) {
+                    $scaling[$scalar[1]] = $scalar[2];
+                    continue;
+                }
+                $raw[] = substr($line, $scalingIndent + 2);
                 continue;
             }
 
             if (str_starts_with($trimmed, '- ')) {
                 if ($section !== 'command') {
-                    throw new \RuntimeException('eregion.yaml application-worker uses syntax this editor cannot merge.');
+                    throw new \RuntimeException('eregion.yaml ' . $name . ' uses syntax this editor cannot merge.');
                 }
                 $command[] = trim(substr($trimmed, 2));
                 continue;
             }
 
             if (preg_match('/^([A-Za-z0-9_]+):\s*(.*)$/', $trimmed, $matches) !== 1) {
-                throw new \RuntimeException('eregion.yaml application-worker uses syntax this editor cannot merge.');
+                throw new \RuntimeException('eregion.yaml ' . $name . ' uses syntax this editor cannot merge.');
             }
 
             $key = $matches[1];
             $value = $matches[2];
             if ($value === '') {
                 $section = $key;
+                if ($key === 'scaling') {
+                    $scalingIndent = $indent;
+                }
                 continue;
             }
 
@@ -176,7 +221,7 @@ final class ManagedJobWorkload
 
             if ($section === 'workers') {
                 if (preg_match('/^-?\d+$/', $value) !== 1) {
-                    throw new \RuntimeException('eregion.yaml application-worker uses syntax this editor cannot merge.');
+                    throw new \RuntimeException('eregion.yaml ' . $name . ' uses syntax this editor cannot merge.');
                 }
                 $workers[$key] = (int) $value;
                 continue;
@@ -187,16 +232,15 @@ final class ManagedJobWorkload
                 continue;
             }
 
-            if ($section === 'scaling') {
-                $scaling[$key] = $value;
-                continue;
-            }
+            throw new \RuntimeException('eregion.yaml ' . $name . ' uses syntax this editor cannot merge.');
+        }
 
-            throw new \RuntimeException('eregion.yaml application-worker uses syntax this editor cannot merge.');
+        if ($raw !== []) {
+            $scaling['raw'] = implode("\n", $raw) . "\n";
         }
 
         if ($mode === null || $command === [] || !isset($workers['min'], $workers['max'])) {
-            throw new \RuntimeException('eregion.yaml application-worker is missing mode, command, or workers.');
+            throw new \RuntimeException('eregion.yaml ' . $name . ' is missing mode, command, or workers.');
         }
 
         $spec = [

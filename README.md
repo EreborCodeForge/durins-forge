@@ -25,12 +25,16 @@ Numa aplicação:
 
 ```bash
 composer require ereborcodeforge/durins-forge
-vendor/bin/durin doctor
-vendor/bin/durin dev
-vendor/bin/durin make:feature ...
+durins-forge doctor
+durins-forge dev
+durins-forge make:feature ...
+# CI / container, without the global launcher:
+vendor/bin/durins-forge doctor
 ```
 
-Apps geradas por `durin new` já declaram `ereborcodeforge/durins-forge` e documentam `vendor/bin/durin`.
+Apps geradas por `durin new` já declaram `ereborcodeforge/durins-forge`. O comando canônico é `durins-forge` quando o Installer global está no `PATH`. Em CI e contêineres use `vendor/bin/durins-forge`. `vendor/bin/durin` continua como alias de compatibilidade e não é o nome recomendado.
+
+Se `vendor/bin` vier antes do binário global do Composer no `PATH`, o alias legado `durin` pode sombrear o `durin` do Installer. O contrato assume o `PATH` recomendado (binário global do Composer antes de `vendor/bin`). Esta ferramenta não altera o `PATH`.
 
 ### Matriz de distribuição
 
@@ -43,7 +47,7 @@ composer install
 # ignore-platform-req=ext-msgpack no Windows se a extensão ainda não estiver instalada
 
 cp .env.example .env
-php bin/durin migrate
+php bin/durins-forge migrate
 ```
 
 `composer.json` pinna (entre outros):
@@ -63,21 +67,22 @@ DX de banco: `db()` / `DB::database('name')` (Mazarbul). Migrations DDL ainda us
 ```bash
 vendor/bin/forge server:install          # baixa Eregion → .mithril/bin
 vendor/bin/forge eregion:craft           # eregion.yaml + var/runtime/eregion.json
-vendor/bin/durin optimize
+durins-forge optimize
 vendor/bin/forge server:check
-vendor/bin/durin serve --host=0.0.0.0 --port=8080
+durins-forge serve --host=0.0.0.0 --port=8080
+# CI / container: vendor/bin/durins-forge optimize
 ```
 
-Neste repo (DX local), `php bin/durin` é equivalente.
+Neste checkout, `php bin/durins-forge` é o entrypoint. `php bin/durin` permanece como alias.
 
-### `durin serve` / `durin dev`
+### `durins-forge serve` / `durins-forge dev`
 
 Entrada orientada a produção via `RuntimeFacade` → Mithril/Eregion. Defaults de `dev` usam `127.0.0.1:8080` e `APP_ENV=development`.
 
 ```bash
-vendor/bin/durin doctor
-vendor/bin/durin status
-vendor/bin/durin dev
+durins-forge doctor
+durins-forge status
+durins-forge dev
 ```
 
 `doctor` = a app **pode** rodar · `status` = o que está **configurado/disponível agora**. Sem `--watch` no V1.
@@ -112,10 +117,10 @@ Skeleton de aplicação (não autoloadado como framework): [`resources/skeleton/
 - `ApplicationPath` / `base_path()` resolvem a **raiz da aplicação**, não o path do package em `vendor/`
 
 ```bash
-vendor/bin/durin optimize
-vendor/bin/durin container:compile
-vendor/bin/durin routes:compile
-vendor/bin/durin config:cache
+durins-forge optimize
+durins-forge container:compile
+durins-forge routes:compile
+durins-forge config:cache
 ```
 
 ---
@@ -123,10 +128,13 @@ vendor/bin/durin config:cache
 ## CLI Durin
 
 ```bash
-vendor/bin/durin
-# neste repo:
-php bin/durin
+durins-forge
+# CI / container:
+vendor/bin/durins-forge
+# neste checkout:
 php bin/durins-forge
+# alias de compatibilidade, não recomendado:
+php bin/durin
 ```
 
 | Comando | Descrição |

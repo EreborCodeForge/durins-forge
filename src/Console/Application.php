@@ -35,6 +35,16 @@ class Application
 {
     public function run(array $argv): int
     {
+        $command = $argv[1] ?? 'help';
+        if (count($argv) === 2 && ($command === '--version' || $command === '-V')) {
+            echo 'durins-forge ' . $this->installedVersion() . PHP_EOL;
+
+            return 0;
+        }
+        if (count($argv) === 2 && ($command === '--help' || $command === '-h')) {
+            $argv[1] = 'help';
+        }
+
         $kernel = new MithrilKernel();
         $kernel->register(PresetsListCommand::class);
         $kernel->register(InitCommand::class);
@@ -62,5 +72,21 @@ class Application
         $kernel->register(WorkerAuditCommand::class);
         $kernel->register(GraphDependenciesCommand::class);
         return $kernel->handle($argv);
+    }
+
+    private function installedVersion(): string
+    {
+        if (!class_exists(\Composer\InstalledVersions::class)) {
+            return 'unknown';
+        }
+
+        $package = 'ereborcodeforge/durins-forge';
+        if (!\Composer\InstalledVersions::isInstalled($package)) {
+            return 'unknown';
+        }
+
+        $version = \Composer\InstalledVersions::getPrettyVersion($package);
+
+        return is_string($version) && $version !== '' ? $version : 'unknown';
     }
 }

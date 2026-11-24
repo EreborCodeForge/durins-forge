@@ -18,6 +18,8 @@ final class InitOptionReader
         'with',
         'supervisor',
         'scaling',
+        'scaling-policy',
+        'resource-guard-mode',
         'workers-min',
         'workers-max',
         'resource-class',

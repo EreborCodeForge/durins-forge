@@ -40,6 +40,7 @@ final class ConsumerModeIntegrationTest extends TestCase
         $writer = new ScaffoldWriter();
         $plan = $engine->plan(new ProjectOptions('consumer-app', 'minimal', $this->consumerRoot));
         $this->assertTrue($writer->write($this->consumerRoot, $plan)->ok);
+        $this->linkInstalledPackage();
 
         ApplicationPath::setRoot($this->consumerRoot);
 
@@ -101,8 +102,12 @@ final class ConsumerModeIntegrationTest extends TestCase
         file_put_contents($this->consumerRoot . '/composer.json', json_encode([
             'name' => 'app/consumer-smoke',
             'type' => 'project',
+            'require' => [
+                'ereborcodeforge/durins-forge' => '^0.4',
+            ],
         ], JSON_THROW_ON_ERROR));
         file_put_contents($this->consumerRoot . '/durin.yaml', "application:\n  name: consumer-smoke\n");
+        $this->linkInstalledPackage();
 
         $php = PHP_BINARY;
         $bin = $this->forgeRoot . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'durin';
@@ -123,18 +128,72 @@ final class ConsumerModeIntegrationTest extends TestCase
         }
     }
 
+    private function linkInstalledPackage(): void
+    {
+        $package = $this->consumerRoot
+            . DIRECTORY_SEPARATOR . 'vendor'
+            . DIRECTORY_SEPARATOR . 'ereborcodeforge'
+            . DIRECTORY_SEPARATOR . 'durins-forge';
+        mkdir(dirname($package), 0777, true);
+        if (!@symlink($this->forgeRoot, $package)) {
+            if (PHP_OS_FAMILY !== 'Windows') {
+                self::markTestSkipped('symlink() is not available.');
+            }
+            exec(
+                'cmd.exe /C mklink /J ' . escapeshellarg($package) . ' ' . escapeshellarg($this->forgeRoot),
+                $output,
+                $status,
+            );
+            if ($status !== 0 || !is_dir($package)) {
+                self::markTestSkipped('mklink /J is not available: ' . implode(' ', $output));
+            }
+        }
+
+        $autoload = $this->forgeRoot . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
+        file_put_contents(
+            $this->consumerRoot . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php',
+            "<?php\nrequire " . var_export($autoload, true) . ";\n",
+        );
+    }
+
     private function removeTree(string $dir): void
     {
-        if (!is_dir($dir)) {
+        if ($this->isLinkedDirectory($dir)) {
+            @rmdir($dir);
+
             return;
         }
-        $it = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::CHILD_FIRST
-        );
-        foreach ($it as $file) {
-            $file->isDir() ? rmdir($file->getPathname()) : unlink($file->getPathname());
+        if (!is_dir($dir)) {
+            @unlink($dir);
+            @rmdir($dir);
+
+            return;
         }
-        rmdir($dir);
+        foreach (scandir($dir) ?: [] as $item) {
+            if ($item === '.' || $item === '..') {
+                continue;
+            }
+            $this->removeTree($dir . DIRECTORY_SEPARATOR . $item);
+        }
+        @rmdir($dir);
+    }
+
+    private function isLinkedDirectory(string $path): bool
+    {
+        if (is_link($path)) {
+            return true;
+        }
+        if (PHP_OS_FAMILY !== 'Windows' || !is_dir($path)) {
+            return false;
+        }
+        $real = realpath($path);
+        if ($real === false) {
+            return false;
+        }
+        $normalize = static function (string $value): string {
+            return rtrim(strtolower(str_replace('\\', '/', $value)), '/');
+        };
+
+        return $normalize($path) !== $normalize($real);
     }
 }

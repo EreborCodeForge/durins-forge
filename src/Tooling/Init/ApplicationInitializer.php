@@ -13,6 +13,7 @@ use EreborCodeForge\Durin\Core\Mutation\ScaffoldWriter;
 use EreborCodeForge\Durin\Core\Project\ProjectDiscovery;
 use EreborCodeForge\Durin\Core\Scaffold\ScaffoldActionType;
 use EreborCodeForge\Durin\Core\Scaffold\ScaffoldPlan;
+use EreborCodeForge\Durin\Forge\Support\ApplicationPath;
 use EreborCodeForge\Durin\Forge\Tooling\Progress\InitProgressReporter;
 use EreborCodeForge\Durin\Forge\Tooling\Runtime\ManagedJobWorkload;
 use EreborCodeForge\Durin\Forge\Tooling\Runtime\ManifestRuntimeFinalizer;
@@ -222,7 +223,9 @@ final class ApplicationInitializer
             || $selection->workersMin !== null
             || $selection->workersMax !== null
             || $selection->resourceClass !== null
-            || $selection->memoryMb !== null;
+            || $selection->memoryMb !== null
+            || $selection->scalingPolicyPath !== null
+            || $selection->resourceGuardMode !== null;
         if (!$workloadRequested) {
             return;
         }
@@ -234,8 +237,10 @@ final class ApplicationInitializer
             );
         }
 
-        $current = ManagedJobWorkload::parseDocument((string) file_get_contents($path));
-        $desired = ManagedJobWorkload::desired($selection);
+        $name = $manifest->isJobMode() ? 'application-worker' : 'http';
+        $kind = $manifest->isJobMode() ? 'consumer' : 'http';
+        $current = ManagedJobWorkload::parseDocument((string) file_get_contents($path), $name);
+        $desired = ManagedJobWorkload::desired($selection, $kind);
         if ($current != $desired) {
             throw new \RuntimeException(
                 'Init cannot change workload settings on an existing application. Use a future configure/evolve command.'
@@ -269,9 +274,20 @@ final class ApplicationInitializer
             throw new \RuntimeException('Refusing to initialize inside the Durin Forge package vendor path.');
         }
 
-        if (!is_file($resolved . DIRECTORY_SEPARATOR . 'composer.json')) {
+        $composerPath = $resolved . DIRECTORY_SEPARATOR . 'composer.json';
+        if (!is_file($composerPath)) {
             throw new \RuntimeException(
                 "Not a Durin application root (missing composer.json): {$resolved}"
+            );
+        }
+
+        $composer = json_decode((string) file_get_contents($composerPath), true);
+        $name = is_array($composer) ? ($composer['name'] ?? null) : null;
+        $packageRoot = realpath(ApplicationPath::forgePackageRoot());
+        if ($name === 'ereborcodeforge/durins-forge'
+            || ($packageRoot !== false && $this->samePath($packageRoot, $resolved))) {
+            throw new \RuntimeException(
+                'Refusing to initialize the ereborcodeforge/durins-forge package as an application.'
             );
         }
 
@@ -448,5 +464,19 @@ final class ApplicationInitializer
         if (is_dir($forgeVendor) && !is_file($forgeVendor . DIRECTORY_SEPARATOR . 'composer.json')) {
             throw new \RuntimeException('Detected unexpected mutation under vendor/ereborcodeforge/durins-forge.');
         }
+    }
+
+    private function samePath(string $left, string $right): bool
+    {
+        $normalize = static function (string $path): string {
+            $path = str_replace('\\', '/', $path);
+            if (PHP_OS_FAMILY === 'Windows') {
+                $path = strtolower($path);
+            }
+
+            return rtrim($path, '/');
+        };
+
+        return $normalize($left) === $normalize($right);
     }
 }

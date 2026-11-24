@@ -31,7 +31,7 @@ if (PHP_SAPI !== 'cli') {
     header('Content-Type: application/json');
     echo json_encode([
         'error' => true,
-        'message' => 'HTTP entry is Eregion. Run: vendor/bin/durin serve',
+        'message' => 'HTTP entry is Eregion. Run: durins-forge serve (or vendor/bin/durins-forge serve)',
     ]);
     exit(1);
 }

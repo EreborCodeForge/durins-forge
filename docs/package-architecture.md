@@ -132,8 +132,8 @@ Install must **not**: write app files, modify config, copy skeleton, migrate, st
 
 ## Package modes
 
-1. **Repository development:** `git clone` → `composer install` → `php bin/durin`  
-2. **Consumer mode:** `composer require` → `vendor/bin/durin`  
+1. **Repository development:** `git clone` → `composer install` → `php bin/durins-forge`  
+2. **Consumer mode:** `composer require` → `durins-forge` when the global launcher is on `PATH`, otherwise `vendor/bin/durins-forge`  
 
 Same implementation; no separate root-app package in this repository.
 

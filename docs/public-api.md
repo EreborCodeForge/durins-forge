@@ -16,7 +16,7 @@ Related: [package-architecture.md](package-architecture.md), [ADR-0006](adr/ADR-
 | PHP | `^8.5` |
 | Production namespace | `EreborCodeForge\Durin\Forge\` |
 | Application namespace | `App\` — **consumer-owned only** |
-| Canonical binary | `vendor/bin/durin` |
+| Canonical binary | `durins-forge` (`vendor/bin/durins-forge` without the global launcher; `php bin/durins-forge` in this checkout) |
 
 ---
 
@@ -61,50 +61,50 @@ No user-facing command may write into `vendor/ereborcodeforge/durins-forge/`. Co
 Preserve command names, important args/options, and meaningful exit-code semantics.
 
 ```text
-durin doctor
-durin status
-durin dev
-durin serve
-durin optimize
-durin graph:dependencies
+durins-forge doctor
+durins-forge status
+durins-forge dev
+durins-forge serve
+durins-forge optimize
+durins-forge graph:dependencies
 
-durin presets:list
-durin presets:list --format=json
-durin init
-durin init --preset=<id>
-durin init --preset=<id> --progress=jsonl
-durin init --skip-runtime-install
+durins-forge presets:list
+durins-forge presets:list --format=json
+durins-forge init
+durins-forge init --preset=<id>
+durins-forge init --preset=<id> --progress=jsonl
+durins-forge init --skip-runtime-install
 
-durin make:module
-durin make:usecase
-durin make:feature
+durins-forge make:module
+durins-forge make:usecase
+durins-forge make:feature
 
-durin migrate
-durin migrate:rollback
-durin migrate:fresh
+durins-forge migrate
+durins-forge migrate:rollback
+durins-forge migrate:fresh
 
-durin routes:compile
-durin routes:clear
-durin routes:postman
+durins-forge routes:compile
+durins-forge routes:clear
+durins-forge routes:postman
 
-durin config:cache
-durin config:clear
-durin container:compile
-durin container:clear
+durins-forge config:cache
+durins-forge config:clear
+durins-forge container:compile
+durins-forge container:clear
 
-durin new
-durin new --preset=<id>
+durins-forge new
+durins-forge new --preset=<id>
 ```
 
 Notes:
 
 - Preset catalog and default come from `ereborcodeforge/durin-presets` — Forge does not hardcode preset ID lists.
-- `durin init` initializes a neutral application root (created by `durin-app` / installer). It is not architecture migration.
+- `durins-forge init` initializes a neutral application root (created by `durin-app` / installer). It is not architecture migration.
 - Default runtime runner is Eregion; `init` installs/configures it unless `--skip-runtime-install`.
 - `--progress=jsonl` emits stable stage IDs for installer UX.
-- `durin new` remains supported; creation UX is primarily owned by `durin-installer`.
+- `durin new` from the installer remains the creation UX. The local helper is `durins-forge new`.
 - Database `migrate*` is **Mazarbul DDL**, not architecture migration.
-- `bin/durins-forge` remains a compatibility entry; `vendor/bin/durin` is canonical.
+- `durins-forge` is the canonical CLI. `bin/durin` and `vendor/bin/durin` remain compatibility aliases until a future major version.
 
 Human-readable wording may improve if it is not part of a tested/documented machine contract (e.g. JSON schemas where exposed).
 

@@ -49,7 +49,7 @@ final class RunCommand extends Command
         }
 
         if ($project->manifest === null) {
-            $this->error('Missing durin.yaml — run vendor/bin/durin init first.');
+            $this->error('Missing durin.yaml — run durins-forge init first.');
 
             return 2;
         }

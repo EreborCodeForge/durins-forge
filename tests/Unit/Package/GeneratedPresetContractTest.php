@@ -30,8 +30,10 @@ final class GeneratedPresetContractTest extends TestCase
             }
 
             $this->assertArrayHasKey('README.md', $files);
-            $this->assertStringContainsString('vendor/bin/durin doctor', $files['README.md']);
-            $this->assertStringContainsString('vendor/bin/durin run', $files['README.md']);
+            $readme = $files['README.md'];
+            $this->assertStringContainsString('durins-forge doctor', $readme);
+            $this->assertStringContainsString('durins-forge run', $readme);
+            $this->assertStringContainsString('vendor/bin/durins-forge run', $readme);
             $this->assertStringNotContainsString('php bin/durin', $files['README.md']);
 
             $this->assertArrayHasKey('src/Kernel.php', $files);

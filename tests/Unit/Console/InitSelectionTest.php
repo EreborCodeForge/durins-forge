@@ -162,7 +162,7 @@ final class InitSelectionTest extends TestCase
         }
 
         $this->assertSame(2, $code);
-        $this->assertStringContainsString('not accepted by vendor/bin/durin new', $output);
+        $this->assertStringContainsString('not accepted by durins-forge new', $output);
         $this->assertFileDoesNotExist($this->tempRoot . '/mail');
     }
 

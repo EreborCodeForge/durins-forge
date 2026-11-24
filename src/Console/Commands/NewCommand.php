@@ -39,8 +39,8 @@ final class NewCommand extends Command
             if ($key === 'preset') {
                 continue;
             }
-            $hint = in_array($key, ['with', 'supervisor', 'scaling', 'workers-min', 'workers-max', 'resource-class', 'memory-mb'], true)
-                ? "Option --{$key} is not accepted by vendor/bin/durin new. Use vendor/bin/durin init or the global durin new command."
+            $hint = in_array($key, ['with', 'supervisor', 'scaling', 'scaling-policy', 'resource-guard-mode', 'workers-min', 'workers-max', 'resource-class', 'memory-mb'], true)
+                ? "Option --{$key} is not accepted by durins-forge new. Use durins-forge init or the global durin new command."
                 : "Unknown option --{$key}.";
             $this->error($hint);
 
@@ -50,7 +50,7 @@ final class NewCommand extends Command
         $presetOption = ArgParser::string($parsed['options'], 'preset');
 
         if (!is_string($name) || $name === '') {
-            $this->error('Usage: durin new <name> [--preset=<id>]');
+            $this->error('Usage: durins-forge new <name> [--preset=<id>]');
 
             return 2;
         }
@@ -108,7 +108,8 @@ final class NewCommand extends Command
         $this->line("  cd {$name}");
         $this->line('  composer install');
         $this->line('  cp .env.example .env');
-        $this->line('  vendor/bin/durin doctor');
+        $this->line('  durins-forge doctor');
+        $this->line('  # CI / container: vendor/bin/durins-forge doctor');
 
         return 0;
     }

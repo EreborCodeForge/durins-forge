@@ -145,6 +145,8 @@ final class InitCommand extends Command
             workersMax: $reader->optionalInt($options, 'workers-max'),
             resourceClass: $reader->optionalString($options, 'resource-class'),
             memoryMb: $reader->optionalInt($options, 'memory-mb'),
+            scalingPolicy: $reader->optionalString($options, 'scaling-policy'),
+            resourceGuardMode: $reader->optionalString($options, 'resource-guard-mode'),
         );
     }
 }

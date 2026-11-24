@@ -28,6 +28,6 @@ final class ProjectKernelCheckTest extends TestCase
 
         $this->assertCount(1, $results);
         $this->assertSame(CheckStatus::Warning, $results[0]->status);
-        $this->assertStringContainsString('durin init', $results[0]->detail);
+        $this->assertStringContainsString('durins-forge init', $results[0]->detail);
     }
 }

@@ -260,6 +260,7 @@ final class EregionRuntimeCheck implements Check
         $report = $this->probe->probe($located['path'], $configPath);
         $results[] = $this->consumerResult($report);
         $results[] = $this->metricsAccessResult($report);
+        array_push($results, ...$this->scalingResults($report));
 
         return $results;
     }
@@ -307,5 +308,39 @@ final class EregionRuntimeCheck implements Check
         }
 
         return CheckResult::warning('runtime.eregion.metrics_access', 'metrics access', 'unknown');
+    }
+
+    /**
+     * @return list<CheckResult>
+     */
+    private function scalingResults(EregionConfigReport $report): array
+    {
+        $advanced = ['cpu_utilization', 'latency', 'throughput', 'hybrid', 'scheduled', 'adaptive'];
+        $needsWorkerCPU = ['cpu_utilization', 'adaptive'];
+        $results = [];
+        foreach ($report->workloads as $workload) {
+            $strategy = $workload['strategy'] ?? '';
+            if (!in_array($strategy, $advanced, true)) {
+                continue;
+            }
+            $name = $workload['name'];
+            $results[] = CheckResult::ok(
+                'runtime.eregion.scaling.configured',
+                'scaling configured',
+                $name . '=' . $strategy,
+            );
+            $supported = !in_array($strategy, $needsWorkerCPU, true) || $report->workerCPU === 'supported';
+            $detail = $name . '=' . ($supported ? 'supported' : 'unsupported');
+            $results[] = $supported
+                ? CheckResult::ok('runtime.eregion.scaling.supported', 'scaling supported', $detail)
+                : CheckResult::warning('runtime.eregion.scaling.supported', 'scaling supported', $detail);
+            $results[] = CheckResult::warning(
+                'runtime.eregion.scaling.observed',
+                'scaling observed',
+                $name . '=not observed; process not probed',
+            );
+        }
+
+        return $results;
     }
 }
